@@ -19,12 +19,55 @@ const Index = () => {
     setIsGenerating(true);
     setPrompt(userPrompt);
     
-    // Simulate AI processing with realistic delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('openai_api_key') || ''}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: `You are a React component generator. Generate a complete React functional component based on the user's prompt. 
+
+Requirements:
+- Use React hooks (useState, useEffect) as needed
+- Use Tailwind CSS for styling
+- Use these available components: Card, CardContent, CardHeader, CardTitle, Button, Input
+- Return ONLY the component code, no explanations
+- Make it a complete, working component
+- Use modern React patterns
+- The component should be named "GeneratedApp"
+- Include proper TypeScript types`
+            },
+            {
+              role: 'user',
+              content: userPrompt
+            }
+          ],
+          max_tokens: 2000,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const generatedCode = data.choices[0]?.message?.content || '';
+      
+      setGeneratedCode(generatedCode);
+    } catch (error) {
+      console.error('Error generating code:', error);
+      // Fallback to sample code if API fails
+      const fallbackCode = generateSampleCode(userPrompt, selectedAPIs, selectedComponents);
+      setGeneratedCode(fallbackCode);
+    }
     
-    // Generate sample code based on prompt
-    const sampleCode = generateSampleCode(userPrompt, selectedAPIs, selectedComponents);
-    setGeneratedCode(sampleCode);
     setIsGenerating(false);
   };
 
