@@ -2,6 +2,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface CodeExecutorProps {
   code: string;
@@ -24,14 +27,13 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
         useEffect: React.useEffect,
         useMemo: React.useMemo,
         useCallback: React.useCallback,
-        // Add shadcn components that might be used
-        Card: require('@/components/ui/card').Card,
-        CardHeader: require('@/components/ui/card').CardHeader,
-        CardTitle: require('@/components/ui/card').CardTitle,
-        CardContent: require('@/components/ui/card').CardContent,
-        Button: require('@/components/ui/button').Button,
-        Input: require('@/components/ui/input').Input,
-        // Add more components as needed
+        // Provide shadcn components directly
+        Card,
+        CardHeader,
+        CardTitle,
+        CardContent,
+        Button,
+        Input,
       };
 
       // Transform the code to remove imports and use context variables
