@@ -19,6 +19,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
 
     try {
       setError(null);
+      console.log('Original code:', code);
       
       // Create a safe execution context with available imports
       const context = {
@@ -36,15 +37,27 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
         Input,
       };
 
-      // Transform the code to remove imports and use context variables
-      let transformedCode = code
-        .replace(/import.*from.*['"][^'"]*['"];?\s*/g, '') // Remove import statements
-        .replace(/export default (\w+);?/, 'return $1;'); // Replace export with return
-
-      // If the code doesn't have a return statement, assume it's a component definition
-      if (!transformedCode.includes('return ')) {
-        transformedCode = `${transformedCode}\nreturn GeneratedApp;`;
+      // More robust code transformation
+      let transformedCode = code;
+      
+      // Remove import statements more carefully
+      transformedCode = transformedCode.replace(/^import\s+.*?from\s+['"][^'"]*['"];?\s*$/gm, '');
+      
+      // Remove export default statements and capture the component name
+      const exportMatch = transformedCode.match(/export\s+default\s+(\w+);?\s*$/m);
+      if (exportMatch) {
+        const componentName = exportMatch[1];
+        transformedCode = transformedCode.replace(/export\s+default\s+\w+;?\s*$/m, '');
+        transformedCode += `\nreturn ${componentName};`;
+      } else {
+        // If no explicit export, assume the last function/const is the component
+        const functionMatch = transformedCode.match(/(?:const|function)\s+(\w+)\s*=/);
+        if (functionMatch && !transformedCode.includes('return ')) {
+          transformedCode += `\nreturn ${functionMatch[1]};`;
+        }
       }
+
+      console.log('Transformed code:', transformedCode);
 
       // Create the function with the context
       const contextKeys = Object.keys(context);
