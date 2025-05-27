@@ -1,6 +1,6 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Monitor, Loader2 } from 'lucide-react';
+import { CodeExecutor } from './CodeExecutor';
 
 interface LivePreviewProps {
   code: string;
@@ -34,63 +34,7 @@ export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
             </div>
           </div>
         ) : code ? (
-          <div className="p-6">
-            {/* Live Preview Content - This would normally render the actual generated React component */}
-            <div className="max-w-4xl mx-auto">
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Generated Application Preview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <Card className="p-4">
-                        <h3 className="font-semibold mb-2">Metric 1</h3>
-                        <p className="text-2xl font-bold text-blue-600">1,234</p>
-                        <p className="text-sm text-gray-500">+12% from last month</p>
-                      </Card>
-                      <Card className="p-4">
-                        <h3 className="font-semibold mb-2">Metric 2</h3>
-                        <p className="text-2xl font-bold text-green-600">5,678</p>
-                        <p className="text-sm text-gray-500">+8% from last month</p>
-                      </Card>
-                      <Card className="p-4">
-                        <h3 className="font-semibold mb-2">Metric 3</h3>
-                        <p className="text-2xl font-bold text-purple-600">910</p>
-                        <p className="text-sm text-gray-500">-3% from last month</p>
-                      </Card>
-                    </div>
-                    
-                    <Card className="p-4">
-                      <h3 className="font-semibold mb-4">Interactive Elements</h3>
-                      <div className="space-y-3">
-                        <input 
-                          type="text" 
-                          placeholder="Sample input field" 
-                          className="w-full p-2 border rounded-md"
-                        />
-                        <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                          Sample Button
-                        </button>
-                      </div>
-                    </Card>
-                    
-                    <Card className="p-4">
-                      <h3 className="font-semibold mb-4">Data Display</h3>
-                      <div className="space-y-2">
-                        {[1, 2, 3].map(i => (
-                          <div key={i} className="flex justify-between items-center p-2 border-b">
-                            <span>Data Item {i}</span>
-                            <span className="text-sm text-gray-500">Value {i}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          <CodeExecutor code={code} />
         ) : (
           <div className="h-full flex items-center justify-center text-gray-500">
             <div className="text-center">
