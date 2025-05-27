@@ -21,56 +21,65 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       setError(null);
       console.log('Original code:', code);
       
-      // Create a safe execution context with available imports
-      const context = {
-        React,
-        useState: React.useState,
-        useEffect: React.useEffect,
-        useMemo: React.useMemo,
-        useCallback: React.useCallback,
-        // Provide shadcn components directly
-        Card,
-        CardHeader,
-        CardTitle,
-        CardContent,
-        Button,
-        Input,
-      };
-
-      // More robust code transformation
-      let transformedCode = code;
+      // Clean the code more carefully
+      let cleanCode = code;
       
-      // Remove import statements more carefully
-      transformedCode = transformedCode.replace(/^import\s+.*?from\s+['"][^'"]*['"];?\s*$/gm, '');
+      // Remove markdown code blocks if present
+      cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       
-      // Remove export default statements and capture the component name
-      const exportMatch = transformedCode.match(/export\s+default\s+(\w+);?\s*$/m);
-      if (exportMatch) {
-        const componentName = exportMatch[1];
-        transformedCode = transformedCode.replace(/export\s+default\s+\w+;?\s*$/m, '');
-        transformedCode += `\nreturn ${componentName};`;
-      } else {
-        // If no explicit export, assume the last function/const is the component
-        const functionMatch = transformedCode.match(/(?:const|function)\s+(\w+)\s*=/);
-        if (functionMatch && !transformedCode.includes('return ')) {
-          transformedCode += `\nreturn ${functionMatch[1]};`;
-        }
+      // Remove import statements but preserve the rest
+      cleanCode = cleanCode.replace(/^import\s+.*?from\s+['"'][^'"]*['"];?\s*$/gm, '');
+      
+      // Remove interface/type definitions that might cause issues
+      cleanCode = cleanCode.replace(/^interface\s+\w+Props\s*\{[^}]*\}\s*$/gm, '');
+      
+      // Find the component function/const
+      let componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)[^{]*\{/);
+      let componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
+      
+      // Remove export statements
+      cleanCode = cleanCode.replace(/^export\s+default\s+\w+;?\s*$/gm, '');
+      cleanCode = cleanCode.replace(/^export\s+\{[^}]*\};?\s*$/gm, '');
+      
+      // If the code doesn't have a return statement for the component, add one
+      if (!cleanCode.includes(`return ${componentName}`)) {
+        cleanCode += `\nreturn ${componentName};`;
       }
 
-      console.log('Transformed code:', transformedCode);
+      console.log('Cleaned code:', cleanCode);
 
-      // Create the function with the context
-      const contextKeys = Object.keys(context);
-      const contextValues = Object.values(context);
+      // Create execution context with all necessary React features and components
+      const contextKeys = [
+        'React', 'useState', 'useEffect', 'useMemo', 'useCallback',
+        'Card', 'CardHeader', 'CardTitle', 'CardContent', 'Button', 'Input'
+      ];
       
-      const func = new Function(...contextKeys, transformedCode);
+      const contextValues = [
+        React, 
+        React.useState, 
+        React.useEffect, 
+        React.useMemo, 
+        React.useCallback,
+        Card, 
+        CardHeader, 
+        CardTitle, 
+        CardContent, 
+        Button, 
+        Input
+      ];
+
+      // Create and execute the function
+      const func = new Function(...contextKeys, cleanCode);
       const ComponentResult = func(...contextValues);
       
       if (typeof ComponentResult === 'function') {
+        // Test render the component to catch any immediate errors
+        React.createElement(ComponentResult);
         setComponent(() => ComponentResult);
       } else {
-        setError('Generated code did not return a valid React component');
+        throw new Error('Code did not return a valid React component function');
       }
+      
     } catch (err) {
       console.error('Code execution error:', err);
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
@@ -98,6 +107,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       <div className="flex items-center justify-center h-full text-gray-500">
         <div className="text-center">
           <p>No valid component to render</p>
+          <p className="text-sm mt-1">Generate an application to see the preview</p>
         </div>
       </div>
     );
@@ -110,6 +120,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       </div>
     );
   } catch (renderError) {
+    console.error('Render error:', renderError);
     return (
       <Alert variant="destructive" className="m-4">
         <AlertTriangle className="h-4 w-4" />
