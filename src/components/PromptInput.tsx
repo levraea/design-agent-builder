@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -40,7 +39,7 @@ export const PromptInput = ({ onGenerate, isGenerating }: PromptInputProps) => {
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
-            placeholder="Describe the application you want to build in plain English. For example: 'Create a dashboard that shows sales metrics and allows users to filter by date range...'"
+            placeholder="Describe the application you want to build in plain English. Powered by Google Gemini 2.0 Flash for fast, intelligent code generation..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             className="min-h-[120px] resize-none border-gray-200 focus:border-purple-300 focus:ring-purple-200"
@@ -54,7 +53,7 @@ export const PromptInput = ({ onGenerate, isGenerating }: PromptInputProps) => {
             {isGenerating ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating Application...
+                Generating with Gemini 2.0 Flash...
               </>
             ) : (
               <>

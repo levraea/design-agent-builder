@@ -11,7 +11,7 @@ export const APIKeyInput = () => {
   const [isStored, setIsStored] = useState(false);
 
   useEffect(() => {
-    const storedKey = localStorage.getItem('openai_api_key');
+    const storedKey = localStorage.getItem('gemini_api_key');
     if (storedKey) {
       setApiKey(storedKey);
       setIsStored(true);
@@ -19,12 +19,12 @@ export const APIKeyInput = () => {
   }, []);
 
   const handleSave = () => {
-    localStorage.setItem('openai_api_key', apiKey);
+    localStorage.setItem('gemini_api_key', apiKey);
     setIsStored(true);
   };
 
   const handleClear = () => {
-    localStorage.removeItem('openai_api_key');
+    localStorage.removeItem('gemini_api_key');
     setApiKey('');
     setIsStored(false);
   };
@@ -34,14 +34,14 @@ export const APIKeyInput = () => {
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Key className="w-4 h-4" />
-          <span>OpenAI API Key</span>
+          <span>Google Gemini API Key</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="relative">
           <Input
             type={showKey ? 'text' : 'password'}
-            placeholder="Enter your OpenAI API key (sk-...)"
+            placeholder="Enter your Google Gemini API key"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             className="pr-10"
@@ -75,7 +75,7 @@ export const APIKeyInput = () => {
         
         <p className="text-xs text-gray-500">
           Your API key is stored locally in your browser and never sent to our servers. 
-          Get your free API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">OpenAI Platform</a>.
+          Get your free API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Google AI Studio</a>.
         </p>
       </CardContent>
     </Card>

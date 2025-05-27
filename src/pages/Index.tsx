@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -20,18 +19,22 @@ const Index = () => {
     setPrompt(userPrompt);
     
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const apiKey = localStorage.getItem('gemini_api_key');
+      if (!apiKey) {
+        throw new Error('Please set your Gemini API key first');
+      }
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('openai_api_key') || ''}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
+          contents: [
             {
-              role: 'system',
-              content: `You are a React component generator. Generate a complete React functional component based on the user's prompt. 
+              parts: [
+                {
+                  text: `You are a React component generator. Generate a complete React functional component based on the user's prompt. 
 
 Requirements:
 - Use React hooks (useState, useEffect) as needed
@@ -41,15 +44,17 @@ Requirements:
 - Make it a complete, working component
 - Use modern React patterns
 - The component should be named "GeneratedApp"
-- Include proper TypeScript types`
-            },
-            {
-              role: 'user',
-              content: userPrompt
+- Include proper TypeScript types
+
+User prompt: ${userPrompt}`
+                }
+              ]
             }
           ],
-          max_tokens: 2000,
-          temperature: 0.7
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2000,
+          }
         })
       });
 
@@ -58,7 +63,7 @@ Requirements:
       }
 
       const data = await response.json();
-      const generatedCode = data.choices[0]?.message?.content || '';
+      const generatedCode = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
       
       setGeneratedCode(generatedCode);
     } catch (error) {
