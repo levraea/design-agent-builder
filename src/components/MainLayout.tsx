@@ -13,11 +13,11 @@ export function MainLayout({ children, completedModules = [] }: MainLayoutProps)
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <ResizablePanelGroup direction="horizontal" className="min-h-screen">
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
+          <ResizablePanel defaultSize={25} minSize={15} maxSize={40}>
             <AppSidebar completedModules={completedModules} />
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={80}>
+          <ResizablePanel>
             <SidebarInset className="flex-1">
               <div className="flex h-14 items-center px-4 border-b">
                 <SidebarTrigger className="mr-2" />
