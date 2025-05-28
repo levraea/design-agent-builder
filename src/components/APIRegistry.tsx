@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Search, Database } from 'lucide-react';
 import { API, APIRegistryProps } from '@/types/api';
 import { fetchAPIs } from '@/services/apiService';
@@ -84,11 +83,6 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
         <CardTitle className="flex items-center space-x-2">
           <Database className="w-5 h-5 text-blue-600" />
           <span>API Registry ({apis.length} APIs)</span>
-          {error && (
-            <Badge className="text-xs bg-yellow-100 text-yellow-800 ml-2">
-              Sample Data
-            </Badge>
-          )}
         </CardTitle>
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
