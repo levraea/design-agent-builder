@@ -12,7 +12,7 @@ export function MainLayout({ children, completedModules = [] }: MainLayoutProps)
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar completedModules={completedModules} />
-        <SidebarInset className="flex-1 ml-80">
+        <SidebarInset className="flex-1">
           <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
           </header>
