@@ -32,11 +32,7 @@ export const GeneratedCode = ({ code }: GeneratedCodeProps) => {
   return (
     <Card className="h-[500px] flex flex-col">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Code className="w-5 h-5 text-green-600" />
-            <span>Generated Code</span>
-          </div>
+        <CardTitle className="flex items-center justify-end">
           <div className="flex space-x-2">
             <Button
               variant="outline"
