@@ -52,8 +52,6 @@ export const APICard = ({ api, isSelected, onToggle }: APICardProps) => {
           <p className="text-sm text-gray-600 mt-1">{api.description}</p>
           <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
             <span>{api.category}</span>
-            <span>•</span>
-            <span>Auth: {api.auth}</span>
             {api.link && (
               <>
                 <span>•</span>
