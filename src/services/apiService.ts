@@ -1,4 +1,3 @@
-
 import { API } from '@/types/api';
 import { mockAPIs } from '@/data/mockAPIs';
 import { getCategoryIcon } from '@/utils/categoryIcons';
@@ -7,28 +6,56 @@ export const fetchAPIs = async (): Promise<{ apis: API[]; error: string | null }
   try {
     console.log('Attempting to fetch APIs from public registry...');
     
-    // Try a working CORS proxy service
-    try {
-      console.log('Trying CORS proxy...');
-      const proxyUrl = 'https://api.allorigins.win/get?url=';
-      const apiUrl = encodeURIComponent('https://api.publicapis.org/entries');
-      const response = await fetch(`${proxyUrl}${apiUrl}`);
-      
-      if (response.ok) {
-        const proxyData = await response.json();
-        // allorigins.win returns data in a 'contents' field as a string
-        const data = JSON.parse(proxyData.contents);
-        console.log('Successfully fetched API data via proxy:', data);
-        return transformAPIData(data);
+    // List of CORS proxy services to try
+    const corsProxies = [
+      'https://corsproxy.io/?',
+      'https://api.codetabs.com/v1/proxy/?quest=',
+      'https://api.allorigins.win/get?url=',
+    ];
+    
+    const apiUrl = 'https://api.publicapis.org/entries';
+    
+    // Try each CORS proxy
+    for (const proxy of corsProxies) {
+      try {
+        console.log(`Trying CORS proxy: ${proxy}`);
+        
+        let proxyUrl;
+        let response;
+        
+        if (proxy.includes('allorigins.win')) {
+          // allorigins.win requires URL encoding
+          proxyUrl = `${proxy}${encodeURIComponent(apiUrl)}`;
+          response = await fetch(proxyUrl);
+          
+          if (response.ok) {
+            const proxyData = await response.json();
+            const data = JSON.parse(proxyData.contents);
+            console.log('Successfully fetched API data via allorigins.win:', data);
+            return transformAPIData(data);
+          }
+        } else {
+          // Other proxies use direct URL appending
+          proxyUrl = `${proxy}${apiUrl}`;
+          response = await fetch(proxyUrl);
+          
+          if (response.ok) {
+            const data = await response.json();
+            console.log(`Successfully fetched API data via ${proxy}:`, data);
+            return transformAPIData(data);
+          }
+        }
+        
+        console.log(`Proxy ${proxy} failed with status:`, response.status);
+      } catch (proxyError) {
+        console.log(`Proxy ${proxy} failed:`, proxyError);
       }
-    } catch (proxyError) {
-      console.log('CORS proxy failed:', proxyError);
     }
 
-    // If proxy fails, try direct fetch as last resort
+    // If all proxies fail, try direct fetch as last resort
     try {
-      console.log('Trying direct fetch as fallback...');
-      const directResponse = await fetch('https://api.publicapis.org/entries');
+      console.log('Trying direct fetch as final fallback...');
+      const directResponse = await fetch(apiUrl);
       if (directResponse.ok) {
         const directData = await directResponse.json();
         console.log('Direct fetch successful:', directData);
