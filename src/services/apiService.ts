@@ -1,4 +1,5 @@
 
+
 import { API } from '@/types/api';
 import { mockAPIs } from '@/data/mockAPIs';
 import { getCategoryIcon } from '@/utils/categoryIcons';
@@ -10,9 +11,11 @@ export const fetchAPIs = async (): Promise<{ apis: API[]; error: string | null }
     // List of CORS proxy services to try
     const corsProxies = [
       'https://corsproxy.io/?',
-      'https://cors-anywhere.herokuapp.com/',
       'https://api.codetabs.com/v1/proxy/?quest=',
       'https://api.allorigins.win/get?url=',
+      'https://proxy.cors.sh/',
+      'https://cors-proxy.fringe.zone/',
+      'https://cors.bridged.cc/',
     ];
     
     const apiUrl = 'https://api.publicapis.org/entries';
