@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -26,7 +27,7 @@ const DesignToCode = () => {
       // Get selected API details
       const selectedAPIDetails = mockAPIs.filter(api => selectedAPIs.includes(api.id));
       
-      // Augment the prompt with API information
+      // Augment the prompt with API information and design requirements
       let augmentedPrompt = userPrompt;
       
       if (selectedAPIDetails.length > 0) {
@@ -41,6 +42,11 @@ ${apiContext}
 
 Make sure to integrate these APIs into the generated component to fetch and display relevant data.`;
       }
+
+      // Add design requirements to the prompt
+      augmentedPrompt = `${augmentedPrompt}
+
+The app should use Material UI design system and Roboto font, ensure the resulting app is intuitive and easy to navigate, and incorporate responsive design principles for compatibility across desktop, tablet, and mobile devices.`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
