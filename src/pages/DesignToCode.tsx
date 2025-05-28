@@ -73,6 +73,21 @@ Make sure to integrate these APIs into the generated component to fetch and disp
 
 The app should use Material UI design system and Roboto font, ensure the resulting app is intuitive and easy to navigate, and incorporate responsive design principles for compatibility across desktop, tablet, and mobile devices.`;
 
+      // Build conversation context for the AI model
+      let conversationContext = '';
+      if (conversationHistory.length > 0) {
+        conversationContext = `
+CONVERSATION HISTORY:
+${conversationHistory.map(msg => `${msg.type.toUpperCase()}: ${msg.content}`).join('\n')}
+
+CURRENT REQUEST:
+USER: ${userPrompt}
+
+Please consider the above conversation history when generating the component. Build upon previous requests and maintain consistency with what was discussed before.
+
+`;
+      }
+
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
@@ -84,6 +99,8 @@ The app should use Material UI design system and Roboto font, ensure the resulti
               parts: [
                 {
                   text: `You are a React component generator. Generate a complete React functional component in PLAIN JAVASCRIPT using React.createElement() calls ONLY.
+
+${conversationContext}
 
 CRITICAL REQUIREMENTS:
 - Use ONLY React.createElement() - NO JSX syntax at all
@@ -115,7 +132,7 @@ function GeneratedApp() {
   );
 }
 
-User prompt: ${augmentedPrompt}`
+${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}`
                 }
               ]
             }
@@ -137,7 +154,7 @@ User prompt: ${augmentedPrompt}`
       setGeneratedCode(generatedCode);
       
       // Add AI response to conversation history
-      addToConversationHistory('ai', 'Generated a React component based on your prompt. The code is now available in the Live Preview and Generated Code tab.');
+      addToConversationHistory('ai', 'Generated a React component based on your prompt and conversation history. The code is now available in the Live Preview and Generated Code tab.');
       
       // Mark the Design-to-Code Generation module as complete
       if (onModuleComplete) {
