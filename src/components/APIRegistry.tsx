@@ -58,7 +58,8 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
     );
   }
 
-  if (error) {
+  // Only show error screen if we have no APIs at all
+  if (error && apis.length === 0) {
     return (
       <Card className="h-[500px] flex flex-col">
         <CardHeader className="pb-4">
