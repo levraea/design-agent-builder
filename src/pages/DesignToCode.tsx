@@ -258,7 +258,7 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
             <Tabs defaultValue="apis" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="apis">API Registry</TabsTrigger>
-                <TabsTrigger value="components">Components</TabsTrigger>
+                <TabsTrigger value="components">Element Design Library</TabsTrigger>
                 <TabsTrigger value="code">Generated Code</TabsTrigger>
               </TabsList>
               
