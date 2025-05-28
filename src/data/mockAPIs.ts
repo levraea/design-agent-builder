@@ -1,5 +1,6 @@
 
-import { Database, Cloud, Globe } from 'lucide-react';
+
+import { Database, Cloud, Globe, Apple } from 'lucide-react';
 import { API } from '@/types/api';
 
 export const mockAPIs: API[] = [
@@ -28,5 +29,19 @@ export const mockAPIs: API[] = [
     auth: 'None',
     https: true,
     cors: 'yes'
+  },
+  {
+    id: 'usda-food-central',
+    name: 'USDA Food Central',
+    description: 'Search and retrieve nutrition data for foods from the USDA Food Data Central database',
+    category: 'Food & Nutrition',
+    version: 'v1',
+    status: 'active',
+    icon: Apple,
+    link: 'https://api.nal.usda.gov/fdc/v1/foods/search',
+    auth: 'API Key',
+    https: true,
+    cors: 'unknown'
   }
 ];
+
