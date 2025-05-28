@@ -1,9 +1,9 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wand2, Loader2 } from 'lucide-react';
-import { APIKeyInput } from './APIKeyInput';
 
 interface PromptInputProps {
   onGenerate: (prompt: string) => void;
@@ -28,8 +28,6 @@ export const PromptInput = ({ onGenerate, isGenerating }: PromptInputProps) => {
 
   return (
     <div className="space-y-4">
-      <APIKeyInput />
-      
       <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">

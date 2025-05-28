@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -15,16 +14,14 @@ const DesignToCode = () => {
   const [selectedComponents, setSelectedComponents] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Hardcoded API key
+  const GEMINI_API_KEY = 'AIzaSyArurZHRyqjGo8a0LS1bZOsTpQr2QgjwqY';
+
   const handleGenerateApp = async (userPrompt: string) => {
     setIsGenerating(true);
     setPrompt(userPrompt);
     
     try {
-      const apiKey = localStorage.getItem('gemini_api_key');
-      if (!apiKey) {
-        throw new Error('Please set your Gemini API key first');
-      }
-
       // Get selected API details
       const selectedAPIDetails = mockAPIs.filter(api => selectedAPIs.includes(api.id));
       
@@ -44,7 +41,7 @@ ${apiContext}
 Make sure to integrate these APIs into the generated component to fetch and display relevant data.`;
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
