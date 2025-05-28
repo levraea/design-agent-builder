@@ -7,7 +7,7 @@ export const mockAPIs: API[] = [
     id: 'openmeteo',
     name: 'Open-Meteo',
     description: 'Free weather API with historical weather data, weather forecasts, and climate data',
-    category: 'Weather',
+    category: 'GDAA Platform',
     version: 'v1',
     status: 'active',
     icon: Cloud,
