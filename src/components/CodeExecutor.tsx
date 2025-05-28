@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -38,12 +37,23 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       cleanCode = cleanCode.replace(/^export\s+default\s+\w+;?\s*$/gm, '');
       cleanCode = cleanCode.replace(/^export\s+\{[^}]*\};?\s*$/gm, '');
       
-      // Remove interface/type definitions
+      // Remove interface/type definitions - improved regex
       cleanCode = cleanCode.replace(/^interface\s+\w+[^{]*\{[^}]*\}\s*$/gm, '');
       cleanCode = cleanCode.replace(/^type\s+\w+[^=]*=[^;]*;?\s*$/gm, '');
       
+      // Remove TypeScript type annotations from function parameters and variables
+      cleanCode = cleanCode.replace(/:\s*React\.FC<[^>]*>/g, '');
+      cleanCode = cleanCode.replace(/:\s*React\.ChangeEvent<[^>]*>/g, '');
+      cleanCode = cleanCode.replace(/:\s*string/g, '');
+      cleanCode = cleanCode.replace(/:\s*number/g, '');
+      cleanCode = cleanCode.replace(/:\s*boolean/g, '');
+      cleanCode = cleanCode.replace(/<[^>]*>/g, ''); // Remove generic type parameters
+      
+      // Clean up any empty lines
+      cleanCode = cleanCode.replace(/^\s*\n/gm, '');
+      
       // Find component name
-      const componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)/);
+      const componentMatch = cleanCode.match(/const\s+(\w+)/);
       const componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
       
       // Ensure the code returns the component
@@ -88,10 +98,6 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       if (typeof GeneratedComponent !== 'function') {
         throw new Error('Generated code did not return a valid React component');
       }
-
-      // Test render to catch immediate errors
-      const testElement = React.createElement(GeneratedComponent);
-      console.log('Component created successfully:', testElement);
 
       setComponent(() => GeneratedComponent);
       
