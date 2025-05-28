@@ -37,23 +37,30 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       cleanCode = cleanCode.replace(/^export\s+default\s+\w+;?\s*$/gm, '');
       cleanCode = cleanCode.replace(/^export\s+\{[^}]*\};?\s*$/gm, '');
       
-      // Remove interface/type definitions - improved regex
-      cleanCode = cleanCode.replace(/^interface\s+\w+[^{]*\{[^}]*\}\s*$/gm, '');
+      // Remove interface/type definitions - more comprehensive
+      cleanCode = cleanCode.replace(/^interface\s+\w+[^{]*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\s*$/gm, '');
       cleanCode = cleanCode.replace(/^type\s+\w+[^=]*=[^;]*;?\s*$/gm, '');
       
-      // Remove TypeScript type annotations from function parameters and variables
+      // Remove TypeScript type annotations more carefully
+      // Remove React.FC type annotations
       cleanCode = cleanCode.replace(/:\s*React\.FC<[^>]*>/g, '');
-      cleanCode = cleanCode.replace(/:\s*React\.ChangeEvent<[^>]*>/g, '');
-      cleanCode = cleanCode.replace(/:\s*string/g, '');
-      cleanCode = cleanCode.replace(/:\s*number/g, '');
-      cleanCode = cleanCode.replace(/:\s*boolean/g, '');
-      cleanCode = cleanCode.replace(/<[^>]*>/g, ''); // Remove generic type parameters
       
-      // Clean up any empty lines
+      // Remove function parameter types but keep the parameter names
+      cleanCode = cleanCode.replace(/\(([^:)]*?):\s*[^)]*\)/g, '($1)');
+      
+      // Remove variable type annotations
+      cleanCode = cleanCode.replace(/:\s*(string|number|boolean|any)\s*=/g, ' =');
+      cleanCode = cleanCode.replace(/:\s*(string|number|boolean|any)\s*;/g, ';');
+      
+      // Remove generic type parameters
+      cleanCode = cleanCode.replace(/<[^>]*>/g, '');
+      
+      // Clean up multiple spaces and empty lines
+      cleanCode = cleanCode.replace(/\s+/g, ' ').replace(/;\s*;/g, ';');
       cleanCode = cleanCode.replace(/^\s*\n/gm, '');
       
-      // Find component name
-      const componentMatch = cleanCode.match(/const\s+(\w+)/);
+      // Find component name - look for const or function declarations
+      const componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)/);
       const componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
       
       // Ensure the code returns the component
