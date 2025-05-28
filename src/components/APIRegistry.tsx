@@ -1,10 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Database, Cloud, Users, ShoppingCart, FileText } from 'lucide-react';
+import { Search, Database, Cloud, Users, ShoppingCart, FileText, Globe, Camera, Music, BookOpen, Gamepad2, Heart } from 'lucide-react';
 
 interface API {
   id: string;
@@ -14,6 +14,10 @@ interface API {
   version: string;
   status: 'active' | 'deprecated' | 'beta';
   icon: React.ComponentType<any>;
+  link: string;
+  auth: string;
+  https: boolean;
+  cors: string;
 }
 
 interface APIRegistryProps {
@@ -21,58 +25,70 @@ interface APIRegistryProps {
   onSelectionChange: (apis: string[]) => void;
 }
 
-const mockAPIs: API[] = [
-  {
-    id: 'user-service',
-    name: 'User Management API',
-    description: 'Handle user authentication, profiles, and permissions',
-    category: 'Authentication',
-    version: 'v2.1.0',
-    status: 'active',
-    icon: Users
-  },
-  {
-    id: 'product-catalog',
-    name: 'Product Catalog API',
-    description: 'Manage product information, categories, and inventory',
-    category: 'E-commerce',
-    version: 'v1.5.2',
-    status: 'active',
-    icon: ShoppingCart
-  },
-  {
-    id: 'analytics-service',
-    name: 'Analytics & Reporting API',
-    description: 'Generate reports, track metrics, and analyze data',
-    category: 'Analytics',
-    version: 'v3.0.1',
-    status: 'active',
-    icon: Database
-  },
-  {
-    id: 'notification-service',
-    name: 'Notification Service API',
-    description: 'Send emails, SMS, and push notifications',
-    category: 'Communication',
-    version: 'v1.8.0',
-    status: 'active',
-    icon: Cloud
-  },
-  {
-    id: 'document-processor',
-    name: 'Document Processing API',
-    description: 'Process, convert, and manage documents',
-    category: 'Documents',
-    version: 'v2.0.0',
-    status: 'beta',
-    icon: FileText
-  }
-];
+const getCategoryIcon = (category: string) => {
+  const categoryLower = category.toLowerCase();
+  if (categoryLower.includes('social') || categoryLower.includes('auth')) return Users;
+  if (categoryLower.includes('shopping') || categoryLower.includes('business')) return ShoppingCart;
+  if (categoryLower.includes('data') || categoryLower.includes('analytics')) return Database;
+  if (categoryLower.includes('cloud') || categoryLower.includes('weather')) return Cloud;
+  if (categoryLower.includes('document') || categoryLower.includes('text')) return FileText;
+  if (categoryLower.includes('photo') || categoryLower.includes('image')) return Camera;
+  if (categoryLower.includes('music') || categoryLower.includes('audio')) return Music;
+  if (categoryLower.includes('books') || categoryLower.includes('news')) return BookOpen;
+  if (categoryLower.includes('games') || categoryLower.includes('entertainment')) return Gamepad2;
+  if (categoryLower.includes('health') || categoryLower.includes('medical')) return Heart;
+  return Globe;
+};
 
 export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [apis, setApis] = useState<API[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredAPIs = mockAPIs.filter(api =>
+  useEffect(() => {
+    const fetchAPIs = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch from Public APIs GitHub repository
+        const response = await fetch('https://api.publicapis.org/entries');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch APIs');
+        }
+        
+        const data = await response.json();
+        
+        // Transform the data to match our interface
+        const transformedAPIs: API[] = data.entries.slice(0, 50).map((api: any, index: number) => ({
+          id: `${api.API.toLowerCase().replace(/\s+/g, '-')}-${index}`,
+          name: api.API,
+          description: api.Description,
+          category: api.Category,
+          version: 'v1.0.0', // Not provided by the API, so we'll use a default
+          status: api.HTTPS ? 'active' : 'beta' as 'active' | 'deprecated' | 'beta',
+          icon: getCategoryIcon(api.Category),
+          link: api.Link,
+          auth: api.Auth || 'None',
+          https: api.HTTPS,
+          cors: api.Cors || 'unknown'
+        }));
+        
+        setApis(transformedAPIs);
+      } catch (err) {
+        console.error('Error fetching APIs:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load APIs');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAPIs();
+  }, []);
+
+  const filteredAPIs = apis.filter(api =>
     api.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     api.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     api.category.toLowerCase().includes(searchTerm.toLowerCase())
@@ -94,12 +110,50 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
     }
   };
 
+  if (loading) {
+    return (
+      <Card className="h-[500px] flex flex-col">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center space-x-2">
+            <Database className="w-5 h-5 text-blue-600" />
+            <span>API Registry</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-2"></div>
+            <p>Loading APIs...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="h-[500px] flex flex-col">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center space-x-2">
+            <Database className="w-5 h-5 text-blue-600" />
+            <span>API Registry</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center text-red-500">
+            <p className="font-medium">Error loading APIs</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="h-[500px] flex flex-col">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center space-x-2">
           <Database className="w-5 h-5 text-blue-600" />
-          <span>API Registry</span>
+          <span>API Registry ({apis.length} APIs)</span>
         </CardTitle>
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -133,21 +187,48 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <h4 className="font-medium text-gray-900 truncate">{api.name}</h4>
-                    <Badge className={`text-xs ${getStatusColor(api.status)}`}>
-                      {api.status}
-                    </Badge>
+                    <div className="flex items-center space-x-2">
+                      {api.https && (
+                        <Badge className="text-xs bg-green-100 text-green-800">
+                          HTTPS
+                        </Badge>
+                      )}
+                      <Badge className={`text-xs ${getStatusColor(api.status)}`}>
+                        {api.status}
+                      </Badge>
+                    </div>
                   </div>
                   <p className="text-sm text-gray-600 mt-1">{api.description}</p>
                   <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
                     <span>{api.category}</span>
                     <span>•</span>
-                    <span>{api.version}</span>
+                    <span>Auth: {api.auth}</span>
+                    {api.link && (
+                      <>
+                        <span>•</span>
+                        <a 
+                          href={api.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Documentation
+                        </a>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           );
         })}
+        
+        {filteredAPIs.length === 0 && searchTerm && (
+          <div className="text-center text-gray-500 py-8">
+            <p>No APIs found matching "{searchTerm}"</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
