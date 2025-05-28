@@ -38,7 +38,7 @@ export const PromptInput = ({ onGenerate, isGenerating, conversationHistory = []
           </CardTitle>
         </CardHeader>
       )}
-      <CardContent className="space-y-4">
+      <CardContent className={`space-y-4 ${hasConversationHistory ? 'pt-6' : ''}`}>
         <Textarea
           placeholder="Describe the application you want to build in plain English. Powered by Google Gemini 2.0 Flash for fast, intelligent code generation..."
           value={prompt}
