@@ -1,4 +1,4 @@
-
+import { useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -136,40 +136,56 @@ const modules = [
   }
 ];
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <MainLayout>
-          <Routes>
-            <Route path="/" element={<Navigate to="/design-to-code" replace />} />
-            <Route path="/design-to-code" element={<DesignToCode />} />
-            
-            {modules.map((module) => (
+const App = () => {
+  const [completedModules, setCompletedModules] = useState<string[]>([]);
+
+  const handleModuleComplete = (moduleUrl: string) => {
+    setCompletedModules(prev => {
+      if (!prev.includes(moduleUrl)) {
+        return [...prev, moduleUrl];
+      }
+      return prev;
+    });
+  };
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <MainLayout completedModules={completedModules}>
+            <Routes>
+              <Route path="/" element={<Navigate to="/design-to-code" replace />} />
               <Route 
-                key={module.path}
-                path={module.path} 
-                element={
-                  <ModulePlaceholder 
-                    title={module.title}
-                    description={module.description}
-                    icon={module.icon}
-                    input={module.input}
-                    aiFunction={module.aiFunction}
-                    output={module.output}
-                  />
-                } 
+                path="/design-to-code" 
+                element={<DesignToCode onModuleComplete={handleModuleComplete} />} 
               />
-            ))}
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </MainLayout>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+              
+              {modules.map((module) => (
+                <Route 
+                  key={module.path}
+                  path={module.path} 
+                  element={
+                    <ModulePlaceholder 
+                      title={module.title}
+                      description={module.description}
+                      icon={module.icon}
+                      input={module.input}
+                      aiFunction={module.aiFunction}
+                      output={module.output}
+                    />
+                  } 
+                />
+              ))}
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </MainLayout>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

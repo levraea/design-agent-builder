@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar"
+import { Checkbox } from "@/components/ui/checkbox"
 import { 
   Target, 
   Map, 
@@ -110,8 +111,16 @@ const modules = [
   },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  completedModules?: string[];
+}
+
+export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
   const location = useLocation();
+
+  const isModuleCompleted = (moduleUrl: string) => {
+    return completedModules.includes(moduleUrl);
+  };
 
   return (
     <Sidebar>
@@ -133,7 +142,12 @@ export function AppSidebar() {
               {modules.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                    <Link to={item.url}>
+                    <Link to={item.url} className="flex items-center space-x-3">
+                      <Checkbox 
+                        checked={isModuleCompleted(item.url)}
+                        className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                        readOnly
+                      />
                       <item.icon className="w-4 h-4" />
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">{item.title}</span>

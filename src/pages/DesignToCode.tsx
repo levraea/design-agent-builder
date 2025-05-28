@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -9,7 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Code } from 'lucide-react';
 import { mockAPIs } from '@/data/mockAPIs';
 
-const DesignToCode = () => {
+interface DesignToCodeProps {
+  onModuleComplete?: (moduleUrl: string) => void;
+}
+
+const DesignToCode = ({ onModuleComplete }: DesignToCodeProps) => {
   const [prompt, setPrompt] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
   const [selectedAPIs, setSelectedAPIs] = useState<string[]>([]);
@@ -110,11 +113,21 @@ User prompt: ${augmentedPrompt}`
       const generatedCode = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
       
       setGeneratedCode(generatedCode);
+      
+      // Mark the Design-to-Code Generation module as complete
+      if (onModuleComplete) {
+        onModuleComplete('/design-to-code');
+      }
     } catch (error) {
       console.error('Error generating code:', error);
       // Fallback to sample code if API fails
       const fallbackCode = generateSampleCode(userPrompt, selectedAPIs, selectedComponents);
       setGeneratedCode(fallbackCode);
+      
+      // Still mark as complete even with fallback
+      if (onModuleComplete) {
+        onModuleComplete('/design-to-code');
+      }
     }
     
     setIsGenerating(false);
