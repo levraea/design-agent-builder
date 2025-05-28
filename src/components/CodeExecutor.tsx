@@ -24,7 +24,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       setError(null);
       console.log('Executing code:', code);
       
-      // Clean the code
+      // Clean the code more carefully
       let cleanCode = code;
       
       // Remove markdown code blocks
@@ -33,44 +33,52 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       // Remove import statements
       cleanCode = cleanCode.replace(/^import\s+.*?from\s+['"'][^'"]*['"];?\s*$/gm, '');
       
-      // Remove export statements
+      // Remove export statements  
       cleanCode = cleanCode.replace(/^export\s+default\s+\w+;?\s*$/gm, '');
       cleanCode = cleanCode.replace(/^export\s+\{[^}]*\};?\s*$/gm, '');
       
-      // Remove interface/type definitions
+      // Remove interface definitions completely
+      cleanCode = cleanCode.replace(/^interface\s+\w+Props\s*\{\s*\}\s*$/gm, '');
       cleanCode = cleanCode.replace(/^interface\s+\w+[^{]*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\s*$/gm, '');
       cleanCode = cleanCode.replace(/^type\s+\w+[^=]*=[^;]*;?\s*$/gm, '');
       
-      // Remove TypeScript type annotations but preserve the structure
-      // Remove React.FC type annotations
+      // Remove React.FC type annotations only
       cleanCode = cleanCode.replace(/:\s*React\.FC<[^>]*>/g, '');
+      cleanCode = cleanCode.replace(/:\s*React\.FC/g, '');
       
-      // Remove function parameter types but keep the parameter names and structure
-      cleanCode = cleanCode.replace(/\(([^)]*?):\s*[^)]*\)/g, (match, params) => {
-        // Keep parameter names, remove types
-        const cleanParams = params.replace(/\w+:\s*[^,)]+/g, (paramMatch) => {
-          return paramMatch.split(':')[0].trim();
-        });
-        return `(${cleanParams})`;
-      });
-      
-      // Remove variable type annotations but keep the variable declarations
-      cleanCode = cleanCode.replace(/const\s+(\w+):\s*[^=]+=/, 'const $1 =');
-      cleanCode = cleanCode.replace(/let\s+(\w+):\s*[^=]+=/, 'let $1 =');
-      cleanCode = cleanCode.replace(/var\s+(\w+):\s*[^=]+=/, 'var $1 =');
-      
-      // Remove useState type annotations
+      // Remove useState type parameters only
       cleanCode = cleanCode.replace(/useState<[^>]*>/g, 'useState');
       
-      // Remove generic type parameters
-      cleanCode = cleanCode.replace(/<[^>]*>/g, '');
+      // Remove parameter type annotations more carefully
+      cleanCode = cleanCode.replace(/\(([^)]*?)\s*:\s*[^)]*\)/g, (match, params) => {
+        // If it's an event parameter, keep the parameter name
+        if (params.includes('e') || params.includes('event')) {
+          const paramName = params.split(':')[0].trim();
+          return `(${paramName})`;
+        }
+        return '()';
+      });
       
-      // Clean up extra whitespace but preserve line structure for JSX
-      cleanCode = cleanCode.replace(/\n\s*\n/g, '\n');
+      // Remove variable type annotations  
+      cleanCode = cleanCode.replace(/const\s+(\w+)\s*:\s*[^=]+=/, 'const $1 =');
+      cleanCode = cleanCode.replace(/let\s+(\w+)\s*:\s*[^=]+=/, 'let $1 =');
+      
+      // Remove remaining angle bracket generics but be careful not to touch JSX
+      cleanCode = cleanCode.replace(/\w+<\w+[^>]*>/g, (match) => {
+        // Don't touch JSX tags
+        if (match.includes('</') || match.startsWith('<')) {
+          return match;
+        }
+        // Remove the generic part
+        return match.split('<')[0];
+      });
+      
+      // Clean up extra whitespace
+      cleanCode = cleanCode.replace(/\n\s*\n/g, '\n').trim();
       
       console.log('Cleaned code:', cleanCode);
 
-      // Find component name - look for const or function declarations
+      // Find component name
       const componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)/);
       const componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
       
