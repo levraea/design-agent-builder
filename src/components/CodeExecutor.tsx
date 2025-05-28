@@ -24,7 +24,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
 
     try {
       setError(null);
-      console.log('Executing code:', code);
+      console.log('Original code:', code);
       
       // Use the code exactly as returned by AI - minimal manipulation
       let cleanCode = code;
@@ -56,16 +56,17 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       // Clean up extra whitespace
       cleanCode = cleanCode.trim();
       
-      console.log('Cleaned code:', cleanCode);
+      console.log('Code after cleaning:', cleanCode);
 
-      // Find component name from the code
-      const componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)/);
-      const componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
+      // Instead of trying to execute JSX directly, let's try a different approach
+      // We'll wrap the code in a way that makes it executable
+      const executableCode = `
+        return function GeneratedComponent(props) {
+          ${cleanCode.replace(/^const\s+\w+\s*=/, 'return')}
+        };
+      `;
       
-      // Ensure the code returns the component
-      if (!cleanCode.includes(`return ${componentName}`)) {
-        cleanCode += `\nreturn ${componentName};`;
-      }
+      console.log('Executable code:', executableCode);
 
       // Create the component function with all necessary dependencies
       const componentFactory = new Function(
@@ -80,7 +81,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
         'CardContent',
         'Button',
         'Input',
-        cleanCode
+        executableCode
       );
 
       // Execute with dependencies
@@ -107,6 +108,11 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       
     } catch (err) {
       console.error('Code execution error:', err);
+      console.error('Error details:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name
+      });
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
       setComponent(null);
     }
