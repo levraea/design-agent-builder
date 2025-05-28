@@ -142,15 +142,19 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
               {modules.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                    <Link to={item.url} className="flex items-center space-x-3">
-                      <Checkbox 
-                        checked={isModuleCompleted(item.url)}
-                        className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                      />
-                      <item.icon className="w-4 h-4" />
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">{item.title}</span>
-                        <span className="text-xs text-gray-500">{item.description}</span>
+                    <Link to={item.url} className="flex items-start space-x-3 py-3">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <Checkbox 
+                          checked={isModuleCompleted(item.url)}
+                          className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                        />
+                      </div>
+                      <div className="flex-shrink-0 mt-0.5">
+                        <item.icon className="w-4 h-4" />
+                      </div>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className="text-sm font-medium truncate">{item.title}</span>
+                        <span className="text-xs text-gray-500 truncate">{item.description}</span>
                       </div>
                     </Link>
                   </SidebarMenuButton>
