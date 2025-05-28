@@ -256,10 +256,9 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
             />
             
             <Tabs defaultValue="apis" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="apis">API Registry</TabsTrigger>
                 <TabsTrigger value="components">Element Components</TabsTrigger>
-                <TabsTrigger value="code">Generated Code</TabsTrigger>
               </TabsList>
               
               <TabsContent value="apis" className="mt-4">
@@ -275,16 +274,32 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
                   onSelectionChange={setSelectedComponents}
                 />
               </TabsContent>
-              
-              <TabsContent value="code" className="mt-4">
-                <GeneratedCode code={generatedCode} />
-              </TabsContent>
             </Tabs>
           </div>
 
-          {/* Right Panel - Live Preview */}
+          {/* Right Panel - Live Preview and Generated Code */}
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <LivePreview code={generatedCode} isGenerating={isGenerating} />
+            <Tabs defaultValue="preview" className="h-full flex flex-col">
+              <div className="bg-gray-900 text-white px-4 py-3 flex items-center justify-between">
+                <TabsList className="bg-gray-800 h-8">
+                  <TabsTrigger value="preview" className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white">Live Preview</TabsTrigger>
+                  <TabsTrigger value="code" className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white">Generated Code</TabsTrigger>
+                </TabsList>
+                <div className="flex space-x-1">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+              </div>
+              
+              <TabsContent value="preview" className="flex-1 m-0">
+                <LivePreview code={generatedCode} isGenerating={isGenerating} />
+              </TabsContent>
+              
+              <TabsContent value="code" className="flex-1 m-0 p-4">
+                <GeneratedCode code={generatedCode} />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
