@@ -1,5 +1,5 @@
 
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { AppSidebar } from "./AppSidebar";
 
@@ -18,14 +18,14 @@ export function MainLayout({ children, completedModules = [] }: MainLayoutProps)
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={75}>
-            <SidebarInset className="flex-1">
+            <div className="flex-1 flex flex-col min-h-screen bg-background">
               <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
                 <SidebarTrigger className="-ml-1" />
               </header>
               <div className="flex flex-1 flex-col gap-4 p-4">
                 {children}
               </div>
-            </SidebarInset>
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
