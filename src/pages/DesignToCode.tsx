@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -6,7 +5,7 @@ import { APIRegistry } from '@/components/APIRegistry';
 import { ComponentLibrary } from '@/components/ComponentLibrary';
 import { GeneratedCode } from '@/components/GeneratedCode';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Brain, Sparkles } from 'lucide-react';
+import { Code } from 'lucide-react';
 import { mockAPIs } from '@/data/mockAPIs';
 
 const DesignToCode = () => {
@@ -175,10 +174,7 @@ User prompt: ${augmentedPrompt}`
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center space-x-3">
-            <div className="relative">
-              <Brain className="w-8 h-8 text-blue-600" />
-              <Sparkles className="w-4 h-4 text-purple-500 absolute -top-1 -right-1 animate-pulse" />
-            </div>
+            <Code className="w-8 h-8 text-blue-600" />
             <span>Design-to-Code Generation</span>
           </h1>
           <p className="text-gray-600">Generate front-end code using preferred tech stack and headless architecture</p>

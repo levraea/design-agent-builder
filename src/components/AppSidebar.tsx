@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -23,7 +24,9 @@ import {
   Users, 
   Palette, 
   GraduationCap, 
-  Code 
+  Code,
+  Brain,
+  Sparkles
 } from 'lucide-react';
 
 const modules = [
@@ -113,7 +116,13 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
-        <h2 className="text-lg font-semibold text-gray-900">Design AI Assistant</h2>
+        <h2 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+          <div className="relative">
+            <Brain className="w-6 h-6 text-blue-600" />
+            <Sparkles className="w-3 h-3 text-purple-500 absolute -top-0.5 -right-0.5 animate-pulse" />
+          </div>
+          <span>Design AI Assistant</span>
+        </h2>
         <p className="text-sm text-gray-600">Turn ideas into digital products</p>
       </SidebarHeader>
       <SidebarContent>
