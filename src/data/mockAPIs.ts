@@ -16,6 +16,19 @@ export const mockAPIs: API[] = [
     cors: 'yes'
   },
   {
+    id: 'openmeteo',
+    name: 'Open-Meteo',
+    description: 'Free weather API with historical weather data, weather forecasts, and climate data',
+    category: 'Weather',
+    version: 'v1',
+    status: 'active',
+    icon: Cloud,
+    link: 'https://open-meteo.com/en/docs',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
     id: 'restcountries',
     name: 'REST Countries',
     description: 'Get information about countries via a RESTful API',
