@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -241,7 +242,7 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
             <Code className="w-8 h-8 text-blue-600" />
             <span>Design-to-Code Generation</span>
           </h1>
-          <p className="text-gray-600">Generate front-end code using preferred tech stack and headless architecture</p>
+          <p className="text-gray-600">Generate front end code, aligned to Bayer Design Principles using preferred tech stack and headless architecture</p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[calc(100vh-300px)]">
