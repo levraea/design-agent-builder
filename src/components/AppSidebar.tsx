@@ -1,4 +1,5 @@
 
+
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -11,7 +12,6 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar"
-import { Checkbox } from "@/components/ui/checkbox"
 import { 
   Target, 
   Map, 
@@ -118,10 +118,6 @@ interface AppSidebarProps {
 export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
   const location = useLocation();
 
-  const isModuleCompleted = (moduleUrl: string) => {
-    return completedModules.includes(moduleUrl);
-  };
-
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
@@ -144,12 +140,6 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
                   <SidebarMenuButton asChild isActive={location.pathname === item.url}>
                     <Link to={item.url} className="flex items-start space-x-3 py-3">
                       <div className="flex-shrink-0 mt-0.5">
-                        <Checkbox 
-                          checked={isModuleCompleted(item.url)}
-                          className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                        />
-                      </div>
-                      <div className="flex-shrink-0 mt-0.5">
                         <item.icon className="w-4 h-4" />
                       </div>
                       <div className="flex flex-col min-w-0 flex-1">
@@ -167,3 +157,4 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
     </Sidebar>
   )
 }
+
