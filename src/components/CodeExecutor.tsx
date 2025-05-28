@@ -24,51 +24,40 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       setError(null);
       console.log('Executing JavaScript code:', code);
       
-      // Since we're now getting plain JavaScript, we can execute it directly
-      // Just remove any markdown code blocks if present
+      // Remove any markdown code blocks if present
       let cleanCode = code;
       if (cleanCode.includes('```')) {
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
       
-      // Wrap the code to make it executable
-      const executableCode = `
-        ${cleanCode}
-        return GeneratedApp;
-      `;
-      
-      console.log('Final executable code:', executableCode);
+      console.log('Final executable code:', cleanCode);
 
-      // Create the component function with all necessary dependencies
-      const componentFactory = new Function(
-        'React',
-        'useState',
-        'useEffect', 
-        'useMemo',
-        'useCallback',
-        'Card',
-        'CardHeader',
-        'CardTitle',
-        'CardContent',
-        'Button',
-        'Input',
-        executableCode
-      );
-
-      // Execute with dependencies
-      const GeneratedComponent = componentFactory(
+      // Create a context with all the React dependencies
+      const context = {
         React,
-        React.useState,
-        React.useEffect,
-        React.useMemo,
-        React.useCallback,
+        useState: React.useState,
+        useEffect: React.useEffect,
+        useMemo: React.useMemo,
+        useCallback: React.useCallback,
         Card,
         CardHeader,
         CardTitle,
         CardContent,
         Button,
         Input
-      );
+      };
+
+      // Use eval with proper context to execute JSX
+      const wrappedCode = `
+        (function() {
+          const { React, useState, useEffect, useMemo, useCallback, Card, CardHeader, CardTitle, CardContent, Button, Input } = arguments[0];
+          ${cleanCode}
+          return GeneratedApp;
+        })
+      `;
+
+      const componentFactory = eval(wrappedCode);
+      const GeneratedComponent = componentFactory(context);
 
       // Validate it's a function
       if (typeof GeneratedComponent !== 'function') {
