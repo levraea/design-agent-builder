@@ -15,70 +15,85 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
   const [Component, setComponent] = useState<React.ComponentType | null>(null);
 
   const executeCode = useMemo(() => {
-    if (!code.trim()) return null;
+    if (!code.trim()) {
+      setComponent(null);
+      setError(null);
+      return;
+    }
 
     try {
       setError(null);
-      console.log('Original code:', code);
+      console.log('Executing code:', code);
       
-      // Clean the code more carefully
+      // Clean the code
       let cleanCode = code;
       
-      // Remove markdown code blocks if present
+      // Remove markdown code blocks
       cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       
-      // Remove import statements but preserve the rest
+      // Remove import statements
       cleanCode = cleanCode.replace(/^import\s+.*?from\s+['"'][^'"]*['"];?\s*$/gm, '');
-      
-      // Remove interface/type definitions that might cause issues
-      cleanCode = cleanCode.replace(/^interface\s+\w+Props\s*\{[^}]*\}\s*$/gm, '');
-      
-      // Find the component function/const
-      let componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)[^{]*\{/);
-      let componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
       
       // Remove export statements
       cleanCode = cleanCode.replace(/^export\s+default\s+\w+;?\s*$/gm, '');
       cleanCode = cleanCode.replace(/^export\s+\{[^}]*\};?\s*$/gm, '');
       
-      // If the code doesn't have a return statement for the component, add one
+      // Remove interface/type definitions
+      cleanCode = cleanCode.replace(/^interface\s+\w+[^{]*\{[^}]*\}\s*$/gm, '');
+      cleanCode = cleanCode.replace(/^type\s+\w+[^=]*=[^;]*;?\s*$/gm, '');
+      
+      // Find component name
+      const componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)/);
+      const componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
+      
+      // Ensure the code returns the component
       if (!cleanCode.includes(`return ${componentName}`)) {
         cleanCode += `\nreturn ${componentName};`;
       }
 
       console.log('Cleaned code:', cleanCode);
 
-      // Create execution context with all necessary React features and components
-      const contextKeys = [
-        'React', 'useState', 'useEffect', 'useMemo', 'useCallback',
-        'Card', 'CardHeader', 'CardTitle', 'CardContent', 'Button', 'Input'
-      ];
-      
-      const contextValues = [
-        React, 
-        React.useState, 
-        React.useEffect, 
-        React.useMemo, 
-        React.useCallback,
-        Card, 
-        CardHeader, 
-        CardTitle, 
-        CardContent, 
-        Button, 
-        Input
-      ];
+      // Create the component function with all necessary dependencies
+      const componentFactory = new Function(
+        'React',
+        'useState',
+        'useEffect', 
+        'useMemo',
+        'useCallback',
+        'Card',
+        'CardHeader',
+        'CardTitle',
+        'CardContent',
+        'Button',
+        'Input',
+        cleanCode
+      );
 
-      // Create and execute the function
-      const func = new Function(...contextKeys, cleanCode);
-      const ComponentResult = func(...contextValues);
-      
-      if (typeof ComponentResult === 'function') {
-        // Test render the component to catch any immediate errors
-        React.createElement(ComponentResult);
-        setComponent(() => ComponentResult);
-      } else {
-        throw new Error('Code did not return a valid React component function');
+      // Execute with dependencies
+      const GeneratedComponent = componentFactory(
+        React,
+        React.useState,
+        React.useEffect,
+        React.useMemo,
+        React.useCallback,
+        Card,
+        CardHeader,
+        CardTitle,
+        CardContent,
+        Button,
+        Input
+      );
+
+      // Validate it's a function
+      if (typeof GeneratedComponent !== 'function') {
+        throw new Error('Generated code did not return a valid React component');
       }
+
+      // Test render to catch immediate errors
+      const testElement = React.createElement(GeneratedComponent);
+      console.log('Component created successfully:', testElement);
+
+      setComponent(() => GeneratedComponent);
       
     } catch (err) {
       console.error('Code execution error:', err);
@@ -113,21 +128,45 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
     );
   }
 
-  try {
-    return (
-      <div className="h-full overflow-auto">
+  return (
+    <div className="h-full overflow-auto">
+      <ErrorBoundary>
         <Component />
-      </div>
-    );
-  } catch (renderError) {
-    console.error('Render error:', renderError);
-    return (
-      <Alert variant="destructive" className="m-4">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Render Error:</strong> {renderError instanceof Error ? renderError.message : 'Component failed to render'}
-        </AlertDescription>
-      </Alert>
-    );
-  }
+      </ErrorBoundary>
+    </div>
+  );
 };
+
+// Error boundary component to catch render errors
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Component render error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Alert variant="destructive" className="m-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Render Error:</strong> {this.state.error?.message || 'Component failed to render'}
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return this.props.children;
+  }
+}
