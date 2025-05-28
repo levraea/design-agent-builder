@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -39,6 +40,18 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       // Remove export statements
       cleanCode = cleanCode.replace(/^export\s+default\s+\w+;\s*$/gm, '');
       cleanCode = cleanCode.replace(/^export\s+\{.*?\}.*?;\s*$/gm, '');
+      
+      // Remove TypeScript interfaces and type definitions
+      cleanCode = cleanCode.replace(/^interface\s+\w+.*?\{[\s\S]*?\}\s*$/gm, '');
+      cleanCode = cleanCode.replace(/^type\s+\w+.*?=[\s\S]*?;\s*$/gm, '');
+      
+      // Remove TypeScript type annotations from function parameters and variables
+      cleanCode = cleanCode.replace(/:\s*React\.FC<[^>]*>/g, '');
+      cleanCode = cleanCode.replace(/:\s*React\.ComponentType<[^>]*>/g, '');
+      cleanCode = cleanCode.replace(/:\s*string\b/g, '');
+      cleanCode = cleanCode.replace(/:\s*number\b/g, '');
+      cleanCode = cleanCode.replace(/:\s*boolean\b/g, '');
+      cleanCode = cleanCode.replace(/:\s*React\.ChangeEvent<[^>]*>/g, '');
       
       // Clean up extra whitespace
       cleanCode = cleanCode.trim();
@@ -167,3 +180,4 @@ class ErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
+
