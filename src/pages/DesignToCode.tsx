@@ -30,8 +30,9 @@ const DesignToCode = ({ onModuleComplete }: DesignToCodeProps) => {
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
 
   // Hardcoded API key
-  const GEMINI_API_KEY = 'AIzaSyArurZHRyqjGo8a0LS1bZOsTpQr2QgjwqY';
-
+  //const GEMINI_API_KEY = 'AIzaSyArurZHRyqjGo8a0LS1bZOsTpQr2QgjwqY';
+  const GEMINI_API_KEY = 'AIzaSyCQdatAJtVX1MulVsd2DtUfFKi7xHYhkSY';
+  
   const addToConversationHistory = (type: 'user' | 'ai', content: string) => {
     const newMessage: ConversationMessage = {
       id: Date.now().toString(),
