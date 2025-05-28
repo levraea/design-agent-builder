@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -13,6 +14,29 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
   const [error, setError] = useState<string | null>(null);
   const [Component, setComponent] = useState<React.ComponentType | null>(null);
 
+  const transformJSX = (code: string) => {
+    // Simple JSX transformation - replace common JSX patterns with React.createElement
+    let transformed = code;
+    
+    // Transform self-closing tags like <Input />
+    transformed = transformed.replace(/<(\w+)([^>]*?)\/>/g, (match, tagName, props) => {
+      const cleanProps = props.trim();
+      if (cleanProps) {
+        return `React.createElement(${tagName}, {${cleanProps.replace(/(\w+)=/g, '$1:')}})`;
+      }
+      return `React.createElement(${tagName})`;
+    });
+    
+    // Transform opening/closing tag pairs like <Card>content</Card>
+    transformed = transformed.replace(/<(\w+)([^>]*?)>(.*?)<\/\1>/gs, (match, tagName, props, children) => {
+      const cleanProps = props.trim();
+      const propsObj = cleanProps ? `{${cleanProps.replace(/(\w+)=/g, '$1:')}}` : 'null';
+      return `React.createElement(${tagName}, ${propsObj}, ${children})`;
+    });
+    
+    return transformed;
+  };
+
   const executeCode = useMemo(() => {
     if (!code.trim()) {
       setComponent(null);
@@ -23,14 +47,16 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
     try {
       setError(null);
       console.log('Executing JavaScript code:', code);
-      
+
       // Remove any markdown code blocks if present
       let cleanCode = code;
       if (cleanCode.includes('```')) {
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
-      
-      console.log('Final executable code:', cleanCode);
+
+      // Transform JSX to React.createElement calls
+      const transformedCode = transformJSX(cleanCode);
+      console.log('Transformed code:', transformedCode);
 
       // Create a context with all the React dependencies
       const context = {
@@ -47,11 +73,11 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
         Input
       };
 
-      // Use eval with proper context to execute JSX
+      // Use eval with proper context
       const wrappedCode = `
         (function() {
           const { React, useState, useEffect, useMemo, useCallback, Card, CardHeader, CardTitle, CardContent, Button, Input } = arguments[0];
-          ${cleanCode}
+          ${transformedCode}
           return GeneratedApp;
         })
       `;
@@ -65,7 +91,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       }
 
       setComponent(() => GeneratedComponent);
-      
+
     } catch (err) {
       console.error('Code execution error:', err);
       console.error('Error details:', {
