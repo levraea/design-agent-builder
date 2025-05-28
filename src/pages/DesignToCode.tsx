@@ -5,6 +5,7 @@ import { APIRegistry } from '@/components/APIRegistry';
 import { ComponentLibrary } from '@/components/ComponentLibrary';
 import { GeneratedCode } from '@/components/GeneratedCode';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Code } from 'lucide-react';
 import { mockAPIs } from '@/data/mockAPIs';
 
 const DesignToCode = () => {
@@ -172,7 +173,10 @@ User prompt: ${augmentedPrompt}`
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Design-to-Code Generation</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center space-x-3">
+            <Code className="w-8 h-8 text-blue-600" />
+            <span>Design-to-Code Generation</span>
+          </h1>
           <p className="text-gray-600">Generate front-end code using preferred tech stack and headless architecture</p>
         </div>
         
