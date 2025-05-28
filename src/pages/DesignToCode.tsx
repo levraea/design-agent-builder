@@ -4,9 +4,17 @@ import { LivePreview } from '@/components/LivePreview';
 import { APIRegistry } from '@/components/APIRegistry';
 import { ComponentLibrary } from '@/components/ComponentLibrary';
 import { GeneratedCode } from '@/components/GeneratedCode';
+import { ConversationHistory } from '@/components/ConversationHistory';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Code } from 'lucide-react';
 import { mockAPIs } from '@/data/mockAPIs';
+
+interface ConversationMessage {
+  id: string;
+  type: 'user' | 'ai';
+  content: string;
+  timestamp: Date;
+}
 
 interface DesignToCodeProps {
   onModuleComplete?: (moduleUrl: string) => void;
@@ -18,13 +26,27 @@ const DesignToCode = ({ onModuleComplete }: DesignToCodeProps) => {
   const [selectedAPIs, setSelectedAPIs] = useState<string[]>([]);
   const [selectedComponents, setSelectedComponents] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
 
   // Hardcoded API key
   const GEMINI_API_KEY = 'AIzaSyArurZHRyqjGo8a0LS1bZOsTpQr2QgjwqY';
 
+  const addToConversationHistory = (type: 'user' | 'ai', content: string) => {
+    const newMessage: ConversationMessage = {
+      id: Date.now().toString(),
+      type,
+      content,
+      timestamp: new Date()
+    };
+    setConversationHistory(prev => [...prev, newMessage]);
+  };
+
   const handleGenerateApp = async (userPrompt: string) => {
     setIsGenerating(true);
     setPrompt(userPrompt);
+    
+    // Add user prompt to conversation history
+    addToConversationHistory('user', userPrompt);
     
     try {
       // Get selected API details
@@ -114,6 +136,9 @@ User prompt: ${augmentedPrompt}`
       
       setGeneratedCode(generatedCode);
       
+      // Add AI response to conversation history
+      addToConversationHistory('ai', 'Generated a React component based on your prompt. The code is now available in the Live Preview and Generated Code tab.');
+      
       // Mark the Design-to-Code Generation module as complete
       if (onModuleComplete) {
         onModuleComplete('/design-to-code');
@@ -123,6 +148,9 @@ User prompt: ${augmentedPrompt}`
       // Fallback to sample code if API fails
       const fallbackCode = generateSampleCode(userPrompt, selectedAPIs, selectedComponents);
       setGeneratedCode(fallbackCode);
+      
+      // Add AI response to conversation history for fallback
+      addToConversationHistory('ai', 'Generated a fallback React component. The API request failed, but I created a sample component based on your prompt.');
       
       // Still mark as complete even with fallback
       if (onModuleComplete) {
@@ -202,6 +230,8 @@ User prompt: ${augmentedPrompt}`
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[calc(100vh-300px)]">
           {/* Left Panel - Controls */}
           <div className="space-y-6">
+            <ConversationHistory messages={conversationHistory} />
+            
             <PromptInput 
               onGenerate={handleGenerateApp}
               isGenerating={isGenerating}
