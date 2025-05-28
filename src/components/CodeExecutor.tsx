@@ -37,28 +37,39 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       cleanCode = cleanCode.replace(/^export\s+default\s+\w+;?\s*$/gm, '');
       cleanCode = cleanCode.replace(/^export\s+\{[^}]*\};?\s*$/gm, '');
       
-      // Remove interface/type definitions - more comprehensive
+      // Remove interface/type definitions
       cleanCode = cleanCode.replace(/^interface\s+\w+[^{]*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}\s*$/gm, '');
       cleanCode = cleanCode.replace(/^type\s+\w+[^=]*=[^;]*;?\s*$/gm, '');
       
-      // Remove TypeScript type annotations more carefully
+      // Remove TypeScript type annotations but preserve the structure
       // Remove React.FC type annotations
       cleanCode = cleanCode.replace(/:\s*React\.FC<[^>]*>/g, '');
       
-      // Remove function parameter types but keep the parameter names
-      cleanCode = cleanCode.replace(/\(([^:)]*?):\s*[^)]*\)/g, '($1)');
+      // Remove function parameter types but keep the parameter names and structure
+      cleanCode = cleanCode.replace(/\(([^)]*?):\s*[^)]*\)/g, (match, params) => {
+        // Keep parameter names, remove types
+        const cleanParams = params.replace(/\w+:\s*[^,)]+/g, (paramMatch) => {
+          return paramMatch.split(':')[0].trim();
+        });
+        return `(${cleanParams})`;
+      });
       
-      // Remove variable type annotations
-      cleanCode = cleanCode.replace(/:\s*(string|number|boolean|any)\s*=/g, ' =');
-      cleanCode = cleanCode.replace(/:\s*(string|number|boolean|any)\s*;/g, ';');
+      // Remove variable type annotations but keep the variable declarations
+      cleanCode = cleanCode.replace(/const\s+(\w+):\s*[^=]+=/, 'const $1 =');
+      cleanCode = cleanCode.replace(/let\s+(\w+):\s*[^=]+=/, 'let $1 =');
+      cleanCode = cleanCode.replace(/var\s+(\w+):\s*[^=]+=/, 'var $1 =');
+      
+      // Remove useState type annotations
+      cleanCode = cleanCode.replace(/useState<[^>]*>/g, 'useState');
       
       // Remove generic type parameters
       cleanCode = cleanCode.replace(/<[^>]*>/g, '');
       
-      // Clean up multiple spaces and empty lines
-      cleanCode = cleanCode.replace(/\s+/g, ' ').replace(/;\s*;/g, ';');
-      cleanCode = cleanCode.replace(/^\s*\n/gm, '');
+      // Clean up extra whitespace but preserve line structure for JSX
+      cleanCode = cleanCode.replace(/\n\s*\n/g, '\n');
       
+      console.log('Cleaned code:', cleanCode);
+
       // Find component name - look for const or function declarations
       const componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)/);
       const componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
@@ -67,8 +78,6 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       if (!cleanCode.includes(`return ${componentName}`)) {
         cleanCode += `\nreturn ${componentName};`;
       }
-
-      console.log('Cleaned code:', cleanCode);
 
       // Create the component function with all necessary dependencies
       const componentFactory = new Function(
