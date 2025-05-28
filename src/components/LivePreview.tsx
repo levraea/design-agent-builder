@@ -10,18 +10,6 @@ interface LivePreviewProps {
 export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
   return (
     <div className="h-full flex flex-col">
-      <div className="bg-gray-900 text-white px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Monitor className="w-4 h-4" />
-          <span className="text-sm font-medium">Live Preview</span>
-        </div>
-        <div className="flex space-x-1">
-          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        </div>
-      </div>
-      
       <div className="flex-1 bg-white overflow-auto">
         {isGenerating ? (
           <div className="h-full flex items-center justify-center">
