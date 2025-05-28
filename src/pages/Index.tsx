@@ -6,6 +6,7 @@ import { ComponentLibrary } from '@/components/ComponentLibrary';
 import { GeneratedCode } from '@/components/GeneratedCode';
 import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { mockAPIs } from '@/data/mockAPIs';
 
 const Index = () => {
   const [prompt, setPrompt] = useState('');
@@ -22,6 +23,25 @@ const Index = () => {
       const apiKey = localStorage.getItem('gemini_api_key');
       if (!apiKey) {
         throw new Error('Please set your Gemini API key first');
+      }
+
+      // Get selected API details
+      const selectedAPIDetails = mockAPIs.filter(api => selectedAPIs.includes(api.id));
+      
+      // Augment the prompt with API information
+      let augmentedPrompt = userPrompt;
+      
+      if (selectedAPIDetails.length > 0) {
+        const apiContext = selectedAPIDetails.map(api => 
+          `- ${api.name} (${api.link}): ${api.description}. Auth: ${api.auth}, HTTPS: ${api.https}, CORS: ${api.cors}`
+        ).join('\n');
+        
+        augmentedPrompt = `${userPrompt}
+
+IMPORTANT: Use the following selected APIs in your implementation:
+${apiContext}
+
+Make sure to integrate these APIs into the generated component to fetch and display relevant data.`;
       }
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
@@ -66,7 +86,7 @@ function GeneratedApp() {
   );
 }
 
-User prompt: ${userPrompt}`
+User prompt: ${augmentedPrompt}`
                 }
               ]
             }
