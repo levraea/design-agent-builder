@@ -19,13 +19,6 @@ export const PromptInput = ({ onGenerate, isGenerating }: PromptInputProps) => {
     }
   };
 
-  const samplePrompts = [
-    "Create a user dashboard with recent activity and notifications",
-    "Build a product catalog with search and filtering",
-    "Generate a customer feedback form with ratings",
-    "Design a team collaboration workspace"
-  ];
-
   return (
     <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
       <CardHeader>
@@ -59,21 +52,6 @@ export const PromptInput = ({ onGenerate, isGenerating }: PromptInputProps) => {
             </>
           )}
         </Button>
-
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-gray-700">Sample Prompts:</p>
-          <div className="space-y-1">
-            {samplePrompts.map((sample, index) => (
-              <button
-                key={index}
-                onClick={() => setPrompt(sample)}
-                className="text-left text-sm text-blue-600 hover:text-blue-800 hover:underline block w-full"
-              >
-                "{sample}"
-              </button>
-            ))}
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
