@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -15,7 +14,7 @@ import {
   Target, 
   Map, 
   Lightbulb, 
-  Sitemap, 
+  Network, 
   FileText, 
   Shield, 
   Search, 
@@ -49,7 +48,7 @@ const modules = [
   {
     title: "Information Architecture",
     url: "/information-architecture",
-    icon: Sitemap,
+    icon: Network,
     description: "Structure and flows"
   },
   {

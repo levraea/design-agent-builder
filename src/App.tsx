@@ -12,7 +12,7 @@ import {
   Target, 
   Map, 
   Lightbulb, 
-  Sitemap, 
+  Network, 
   FileText, 
   Shield, 
   Search, 
@@ -57,7 +57,7 @@ const modules = [
     path: "/information-architecture",
     title: "Information Architecture & Flows",
     description: "Generate app/site structure and key flows",
-    icon: Sitemap,
+    icon: Network,
     input: "Approved concepts",
     aiFunction: "Generate app/site structure and key flows",
     output: "IA diagrams, user flow maps"
