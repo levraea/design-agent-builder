@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -40,6 +39,75 @@ const getCategoryIcon = (category: string) => {
   return Globe;
 };
 
+// Fallback mock data when API fails
+const mockAPIs: API[] = [
+  {
+    id: 'jsonplaceholder',
+    name: 'JSONPlaceholder',
+    description: 'Free fake REST API for testing and prototyping',
+    category: 'Development',
+    version: 'v1.0.0',
+    status: 'active',
+    icon: Database,
+    link: 'https://jsonplaceholder.typicode.com',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'openweather',
+    name: 'OpenWeatherMap',
+    description: 'Weather data including current weather, forecasts, and historical data',
+    category: 'Weather',
+    version: 'v2.5',
+    status: 'active',
+    icon: Cloud,
+    link: 'https://openweathermap.org/api',
+    auth: 'API Key',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'unsplash',
+    name: 'Unsplash',
+    description: 'Beautiful, free photos gifted by the worlds most generous community',
+    category: 'Photography',
+    version: 'v1.0',
+    status: 'active',
+    icon: Camera,
+    link: 'https://unsplash.com/developers',
+    auth: 'API Key',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'restcountries',
+    name: 'REST Countries',
+    description: 'Get information about countries via a RESTful API',
+    category: 'Geography',
+    version: 'v3.1',
+    status: 'active',
+    icon: Globe,
+    link: 'https://restcountries.com',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'quotegarden',
+    name: 'QuoteGarden',
+    description: 'REST API for famous quotes',
+    category: 'Text',
+    version: 'v3.0',
+    status: 'active',
+    icon: BookOpen,
+    link: 'https://quotegarden.herokuapp.com',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  }
+];
+
 export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [apis, setApis] = useState<API[]>([]);
@@ -52,14 +120,21 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
         setLoading(true);
         setError(null);
         
-        // Fetch from Public APIs GitHub repository
-        const response = await fetch('https://api.publicapis.org/entries');
+        console.log('Attempting to fetch APIs from public registry...');
+        
+        // Try using a CORS proxy first
+        const corsProxy = 'https://api.allorigins.win/get?url=';
+        const apiUrl = encodeURIComponent('https://api.publicapis.org/entries');
+        const response = await fetch(`${corsProxy}${apiUrl}`);
         
         if (!response.ok) {
-          throw new Error('Failed to fetch APIs');
+          throw new Error('Failed to fetch from CORS proxy');
         }
         
-        const data = await response.json();
+        const proxyData = await response.json();
+        const data = JSON.parse(proxyData.contents);
+        
+        console.log('Successfully fetched API data:', data);
         
         // Transform the data to match our interface
         const transformedAPIs: API[] = data.entries.slice(0, 50).map((api: any, index: number) => ({
@@ -67,7 +142,7 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
           name: api.API,
           description: api.Description,
           category: api.Category,
-          version: 'v1.0.0', // Not provided by the API, so we'll use a default
+          version: 'v1.0.0',
           status: api.HTTPS ? 'active' : 'beta' as 'active' | 'deprecated' | 'beta',
           icon: getCategoryIcon(api.Category),
           link: api.Link,
@@ -77,9 +152,11 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
         }));
         
         setApis(transformedAPIs);
+        console.log('APIs loaded successfully:', transformedAPIs.length);
       } catch (err) {
-        console.error('Error fetching APIs:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load APIs');
+        console.error('Error fetching APIs, falling back to mock data:', err);
+        setApis(mockAPIs);
+        setError('Using sample APIs (live registry unavailable)');
       } finally {
         setLoading(false);
       }
@@ -154,6 +231,11 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
         <CardTitle className="flex items-center space-x-2">
           <Database className="w-5 h-5 text-blue-600" />
           <span>API Registry ({apis.length} APIs)</span>
+          {error && (
+            <Badge className="text-xs bg-yellow-100 text-yellow-800 ml-2">
+              Sample Data
+            </Badge>
+          )}
         </CardTitle>
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
