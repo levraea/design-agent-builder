@@ -11,22 +11,22 @@ interface MainLayoutProps {
 export function MainLayout({ children, completedModules = [] }: MainLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <ResizablePanelGroup direction="horizontal" className="min-h-screen">
-          <ResizablePanel defaultSize={25} minSize={15} maxSize={50}>
-            <AppSidebar completedModules={completedModules} />
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={75}>
-            <SidebarInset className="flex-1 h-full">
-              <div className="flex h-14 items-center px-4 border-b">
-                <SidebarTrigger className="mr-2" />
-              </div>
+      <ResizablePanelGroup direction="horizontal" className="min-h-screen w-full">
+        <ResizablePanel defaultSize={25} minSize={15} maxSize={50} className="min-w-0">
+          <AppSidebar completedModules={completedModules} />
+        </ResizablePanel>
+        <ResizableHandle withHandle className="w-1 bg-border hover:bg-accent transition-colors" />
+        <ResizablePanel defaultSize={75} className="min-w-0">
+          <SidebarInset className="w-full h-full">
+            <div className="flex h-14 items-center px-4 border-b">
+              <SidebarTrigger className="mr-2" />
+            </div>
+            <div className="p-4 h-[calc(100vh-3.5rem)] overflow-auto">
               {children}
-            </SidebarInset>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
+            </div>
+          </SidebarInset>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </SidebarProvider>
   );
 }

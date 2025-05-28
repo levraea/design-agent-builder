@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -122,7 +123,7 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
   };
 
   return (
-    <Sidebar variant="sidebar" className="border-r">
+    <Sidebar variant="sidebar" className="border-r w-full h-full">
       <SidebarHeader className="p-4">
         <h2 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
           <div className="relative">
