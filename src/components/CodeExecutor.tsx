@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -24,49 +22,22 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
 
     try {
       setError(null);
-      console.log('Original code:', code);
+      console.log('Executing JavaScript code:', code);
       
-      // Use the code exactly as returned by AI - minimal manipulation
+      // Since we're now getting plain JavaScript, we can execute it directly
+      // Just remove any markdown code blocks if present
       let cleanCode = code;
-      
-      // Only remove markdown code blocks if present
       if (cleanCode.includes('```')) {
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
       
-      // Remove import statements since we provide dependencies directly
-      cleanCode = cleanCode.replace(/^import\s+.*?;\s*$/gm, '');
-      
-      // Remove export statements
-      cleanCode = cleanCode.replace(/^export\s+default\s+\w+;\s*$/gm, '');
-      cleanCode = cleanCode.replace(/^export\s+\{.*?\}.*?;\s*$/gm, '');
-      
-      // Remove TypeScript interfaces and type definitions
-      cleanCode = cleanCode.replace(/^interface\s+\w+.*?\{[\s\S]*?\}\s*$/gm, '');
-      cleanCode = cleanCode.replace(/^type\s+\w+.*?=[\s\S]*?;\s*$/gm, '');
-      
-      // Remove TypeScript type annotations from function parameters and variables
-      cleanCode = cleanCode.replace(/:\s*React\.FC<[^>]*>/g, '');
-      cleanCode = cleanCode.replace(/:\s*React\.ComponentType<[^>]*>/g, '');
-      cleanCode = cleanCode.replace(/:\s*string\b/g, '');
-      cleanCode = cleanCode.replace(/:\s*number\b/g, '');
-      cleanCode = cleanCode.replace(/:\s*boolean\b/g, '');
-      cleanCode = cleanCode.replace(/:\s*React\.ChangeEvent<[^>]*>/g, '');
-      
-      // Clean up extra whitespace
-      cleanCode = cleanCode.trim();
-      
-      console.log('Code after cleaning:', cleanCode);
-
-      // Instead of trying to execute JSX directly, let's try a different approach
-      // We'll wrap the code in a way that makes it executable
+      // Wrap the code to make it executable
       const executableCode = `
-        return function GeneratedComponent(props) {
-          ${cleanCode.replace(/^const\s+\w+\s*=/, 'return')}
-        };
+        ${cleanCode}
+        return GeneratedApp;
       `;
       
-      console.log('Executable code:', executableCode);
+      console.log('Final executable code:', executableCode);
 
       // Create the component function with all necessary dependencies
       const componentFactory = new Function(
@@ -186,4 +157,3 @@ class ErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
-

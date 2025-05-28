@@ -34,17 +34,20 @@ const Index = () => {
             {
               parts: [
                 {
-                  text: `You are a React component generator. Generate a complete React functional component based on the user's prompt. 
+                  text: `You are a React component generator. Generate a complete React functional component in plain JavaScript (NOT TypeScript) based on the user's prompt. 
 
 Requirements:
+- Use plain JavaScript, NO TypeScript syntax or type annotations
 - Use React hooks (useState, useEffect) as needed
 - Use Tailwind CSS for styling
 - Use these available components: Card, CardContent, CardHeader, CardTitle, Button, Input
-- Return ONLY the component code, no explanations
+- Return ONLY the component code, no explanations or markdown
 - Make it a complete, working component
 - Use modern React patterns
 - The component should be named "GeneratedApp"
-- Include proper TypeScript types
+- DO NOT include any import statements
+- DO NOT include any export statements
+- DO NOT include any TypeScript interfaces or types
 
 User prompt: ${userPrompt}`
                 }
@@ -77,12 +80,7 @@ User prompt: ${userPrompt}`
   };
 
   const generateSampleCode = (prompt: string, apis: string[], components: string[]) => {
-    return `import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-
-const GeneratedApp = () => {
+    return `const GeneratedApp = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -136,9 +134,7 @@ const GeneratedApp = () => {
       </Card>
     </div>
   );
-};
-
-export default GeneratedApp;`;
+};`;
   };
 
   return (
