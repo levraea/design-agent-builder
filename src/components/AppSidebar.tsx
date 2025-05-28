@@ -123,7 +123,7 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
   };
 
   return (
-    <Sidebar className="w-full border-r">
+    <Sidebar>
       <SidebarHeader className="p-4">
         <h2 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
           <div className="relative">
