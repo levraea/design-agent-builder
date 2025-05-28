@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -24,7 +25,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       setError(null);
       console.log('Executing code:', code);
       
-      // Use the code exactly as returned by AI - no manipulation
+      // Use the code exactly as returned by AI - minimal manipulation
       let cleanCode = code;
       
       // Only remove markdown code blocks if present
@@ -32,7 +33,17 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
       
-      console.log('Using code as-is:', cleanCode);
+      // Remove import statements since we provide dependencies directly
+      cleanCode = cleanCode.replace(/^import\s+.*?;\s*$/gm, '');
+      
+      // Remove export statements
+      cleanCode = cleanCode.replace(/^export\s+default\s+\w+;\s*$/gm, '');
+      cleanCode = cleanCode.replace(/^export\s+\{.*?\}.*?;\s*$/gm, '');
+      
+      // Clean up extra whitespace
+      cleanCode = cleanCode.trim();
+      
+      console.log('Cleaned code:', cleanCode);
 
       // Find component name from the code
       const componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)/);
