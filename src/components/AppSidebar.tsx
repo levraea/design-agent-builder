@@ -1,5 +1,4 @@
 
-
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -12,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { 
   Target, 
   Map, 
@@ -119,42 +119,47 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
   const location = useLocation();
 
   return (
-    <Sidebar>
-      <SidebarHeader className="p-4">
-        <h2 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-          <div className="relative">
-            <Brain className="w-6 h-6 text-blue-600" />
-            <Sparkles className="w-3 h-3 text-purple-500 absolute -top-0.5 -right-0.5 animate-pulse" />
-          </div>
-          <span>Design Agent</span>
-        </h2>
-        <p className="text-sm text-gray-600">Turn ideas into digital products</p>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Core Modules</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {modules.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                    <Link to={item.url} className="flex items-start space-x-3 py-3">
-                      <div className="flex-shrink-0 mt-0.5">
-                        <item.icon className="w-4 h-4" />
-                      </div>
-                      <div className="flex flex-col min-w-0 flex-1">
-                        <span className="text-sm font-medium truncate">{item.title}</span>
-                        <span className="text-xs text-gray-500 truncate">{item.description}</span>
-                      </div>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <TooltipProvider>
+      <Sidebar>
+        <SidebarHeader className="p-4">
+          <h2 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+            <div className="relative">
+              <Brain className="w-6 h-6 text-blue-600" />
+              <Sparkles className="w-3 h-3 text-purple-500 absolute -top-0.5 -right-0.5 animate-pulse" />
+            </div>
+            <span>Design Agent</span>
+          </h2>
+          <p className="text-sm text-gray-600">Turn ideas into digital products</p>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Core Modules</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {modules.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton asChild isActive={location.pathname === item.url}>
+                          <Link to={item.url} className="flex items-center space-x-3 py-3">
+                            <div className="flex-shrink-0">
+                              <item.icon className="w-4 h-4" />
+                            </div>
+                            <span className="text-sm font-medium truncate">{item.title}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p>{item.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </TooltipProvider>
   )
 }
-
