@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -25,34 +24,17 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       setError(null);
       console.log('Executing code:', code);
       
-      // Much simpler cleaning - only remove the most basic things
+      // Use the code exactly as returned by AI - no manipulation
       let cleanCode = code;
       
-      // Remove markdown code blocks
-      cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
+      // Only remove markdown code blocks if present
+      if (cleanCode.includes('```')) {
+        cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
+      }
       
-      // Remove only simple import/export lines
-      const lines = cleanCode.split('\n');
-      const filteredLines = lines.filter(line => {
-        const trimmed = line.trim();
-        return !trimmed.startsWith('import ') && 
-               !trimmed.startsWith('export default') &&
-               !trimmed.startsWith('export {');
-      });
-      cleanCode = filteredLines.join('\n');
-      
-      // Remove simple interface definitions (single line only)
-      cleanCode = cleanCode.replace(/^interface\s+\w+\s*\{\s*\}\s*$/gm, '');
-      
-      // Remove React.FC annotations only
-      cleanCode = cleanCode.replace(/:\s*React\.FC/g, '');
-      
-      // Clean up extra whitespace
-      cleanCode = cleanCode.trim();
-      
-      console.log('Cleaned code:', cleanCode);
+      console.log('Using code as-is:', cleanCode);
 
-      // Find component name
+      // Find component name from the code
       const componentMatch = cleanCode.match(/(?:const|function)\s+(\w+)/);
       const componentName = componentMatch ? componentMatch[1] : 'GeneratedApp';
       
