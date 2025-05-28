@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -24,40 +25,30 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       setError(null);
       console.log('Executing code:', code);
       
-      // Clean the code step by step, preserving JSX structure
+      // Much simpler cleaning - only remove the most basic things
       let cleanCode = code;
       
       // Remove markdown code blocks
       cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       
-      // Remove import statements (line by line)
-      cleanCode = cleanCode.split('\n').filter(line => 
-        !line.trim().startsWith('import ') && !line.trim().startsWith('export ')
-      ).join('\n');
-      
-      // Remove interface definitions (complete blocks)
-      cleanCode = cleanCode.replace(/interface\s+\w+[^{]*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/gs, '');
-      cleanCode = cleanCode.replace(/type\s+\w+[^=]*=[^;]*;/gs, '');
-      
-      // Remove React.FC type annotations
-      cleanCode = cleanCode.replace(/:\s*React\.FC(?:<[^>]*>)?/g, '');
-      
-      // Remove useState type parameters
-      cleanCode = cleanCode.replace(/useState<[^>]*>/g, 'useState');
-      
-      // Remove parameter type annotations carefully
-      cleanCode = cleanCode.replace(/\(([^)]*?):\s*[^)]*\)/g, (match, params) => {
-        if (params.trim() === '') return '()';
-        // Keep parameter name, remove type
-        const paramName = params.split(':')[0].trim();
-        return `(${paramName})`;
+      // Remove only simple import/export lines
+      const lines = cleanCode.split('\n');
+      const filteredLines = lines.filter(line => {
+        const trimmed = line.trim();
+        return !trimmed.startsWith('import ') && 
+               !trimmed.startsWith('export default') &&
+               !trimmed.startsWith('export {');
       });
+      cleanCode = filteredLines.join('\n');
       
-      // Remove variable type annotations
-      cleanCode = cleanCode.replace(/(const|let|var)\s+(\w+)\s*:\s*[^=]+=/g, '$1 $2 =');
+      // Remove simple interface definitions (single line only)
+      cleanCode = cleanCode.replace(/^interface\s+\w+\s*\{\s*\}\s*$/gm, '');
       
-      // Clean up whitespace
-      cleanCode = cleanCode.replace(/\n\s*\n\s*\n/g, '\n\n').trim();
+      // Remove React.FC annotations only
+      cleanCode = cleanCode.replace(/:\s*React\.FC/g, '');
+      
+      // Clean up extra whitespace
+      cleanCode = cleanCode.trim();
       
       console.log('Cleaned code:', cleanCode);
 
