@@ -146,7 +146,6 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
                       <Checkbox 
                         checked={isModuleCompleted(item.url)}
                         className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                        readOnly
                       />
                       <item.icon className="w-4 h-4" />
                       <div className="flex flex-col">
