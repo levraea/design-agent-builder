@@ -5,13 +5,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wand2, Loader2 } from 'lucide-react';
 
+interface ConversationMessage {
+  id: string;
+  type: 'user' | 'ai';
+  content: string;
+  timestamp: Date;
+}
+
 interface PromptInputProps {
   onGenerate: (prompt: string) => void;
   isGenerating: boolean;
+  conversationHistory?: ConversationMessage[];
 }
 
-export const PromptInput = ({ onGenerate, isGenerating }: PromptInputProps) => {
+export const PromptInput = ({ onGenerate, isGenerating, conversationHistory = [] }: PromptInputProps) => {
   const [prompt, setPrompt] = useState('');
+  const hasConversationHistory = conversationHistory.length > 0;
 
   const handleSubmit = () => {
     if (prompt.trim()) {
@@ -21,12 +30,14 @@ export const PromptInput = ({ onGenerate, isGenerating }: PromptInputProps) => {
 
   return (
     <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <Wand2 className="w-5 h-5 text-purple-600" />
-          <span>Describe Your Application</span>
-        </CardTitle>
-      </CardHeader>
+      {!hasConversationHistory && (
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Wand2 className="w-5 h-5 text-purple-600" />
+            <span>Describe Your Application</span>
+          </CardTitle>
+        </CardHeader>
+      )}
       <CardContent className="space-y-4">
         <Textarea
           placeholder="Describe the application you want to build in plain English. Powered by Google Gemini 2.0 Flash for fast, intelligent code generation..."
@@ -48,7 +59,7 @@ export const PromptInput = ({ onGenerate, isGenerating }: PromptInputProps) => {
           ) : (
             <>
               <Wand2 className="w-4 h-4 mr-2" />
-              Generate Application
+              {hasConversationHistory ? 'Submit' : 'Generate Application'}
             </>
           )}
         </Button>

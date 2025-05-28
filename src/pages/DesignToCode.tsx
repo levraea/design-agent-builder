@@ -235,6 +235,7 @@ User prompt: ${augmentedPrompt}`
             <PromptInput 
               onGenerate={handleGenerateApp}
               isGenerating={isGenerating}
+              conversationHistory={conversationHistory}
             />
             
             <Tabs defaultValue="apis" className="w-full">
