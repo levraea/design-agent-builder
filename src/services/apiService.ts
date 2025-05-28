@@ -7,9 +7,27 @@ export const fetchAPIs = async (): Promise<{ apis: API[]; error: string | null }
   try {
     console.log('Attempting to fetch APIs from public registry...');
     
-    // Try direct fetch first (might work in some environments)
+    // Try a working CORS proxy service
     try {
-      console.log('Trying direct fetch...');
+      console.log('Trying CORS proxy...');
+      const proxyUrl = 'https://api.allorigins.win/get?url=';
+      const apiUrl = encodeURIComponent('https://api.publicapis.org/entries');
+      const response = await fetch(`${proxyUrl}${apiUrl}`);
+      
+      if (response.ok) {
+        const proxyData = await response.json();
+        // allorigins.win returns data in a 'contents' field as a string
+        const data = JSON.parse(proxyData.contents);
+        console.log('Successfully fetched API data via proxy:', data);
+        return transformAPIData(data);
+      }
+    } catch (proxyError) {
+      console.log('CORS proxy failed:', proxyError);
+    }
+
+    // If proxy fails, try direct fetch as last resort
+    try {
+      console.log('Trying direct fetch as fallback...');
       const directResponse = await fetch('https://api.publicapis.org/entries');
       if (directResponse.ok) {
         const directData = await directResponse.json();
@@ -17,31 +35,7 @@ export const fetchAPIs = async (): Promise<{ apis: API[]; error: string | null }
         return transformAPIData(directData);
       }
     } catch (directError) {
-      console.log('Direct fetch failed, trying CORS proxies...');
-    }
-
-    // Try different CORS proxy services
-    const corsProxies = [
-      'https://corsproxy.io/?',
-      'https://cors-anywhere.herokuapp.com/',
-      'https://api.codetabs.com/v1/proxy?quest='
-    ];
-
-    for (const proxy of corsProxies) {
-      try {
-        console.log(`Trying CORS proxy: ${proxy}`);
-        const apiUrl = 'https://api.publicapis.org/entries';
-        const response = await fetch(`${proxy}${encodeURIComponent(apiUrl)}`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Successfully fetched API data via proxy:', data);
-          return transformAPIData(data);
-        }
-      } catch (proxyError) {
-        console.log(`CORS proxy ${proxy} failed:`, proxyError);
-        continue;
-      }
+      console.log('Direct fetch failed:', directError);
     }
 
     throw new Error('All API fetch attempts failed');
