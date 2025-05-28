@@ -34,20 +34,37 @@ const Index = () => {
             {
               parts: [
                 {
-                  text: `You are a React component generator. Generate a complete React functional component in plain JavaScript (NOT TypeScript) based on the user's prompt. 
+                  text: `You are a React component generator. Generate a complete React functional component in PLAIN JAVASCRIPT using React.createElement() calls ONLY.
 
-Requirements:
+CRITICAL REQUIREMENTS:
+- Use ONLY React.createElement() - NO JSX syntax at all
+- NO angle brackets < > anywhere in the code
 - Use plain JavaScript, NO TypeScript syntax or type annotations
 - Use React hooks (useState, useEffect) as needed
-- Use Tailwind CSS for styling
 - Use these available components: Card, CardContent, CardHeader, CardTitle, Button, Input
 - Return ONLY the component code, no explanations or markdown
 - Make it a complete, working component
-- Use modern React patterns
 - The component should be named "GeneratedApp"
 - DO NOT include any import statements
 - DO NOT include any export statements
 - DO NOT include any TypeScript interfaces or types
+
+EXAMPLE FORMAT:
+function GeneratedApp() {
+  const [count, setCount] = useState(0);
+  
+  return React.createElement('div', { className: 'p-4' },
+    React.createElement(Card, null,
+      React.createElement(CardHeader, null,
+        React.createElement(CardTitle, null, 'My App')
+      ),
+      React.createElement(CardContent, null,
+        React.createElement('p', null, 'Count: ' + count),
+        React.createElement(Button, { onClick: () => setCount(count + 1) }, 'Increment')
+      )
+    )
+  );
+}
 
 User prompt: ${userPrompt}`
                 }
@@ -80,7 +97,7 @@ User prompt: ${userPrompt}`
   };
 
   const generateSampleCode = (prompt: string, apis: string[], components: string[]) => {
-    return `const GeneratedApp = () => {
+    return `function GeneratedApp() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -106,35 +123,32 @@ User prompt: ${userPrompt}`
     setLoading(false);
   };
 
-  return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Generated Application</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <Input placeholder="Enter your input..." />
-            <Button onClick={fetchData} disabled={loading}>
-              {loading ? 'Loading...' : 'Submit'}
-            </Button>
-            {data.length > 0 && (
-              <div className="grid gap-4">
-                {data.map((item, index) => (
-                  <Card key={index}>
-                    <CardContent className="p-4">
-                      <p>Data item {index + 1}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+  return React.createElement('div', { className: 'p-6 max-w-4xl mx-auto' },
+    React.createElement(Card, { className: 'mb-6' },
+      React.createElement(CardHeader, null,
+        React.createElement(CardTitle, null, 'Generated Application')
+      ),
+      React.createElement(CardContent, null,
+        React.createElement('div', { className: 'space-y-4' },
+          React.createElement(Input, { placeholder: 'Enter your input...' }),
+          React.createElement(Button, { 
+            onClick: fetchData, 
+            disabled: loading 
+          }, loading ? 'Loading...' : 'Submit'),
+          data.length > 0 && React.createElement('div', { className: 'grid gap-4' },
+            data.map((item, index) =>
+              React.createElement(Card, { key: index },
+                React.createElement(CardContent, { className: 'p-4' },
+                  React.createElement('p', null, 'Data item ' + (index + 1))
+                )
+              )
+            )
+          )
+        )
+      )
+    )
   );
-};`;
+}`;
   };
 
   return (

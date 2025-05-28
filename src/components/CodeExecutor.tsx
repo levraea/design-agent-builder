@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -13,29 +12,6 @@ interface CodeExecutorProps {
 export const CodeExecutor = ({ code }: CodeExecutorProps) => {
   const [error, setError] = useState<string | null>(null);
   const [Component, setComponent] = useState<React.ComponentType | null>(null);
-
-  const transformJSX = (code: string) => {
-    // Simple JSX transformation - replace common JSX patterns with React.createElement
-    let transformed = code;
-    
-    // Transform self-closing tags like <Input />
-    transformed = transformed.replace(/<(\w+)([^>]*?)\/>/g, (match, tagName, props) => {
-      const cleanProps = props.trim();
-      if (cleanProps) {
-        return `React.createElement(${tagName}, {${cleanProps.replace(/(\w+)=/g, '$1:')}})`;
-      }
-      return `React.createElement(${tagName})`;
-    });
-    
-    // Transform opening/closing tag pairs like <Card>content</Card>
-    transformed = transformed.replace(/<(\w+)([^>]*?)>(.*?)<\/\1>/gs, (match, tagName, props, children) => {
-      const cleanProps = props.trim();
-      const propsObj = cleanProps ? `{${cleanProps.replace(/(\w+)=/g, '$1:')}}` : 'null';
-      return `React.createElement(${tagName}, ${propsObj}, ${children})`;
-    });
-    
-    return transformed;
-  };
 
   const executeCode = useMemo(() => {
     if (!code.trim()) {
@@ -54,9 +30,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
 
-      // Transform JSX to React.createElement calls
-      const transformedCode = transformJSX(cleanCode);
-      console.log('Transformed code:', transformedCode);
+      console.log('Clean executable code:', cleanCode);
 
       // Create a context with all the React dependencies
       const context = {
@@ -77,7 +51,7 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
       const wrappedCode = `
         (function() {
           const { React, useState, useEffect, useMemo, useCallback, Card, CardHeader, CardTitle, CardContent, Button, Input } = arguments[0];
-          ${transformedCode}
+          ${cleanCode}
           return GeneratedApp;
         })
       `;
