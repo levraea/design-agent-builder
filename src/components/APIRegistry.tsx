@@ -43,7 +43,7 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
       <Card className="h-[500px] flex flex-col">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center space-x-2">
-            <Database className="w-5 h-5 text-blue-600" />
+            <Database className="w-5 h-5" style={{ color: '#D30F4B' }} />
             <span>API Registry</span>
           </CardTitle>
         </CardHeader>
@@ -63,7 +63,7 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
       <Card className="h-[500px] flex flex-col">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center space-x-2">
-            <Database className="w-5 h-5 text-blue-600" />
+            <Database className="w-5 h-5" style={{ color: '#D30F4B' }} />
             <span>API Registry</span>
           </CardTitle>
         </CardHeader>
@@ -81,7 +81,7 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
     <Card className="h-[500px] flex flex-col">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center space-x-2">
-          <Database className="w-5 h-5 text-blue-600" />
+          <Database className="w-5 h-5" style={{ color: '#D30F4B' }} />
           <span>API Registry ({apis.length} APIs)</span>
         </CardTitle>
         <div className="relative">

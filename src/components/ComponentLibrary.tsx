@@ -100,7 +100,7 @@ export const ComponentLibrary = ({ selectedComponents, onSelectionChange }: Comp
     <Card className="h-[500px] flex flex-col">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center space-x-2">
-          <Layout className="w-5 h-5 text-purple-600" />
+          <Layout className="w-5 h-5" style={{ color: '#66B512' }} />
           <span>Component Library</span>
         </CardTitle>
         <div className="relative">
