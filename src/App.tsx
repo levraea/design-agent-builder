@@ -24,6 +24,7 @@ import {
   GraduationCap,
   User
 } from 'lucide-react';
+import { PersonaModule } from "./pages/PersonaModule";
 
 const queryClient = new QueryClient();
 
@@ -175,8 +176,15 @@ const App = () => {
                 <DesignToCode onModuleComplete={handleModuleComplete} />
               </MainLayout>
             } />
+
+            {/* Personas module with custom component */}
+            <Route path="/personas" element={
+              <MainLayout completedModules={completedModules}>
+                <PersonaModule />
+              </MainLayout>
+            } />
             
-            {modules.map((module) => (
+            {modules.filter(module => module.path !== "/personas").map((module) => (
               <Route 
                 key={module.path}
                 path={module.path} 
