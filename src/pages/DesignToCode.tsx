@@ -35,23 +35,27 @@ const DesignToCode = ({ onModuleComplete }: DesignToCodeProps) => {
           <p className="text-gray-600">Generate front end code, aligned to Bayer Design Principles using preferred tech stack and headless architecture</p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[calc(100vh-300px)]">
-          {/* Left Panel - Controls */}
-          <DesignControlPanel
-            selectedAPIs={selectedAPIs}
-            onAPISelectionChange={setSelectedAPIs}
-            selectedComponents={selectedComponents}
-            onComponentSelectionChange={setSelectedComponents}
-            conversationHistory={conversationHistory}
-            onGenerate={onGenerate}
-            isGenerating={isGenerating}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[calc(100vh-300px)]">
+          {/* Left Panel - Controls (1/3 width) */}
+          <div className="lg:col-span-1">
+            <DesignControlPanel
+              selectedAPIs={selectedAPIs}
+              onAPISelectionChange={setSelectedAPIs}
+              selectedComponents={selectedComponents}
+              onComponentSelectionChange={setSelectedComponents}
+              conversationHistory={conversationHistory}
+              onGenerate={onGenerate}
+              isGenerating={isGenerating}
+            />
+          </div>
 
-          {/* Right Panel - Live Preview and Generated Code */}
-          <PreviewPanel
-            generatedCode={generatedCode}
-            isGenerating={isGenerating}
-          />
+          {/* Right Panel - Live Preview and Generated Code (2/3 width) */}
+          <div className="lg:col-span-2">
+            <PreviewPanel
+              generatedCode={generatedCode}
+              isGenerating={isGenerating}
+            />
+          </div>
         </div>
       </div>
     </div>
