@@ -121,12 +121,12 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
   return (
     <TooltipProvider>
       <Sidebar>
-        <SidebarHeader className="p-4">
+        <SidebarHeader className="p-4 bg-gradient-to-r from-brand-blue/5 to-brand-green/5">
           <Link to="/" className="block">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center space-x-2 hover:text-blue-600 transition-colors cursor-pointer">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center space-x-2 hover:text-brand-blue transition-colors cursor-pointer">
               <div className="relative">
-                <Brain className="w-6 h-6 text-blue-600" />
-                <Sparkles className="w-3 h-3 text-purple-500 absolute -top-0.5 -right-0.5 animate-pulse" />
+                <Brain className="w-6 h-6 text-brand-blue" />
+                <Sparkles className="w-3 h-3 text-brand-red absolute -top-0.5 -right-0.5 animate-pulse" />
               </div>
               <span>Design Agent</span>
             </h2>
@@ -135,7 +135,7 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Core Modules</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-brand-blue font-medium">Core Modules</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {modules.map((item) => (
@@ -143,15 +143,15 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                          <Link to={item.url} className="flex items-center space-x-3 py-3">
+                          <Link to={item.url} className="flex items-center space-x-3 py-3 hover:bg-brand-blue/5 transition-colors">
                             <div className="flex-shrink-0">
-                              <item.icon className="w-4 h-4" />
+                              <item.icon className={`w-4 h-4 ${location.pathname === item.url ? 'text-brand-blue' : 'text-gray-600'}`} />
                             </div>
-                            <span className="text-sm font-medium truncate">{item.title}</span>
+                            <span className={`text-sm font-medium truncate ${location.pathname === item.url ? 'text-brand-blue' : 'text-gray-700'}`}>{item.title}</span>
                           </Link>
                         </SidebarMenuButton>
                       </TooltipTrigger>
-                      <TooltipContent side="right">
+                      <TooltipContent side="right" className="bg-brand-blue text-white">
                         <p>{item.description}</p>
                       </TooltipContent>
                     </Tooltip>
