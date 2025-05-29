@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -27,7 +26,8 @@ import {
   GraduationCap, 
   Code,
   Brain,
-  Sparkles
+  Sparkles,
+  User
 } from 'lucide-react';
 
 const modules = [
@@ -36,6 +36,12 @@ const modules = [
     url: "/problem-framing",
     icon: Target,
     description: "Reframe ideas as outcomes"
+  },
+  {
+    title: "Personas",
+    url: "/personas",
+    icon: User,
+    description: "Define target user personas"
   },
   {
     title: "Journey Mapping",

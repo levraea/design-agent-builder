@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -22,7 +21,8 @@ import {
   Database, 
   Users, 
   Palette, 
-  GraduationCap 
+  GraduationCap,
+  User
 } from 'lucide-react';
 
 const queryClient = new QueryClient();
@@ -36,6 +36,15 @@ const modules = [
     input: "Feature idea or business request",
     aiFunction: "Reframe outputs as outcomes, identify user needs",
     output: "Clear problem statement and desired outcome"
+  },
+  {
+    path: "/personas",
+    title: "Personas",
+    description: "Create detailed user personas based on research and data",
+    icon: User,
+    input: "User research data and business goals",
+    aiFunction: "Generate detailed user personas with demographics, goals, and pain points",
+    output: "Comprehensive persona profiles with scenarios"
   },
   {
     path: "/journey-mapping",
