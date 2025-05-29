@@ -1,7 +1,7 @@
 
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Bot, Clock } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { User, Bot } from 'lucide-react';
 
 interface ConversationMessage {
   id: string;
@@ -28,13 +28,7 @@ export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
 
   return (
     <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center space-x-2 text-lg">
-          <Clock className="w-5 h-5 text-gray-600" />
-          <span>Conversation History</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <ScrollArea className="h-64 w-full">
           <div className="space-y-4">
             {messages.map((message) => (
