@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ConversationMessage } from '@/types/conversation';
 
@@ -112,10 +113,18 @@ ${apiContext}
 Make sure to integrate these APIs into the generated component to fetch and display relevant data.`;
       }
 
-      // Add design requirements to the prompt
+      // Add comprehensive design requirements to the prompt
       augmentedPrompt = `${augmentedPrompt}
 
-The app should use Material UI design system and Roboto font, ensure the resulting app is intuitive and easy to navigate, and incorporate responsive design principles for compatibility across desktop, tablet, and mobile devices.`;
+DESIGN GUIDELINES:
+- Ensure intuitive navigation and responsive design for desktop, tablet, and mobile
+- Utilize Material UI design system and Roboto font family
+- Create a modern, appealing interface with a clean, card-based layout
+- Incorporate smooth animations, hover effects, and a color palette of #0091DF (blue), #66B512 (green), and #D30F4B (red)
+- Include appropriate icons and smooth transitions for an engaging user experience
+- Ensure accessibility compliance with WCAG 2.2 standards
+- Use semantic HTML elements and proper ARIA labels
+- Ensure sufficient color contrast and keyboard navigation support`;
 
       // Build conversation context for the AI model
       let conversationContext = '';
