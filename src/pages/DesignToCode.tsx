@@ -178,9 +178,9 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
       }
 
       const data = await response.json();
-      const generatedCode = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const newGeneratedCode = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
       
-      setGeneratedCode(generatedCode);
+      setGeneratedCode(newGeneratedCode);
       
       // Add AI response to conversation history
       addToConversationHistory('ai', 'Generated a React component based on your prompt and conversation history. The code is now available in the Live Preview and Generated Code tab.');
