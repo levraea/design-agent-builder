@@ -25,6 +25,7 @@ export const PromptInput = ({ onGenerate, isGenerating, conversationHistory = []
   const handleSubmit = () => {
     if (prompt.trim()) {
       onGenerate(prompt);
+      setPrompt(''); // Clear the prompt after submission
     }
   };
 
