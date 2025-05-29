@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -27,10 +28,17 @@ import {
   Code,
   Brain,
   Sparkles,
-  User
+  User,
+  LayoutDashboard
 } from 'lucide-react';
 
 const modules = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+    description: "Your design workspace overview"
+  },
   {
     title: "Problem Framing",
     url: "/problem-framing",
