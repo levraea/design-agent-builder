@@ -1,16 +1,9 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wand2, Loader2 } from 'lucide-react';
-
-interface ConversationMessage {
-  id: string;
-  type: 'user' | 'ai';
-  content: string;
-  timestamp: Date;
-}
+import { ConversationMessage } from '@/types/conversation';
 
 interface PromptInputProps {
   onGenerate: (prompt: string) => void;

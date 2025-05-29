@@ -1,15 +1,7 @@
-
-
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Bot } from 'lucide-react';
-
-interface ConversationMessage {
-  id: string;
-  type: 'user' | 'ai';
-  content: string;
-  timestamp: Date;
-}
+import { ConversationMessage } from '@/types/conversation';
 
 interface ConversationHistoryProps {
   messages: ConversationMessage[];
@@ -75,4 +67,3 @@ export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
     </Card>
   );
 };
-
