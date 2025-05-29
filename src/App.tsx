@@ -1,10 +1,12 @@
+
 import { useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainLayout } from "./components/MainLayout";
+import Landing from "./pages/Landing";
 import DesignToCode from "./pages/DesignToCode";
 import { ModulePlaceholder } from "./pages/ModulePlaceholder";
 import NotFound from "./pages/NotFound";
@@ -154,19 +156,23 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <MainLayout completedModules={completedModules}>
-            <Routes>
-              <Route path="/" element={<Navigate to="/design-to-code" replace />} />
+          <Routes>
+            {/* Landing page at root */}
+            <Route path="/" element={<Landing />} />
+            
+            {/* Design tool routes with layout */}
+            <Route path="/design-to-code" element={
+              <MainLayout completedModules={completedModules}>
+                <DesignToCode onModuleComplete={handleModuleComplete} />
+              </MainLayout>
+            } />
+            
+            {modules.map((module) => (
               <Route 
-                path="/design-to-code" 
-                element={<DesignToCode onModuleComplete={handleModuleComplete} />} 
-              />
-              
-              {modules.map((module) => (
-                <Route 
-                  key={module.path}
-                  path={module.path} 
-                  element={
+                key={module.path}
+                path={module.path} 
+                element={
+                  <MainLayout completedModules={completedModules}>
                     <ModulePlaceholder 
                       title={module.title}
                       description={module.description}
@@ -175,13 +181,13 @@ const App = () => {
                       aiFunction={module.aiFunction}
                       output={module.output}
                     />
-                  } 
-                />
-              ))}
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </MainLayout>
+                  </MainLayout>
+                } 
+              />
+            ))}
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
