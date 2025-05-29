@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -89,17 +90,7 @@ Please consider the above conversation history when generating the component. Bu
 `;
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `You are a React component generator. Generate a complete React functional component in PLAIN JAVASCRIPT using React.createElement() calls ONLY.
+      const fullPrompt = `You are a React component generator. Generate a complete React functional component in PLAIN JAVASCRIPT using React.createElement() calls ONLY.
 
 ${conversationContext}
 
@@ -133,7 +124,24 @@ function GeneratedApp() {
   );
 }
 
-${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}`
+${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}`;
+
+      // Log the complete prompt that will be sent to the AI
+      console.log('=== FULL PROMPT SENT TO GEMINI API ===');
+      console.log(fullPrompt);
+      console.log('=== END OF PROMPT ===');
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: fullPrompt
                 }
               ]
             }
