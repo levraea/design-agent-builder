@@ -289,9 +289,9 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
             
             <Tabs defaultValue="apis" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="apis">API Registry</TabsTrigger>
-                <TabsTrigger value="components">Element UI Components</TabsTrigger>
-                <TabsTrigger value="conversation">Conversation</TabsTrigger>
+                <TabsTrigger value="apis">APIs</TabsTrigger>
+                <TabsTrigger value="components">Components</TabsTrigger>
+                <TabsTrigger value="conversation">Chat</TabsTrigger>
               </TabsList>
               
               <TabsContent value="apis" className="mt-4">
