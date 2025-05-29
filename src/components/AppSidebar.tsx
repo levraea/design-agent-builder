@@ -126,7 +126,7 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
             <h2 className="text-lg font-semibold text-gray-900 flex items-center space-x-2 hover:text-brand-blue transition-colors cursor-pointer">
               <div className="relative">
                 <Brain className="w-6 h-6 text-brand-blue" />
-                <Sparkles className="w-3 h-3 text-brand-red absolute -top-0.5 -right-0.5 animate-pulse" />
+                <Sparkles className="w-3 h-3 text-brand-green absolute -top-0.5 -right-0.5 animate-pulse" />
               </div>
               <span>Design Agent</span>
             </h2>
