@@ -58,7 +58,7 @@ export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1">
                     <span className="text-sm font-medium text-gray-900">
-                      {message.type === 'user' ? 'You' : 'AI Assistant'}
+                      {message.type === 'user' ? 'You' : 'AI Agent'}
                     </span>
                     <span className="text-xs text-gray-500">
                       {formatTime(message.timestamp)}
