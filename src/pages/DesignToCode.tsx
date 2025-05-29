@@ -167,7 +167,7 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
             }
           ],
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.0,
             maxOutputTokens: 2000,
           }
         })
