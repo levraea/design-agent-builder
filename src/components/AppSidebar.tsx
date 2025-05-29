@@ -12,6 +12,13 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { 
   Target, 
   Map, 
@@ -29,7 +36,8 @@ import {
   Brain,
   Sparkles,
   User,
-  LayoutDashboard
+  LayoutDashboard,
+  FolderOpen
 } from 'lucide-react';
 
 const modules = [
@@ -125,6 +133,14 @@ const modules = [
   },
 ];
 
+// Mock project data - in a real app this would come from your data store
+const projects = [
+  { id: "1", name: "E-commerce Redesign", lastEdited: "2024-05-28" },
+  { id: "2", name: "Mobile Banking App", lastEdited: "2024-05-27" },
+  { id: "3", name: "SaaS Dashboard", lastEdited: "2024-05-26" },
+  { id: "4", name: "Healthcare Portal", lastEdited: "2024-05-25" },
+];
+
 interface AppSidebarProps {
   completedModules?: string[];
 }
@@ -147,7 +163,31 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
             <p className="text-sm text-gray-600">Turn ideas into digital products</p>
           </Link>
         </SidebarHeader>
+        
         <SidebarContent>
+          {/* Project Context Dropdown */}
+          <div className="px-4 py-3 border-b border-gray-200">
+            <label className="text-xs font-medium text-gray-500 mb-2 block">Current Project</label>
+            <Select defaultValue="1">
+              <SelectTrigger className="w-full h-9 text-sm">
+                <div className="flex items-center space-x-2">
+                  <FolderOpen className="w-4 h-4 text-gray-500" />
+                  <SelectValue placeholder="Select project..." />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                {projects.map((project) => (
+                  <SelectItem key={project.id} value={project.id} className="text-sm">
+                    <div className="flex flex-col">
+                      <span className="font-medium">{project.name}</span>
+                      <span className="text-xs text-gray-500">Last edited: {project.lastEdited}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <SidebarGroup>
             <SidebarGroupLabel className="text-brand-blue font-medium">Core Modules</SidebarGroupLabel>
             <SidebarGroupContent>
