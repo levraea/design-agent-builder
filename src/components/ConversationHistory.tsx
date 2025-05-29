@@ -1,4 +1,5 @@
 
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Bot } from 'lucide-react';
@@ -29,7 +30,7 @@ export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
   return (
     <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
       <CardContent className="pt-6">
-        <ScrollArea className="h-64 w-full">
+        <ScrollArea className="h-48 w-full">
           <div className="space-y-4">
             {messages.map((message) => (
               <div
@@ -74,3 +75,4 @@ export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
     </Card>
   );
 };
+
