@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,7 +28,7 @@ export const PromptInput = ({ onGenerate, isGenerating, conversationHistory = []
       {!hasConversationHistory && (
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Wand2 className="w-5 h-5 text-purple-600" />
+            <Wand2 className="w-5 h-5 text-brand-blue" />
             <span>Describe Your Application</span>
           </CardTitle>
         </CardHeader>
@@ -37,13 +38,13 @@ export const PromptInput = ({ onGenerate, isGenerating, conversationHistory = []
           placeholder="Ask the agent..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          className="min-h-[120px] resize-none border-gray-200 focus:border-purple-300 focus:ring-purple-200"
+          className="min-h-[120px] resize-none border-gray-200 focus:border-brand-blue focus:ring-brand-blue/20"
         />
         
         <Button 
           onClick={handleSubmit}
           disabled={!prompt.trim() || isGenerating}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+          className="w-full bg-gradient-to-r from-brand-blue to-brand-green hover:from-brand-blue/90 hover:to-brand-green/90 text-white"
         >
           {isGenerating ? (
             <>
