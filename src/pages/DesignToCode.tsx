@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -290,12 +289,12 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
               </TabsList>
               
               <TabsContent value="chat" className="mt-4 space-y-4">
+                <ConversationHistory messages={conversationHistory} />
                 <PromptInput 
                   onGenerate={handleGenerateApp}
                   isGenerating={isGenerating}
                   conversationHistory={conversationHistory}
                 />
-                <ConversationHistory messages={conversationHistory} />
               </TabsContent>
               
               <TabsContent value="apis" className="mt-4">
