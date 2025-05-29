@@ -9,8 +9,8 @@ interface LivePreviewProps {
 
 export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
   return (
-    <div className="h-full flex flex-col min-h-0">
-      <div className="flex-1 bg-white overflow-hidden flex flex-col min-h-0">
+    <div className="h-full flex flex-col">
+      <div className="flex-1 bg-white overflow-hidden">
         {isGenerating ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
@@ -22,7 +22,7 @@ export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
             </div>
           </div>
         ) : code ? (
-          <div className="flex-1 min-h-0">
+          <div className="h-full">
             <CodeExecutor code={code} />
           </div>
         ) : (

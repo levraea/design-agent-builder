@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -106,11 +105,9 @@ export const CodeExecutor = ({ code }: CodeExecutorProps) => {
   }
 
   return (
-    <div className="h-full min-h-full flex flex-col">
+    <div className="w-full h-full overflow-auto">
       <ErrorBoundary>
-        <div className="flex-1 flex flex-col min-h-0">
-          <Component />
-        </div>
+        <Component />
       </ErrorBoundary>
     </div>
   );
