@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -90,8 +89,7 @@ Please consider the above conversation history when generating the component. Bu
 `;
       }
 
-      //const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-0520:generateContent?key=${GEMINI_API_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -165,12 +163,12 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
       }
     } catch (error) {
       console.error('Error generating code:', error);
-      // Fallback to sample code if API fails
-      const fallbackCode = generateSampleCode(userPrompt, selectedAPIs, selectedComponents);
+      // Fallback to sample code if API fails, including the error message
+      const fallbackCode = generateSampleCode(userPrompt, selectedAPIs, selectedComponents, error.message);
       setGeneratedCode(fallbackCode);
       
       // Add AI response to conversation history for fallback
-      addToConversationHistory('ai', 'Generated a fallback React component. The API request failed, but I created a sample component based on your prompt.');
+      addToConversationHistory('ai', `API request failed: ${error.message}. Generated a fallback React component instead.`);
       
       // Still mark as complete even with fallback
       if (onModuleComplete) {
@@ -181,7 +179,7 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
     setIsGenerating(false);
   };
 
-  const generateSampleCode = (prompt: string, apis: string[], components: string[]) => {
+  const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
     return `function GeneratedApp() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -189,6 +187,7 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
   // Generated based on: "${prompt}"
   // Using APIs: ${apis.join(', ') || 'None selected'}
   // Using Components: ${components.join(', ') || 'Default UI components'}
+  ${errorMessage ? `// API Error: ${errorMessage}` : ''}
 
   useEffect(() => {
     // Fetch data from selected APIs
@@ -211,10 +210,15 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
   return React.createElement('div', { className: 'p-6 max-w-4xl mx-auto' },
     React.createElement(Card, { className: 'mb-6' },
       React.createElement(CardHeader, null,
-        React.createElement(CardTitle, null, 'Generated Application')
+        React.createElement(CardTitle, null, 'Generated Application (Fallback)')
       ),
       React.createElement(CardContent, null,
         React.createElement('div', { className: 'space-y-4' },
+          ${errorMessage ? `React.createElement('div', { className: 'bg-red-50 border border-red-200 rounded-md p-4 mb-4' },
+            React.createElement('h4', { className: 'text-red-800 font-medium mb-2' }, 'API Generation Failed'),
+            React.createElement('p', { className: 'text-red-600 text-sm' }, '${errorMessage}'),
+            React.createElement('p', { className: 'text-red-600 text-sm mt-2' }, 'Showing fallback component instead.')
+          ),` : ''}
           React.createElement(Input, { placeholder: 'Enter your input...' }),
           React.createElement(Button, { 
             onClick: fetchData, 
