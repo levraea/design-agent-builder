@@ -90,9 +90,29 @@ Please consider the above conversation history when generating the component. Bu
 `;
       }
 
+      // Include current generated code if it exists
+      let currentCodeContext = '';
+      if (generatedCode.trim()) {
+        currentCodeContext = `
+CURRENT GENERATED CODE:
+The following is the last code you generated. Please build upon this code and modify it according to the new request while maintaining existing functionality:
+
+\`\`\`javascript
+${generatedCode}
+\`\`\`
+
+MODIFICATION INSTRUCTIONS:
+- Modify the existing GeneratedApp function above to incorporate the new request
+- Keep all existing functionality that is not being changed
+- Only update the parts that are specifically requested by the user
+- Ensure the component still works correctly after modifications
+
+`;
+      }
+
       const fullPrompt = `You are a React component generator. Generate a complete React functional component in PLAIN JAVASCRIPT using React.createElement() calls ONLY.
 
-${conversationContext}
+${conversationContext}${currentCodeContext}
 
 CRITICAL REQUIREMENTS:
 - Use ONLY React.createElement() - NO JSX syntax at all
