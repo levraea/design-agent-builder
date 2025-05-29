@@ -1,3 +1,4 @@
+
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Bot } from 'lucide-react';
@@ -28,15 +29,15 @@ export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
               <div
                 key={message.id}
                 className={`flex items-start space-x-3 ${
-                  message.type === 'user' ? 'flex-row' : 'flex-row'
+                  message.role === 'user' ? 'flex-row' : 'flex-row'
                 }`}
               >
                 <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                  message.type === 'user' 
+                  message.role === 'user' 
                     ? 'bg-blue-100 text-blue-600' 
                     : 'bg-purple-100 text-purple-600'
                 }`}>
-                  {message.type === 'user' ? (
+                  {message.role === 'user' ? (
                     <User className="w-4 h-4" />
                   ) : (
                     <Bot className="w-4 h-4" />
@@ -45,14 +46,14 @@ export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1">
                     <span className="text-sm font-medium text-gray-900">
-                      {message.type === 'user' ? 'You' : 'AI Agent'}
+                      {message.role === 'user' ? 'You' : 'AI Agent'}
                     </span>
                     <span className="text-xs text-gray-500">
                       {formatTime(message.timestamp)}
                     </span>
                   </div>
                   <div className={`text-sm p-3 rounded-lg ${
-                    message.type === 'user'
+                    message.role === 'user'
                       ? 'bg-blue-50 text-blue-900'
                       : 'bg-gray-50 text-gray-900'
                   }`}>

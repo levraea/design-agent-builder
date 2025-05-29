@@ -10,10 +10,10 @@ export const useCodeGeneration = () => {
   // Hardcoded API key
   const GEMINI_API_KEY = 'AIzaSyCQdatAJtVX1MulVsd2DtUfFKi7xHYhkSY';
   
-  const addToConversationHistory = (type: 'user' | 'ai', content: string) => {
+  const addToConversationHistory = (role: 'user' | 'assistant', content: string) => {
     const newMessage: ConversationMessage = {
       id: Date.now().toString(),
-      type,
+      role,
       content,
       timestamp: new Date()
     };
@@ -131,7 +131,7 @@ DESIGN GUIDELINES:
       if (conversationHistory.length > 0) {
         conversationContext = `
 CONVERSATION HISTORY:
-${conversationHistory.map(msg => `${msg.type.toUpperCase()}: ${msg.content}`).join('\n')}
+${conversationHistory.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join('\n')}
 
 CURRENT REQUEST:
 USER: ${userPrompt}
@@ -234,7 +234,7 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
       setGeneratedCode(newGeneratedCode);
       
       // Add AI response to conversation history
-      addToConversationHistory('ai', 'Generated a React component based on your prompt and conversation history. The code is now available in the Live Preview and Generated Code tab.');
+      addToConversationHistory('assistant', 'Generated a React component based on your prompt and conversation history. The code is now available in the Live Preview and Generated Code tab.');
       
       // Mark the Design-to-Code Generation module as complete
       if (onModuleComplete) {
@@ -247,7 +247,7 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
       setGeneratedCode(fallbackCode);
       
       // Add AI response to conversation history for fallback
-      addToConversationHistory('ai', `API request failed: ${error.message}. Generated a fallback React component instead.`);
+      addToConversationHistory('assistant', `API request failed: ${error.message}. Generated a fallback React component instead.`);
       
       // Still mark as complete even with fallback
       if (onModuleComplete) {
