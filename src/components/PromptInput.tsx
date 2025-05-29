@@ -41,7 +41,7 @@ export const PromptInput = ({ onGenerate, isGenerating, conversationHistory = []
       )}
       <CardContent className={`space-y-4 ${hasConversationHistory ? 'pt-6' : ''}`}>
         <Textarea
-          placeholder="Describe the application you want to build in plain English."
+          placeholder="Ask the agent..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           className="min-h-[120px] resize-none border-gray-200 focus:border-purple-300 focus:ring-purple-200"
