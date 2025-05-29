@@ -1,7 +1,7 @@
 
 export interface ConversationMessage {
   id: string;
-  role: 'user' | 'assistant';
+  type: 'user' | 'ai';
   content: string;
   timestamp: Date;
 }
