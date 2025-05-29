@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { LivePreview } from '@/components/LivePreview';
@@ -281,18 +282,21 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-[calc(100vh-300px)]">
           {/* Left Panel - Controls */}
           <div className="space-y-6">
-            <PromptInput 
-              onGenerate={handleGenerateApp}
-              isGenerating={isGenerating}
-              conversationHistory={conversationHistory}
-            />
-            
-            <Tabs defaultValue="apis" className="w-full">
+            <Tabs defaultValue="chat" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="chat">Chat</TabsTrigger>
                 <TabsTrigger value="apis">APIs</TabsTrigger>
                 <TabsTrigger value="components">Components</TabsTrigger>
-                <TabsTrigger value="conversation">Chat</TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="chat" className="mt-4 space-y-4">
+                <PromptInput 
+                  onGenerate={handleGenerateApp}
+                  isGenerating={isGenerating}
+                  conversationHistory={conversationHistory}
+                />
+                <ConversationHistory messages={conversationHistory} />
+              </TabsContent>
               
               <TabsContent value="apis" className="mt-4">
                 <APIRegistry 
@@ -306,10 +310,6 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
                   selectedComponents={selectedComponents}
                   onSelectionChange={setSelectedComponents}
                 />
-              </TabsContent>
-
-              <TabsContent value="conversation" className="mt-4">
-                <ConversationHistory messages={conversationHistory} />
               </TabsContent>
             </Tabs>
           </div>
