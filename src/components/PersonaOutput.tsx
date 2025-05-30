@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, Target, Heart, Brain, Smartphone, Quote, Edit, RotateCcw, Download } from 'lucide-react';
 import { Persona } from '@/types/persona';
+import { MarkdownRenderer } from '@/utils/markdownRenderer';
 
 interface PersonaOutputProps {
   persona: Persona;
@@ -103,14 +104,20 @@ Created: ${persona.createdAt.toLocaleDateString()}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-2">Role & Occupation</h3>
-                  <p className="text-gray-600 mb-4">{persona.role}</p>
+                  <div className="text-gray-600 mb-4">
+                    <MarkdownRenderer content={persona.role} />
+                  </div>
                   
                   <h3 className="font-semibold text-gray-800 mb-2">Lifestyle & Background</h3>
-                  <p className="text-gray-600">{persona.lifestyle}</p>
+                  <div className="text-gray-600">
+                    <MarkdownRenderer content={persona.lifestyle} />
+                  </div>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 mb-2">Tech Comfort</h3>
-                  <p className="text-gray-600 mb-4">{persona.techComfort}</p>
+                  <div className="text-gray-600 mb-4">
+                    <MarkdownRenderer content={persona.techComfort} />
+                  </div>
                   
                   {persona.personalTouch && (
                     <>
@@ -118,7 +125,9 @@ Created: ${persona.createdAt.toLocaleDateString()}
                         <Quote className="w-4 h-4" />
                         <span>Personal Touch</span>
                       </h3>
-                      <p className="text-gray-600 italic">"{persona.personalTouch}"</p>
+                      <div className="text-gray-600 italic">
+                        <MarkdownRenderer content={`"${persona.personalTouch}"`} />
+                      </div>
                     </>
                   )}
                 </div>
@@ -144,7 +153,9 @@ Created: ${persona.createdAt.toLocaleDateString()}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700">{persona.goals}</p>
+                    <div className="text-gray-700">
+                      <MarkdownRenderer content={persona.goals} />
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -156,7 +167,9 @@ Created: ${persona.createdAt.toLocaleDateString()}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700">{persona.challenges}</p>
+                    <div className="text-gray-700">
+                      <MarkdownRenderer content={persona.challenges} />
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -168,7 +181,9 @@ Created: ${persona.createdAt.toLocaleDateString()}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700">{persona.motivation}</p>
+                    <div className="text-gray-700">
+                      <MarkdownRenderer content={persona.motivation} />
+                    </div>
                   </CardContent>
                 </Card>
               </div>
