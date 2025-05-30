@@ -1,5 +1,5 @@
 
-import { Database, Cloud, Globe, Apple, Pill, Wheat, Heart, Building2 } from 'lucide-react';
+import { Database, Cloud, Globe, Apple, Pill, Wheat, Heart, Building2, Microscope, Dna, GraduationCap, Telescope } from 'lucide-react';
 import { API } from '@/types/api';
 
 export const mockAPIs: API[] = [
@@ -132,5 +132,57 @@ export const mockAPIs: API[] = [
     auth: 'None',
     https: true,
     cors: 'unknown'
+  },
+  {
+    id: 'ebi-search',
+    name: 'EBI Search API',
+    description: 'Provides access to a vast array of biological data resources hosted at the European Bioinformatics Institute (EBI), including nucleotide and protein sequences, gene expression profiles, and more',
+    category: 'PH Drug Innovation Platform',
+    version: 'v1',
+    status: 'active',
+    icon: Microscope,
+    link: 'https://www.ebi.ac.uk/ebisearch/documentation.ebi',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'lapis',
+    name: 'LAPIS (Lightweight API for Sequences)',
+    description: 'Offers rapid retrieval and analysis of genomic sequencing data, optimized for large datasets like SARS-CoV-2 sequences',
+    category: 'CH Data Assets, Analytics, and AI Platform',
+    version: 'v1',
+    status: 'active',
+    icon: Dna,
+    link: 'https://lapis.genspectrum.org/api/v1/',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'openalex',
+    name: 'OpenAlex',
+    description: 'A comprehensive open index of scholarly works, authors, institutions, and concepts, useful for bibliometric and academic research',
+    category: 'Enterprise Data & Analytics Platform',
+    version: 'v1',
+    status: 'active',
+    icon: GraduationCap,
+    link: 'https://docs.openalex.org/',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'go-apod',
+    name: 'Go-APOD (Astronomy Picture of the Day)',
+    description: 'A CORS-enabled, no-auth wrapper for NASA\'s Astronomy Picture of the Day, providing daily images and explanations',
+    category: 'CS Global Data Assets & Analytics Platform',
+    version: 'v1',
+    status: 'active',
+    icon: Telescope,
+    link: 'https://github.com/johnnytheboy1990/go-apod',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
   }
 ];
