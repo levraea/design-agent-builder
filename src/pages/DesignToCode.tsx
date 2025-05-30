@@ -35,7 +35,7 @@ const DesignToCode = ({ onModuleComplete }: DesignToCodeProps) => {
           <p className="text-gray-600">Generate front end code, aligned to Bayer Design Principles using preferred tech stack and headless architecture</p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[calc(100vh-300px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[calc(100vh-250px)]">
           {/* Left Panel - Controls (1/3 width) */}
           <div className="lg:col-span-1">
             <DesignControlPanel

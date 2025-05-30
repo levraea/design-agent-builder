@@ -10,7 +10,7 @@ interface PreviewPanelProps {
 
 export const PreviewPanel = ({ generatedCode, isGenerating }: PreviewPanelProps) => {
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden h-[calc(100vh-8rem)]">
       <Tabs defaultValue="preview" className="h-full flex flex-col">
         <TabsList className="bg-gray-800 h-8 m-4 mb-0">
           <TabsTrigger value="preview" className="text-white data-[state=active]:bg-gray-700 data-[state=active]:text-white">Live Preview</TabsTrigger>

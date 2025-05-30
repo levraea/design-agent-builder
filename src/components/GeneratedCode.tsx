@@ -30,7 +30,7 @@ export const GeneratedCode = ({ code }: GeneratedCodeProps) => {
   };
 
   return (
-    <Card className="h-[500px] flex flex-col">
+    <Card className="h-full flex flex-col">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center justify-end">
           <div className="flex space-x-2">
