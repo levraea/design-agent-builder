@@ -1,3 +1,5 @@
+
+import { useEffect, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Bot } from 'lucide-react';
@@ -8,6 +10,18 @@ interface ConversationHistoryProps {
 }
 
 export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [messages]);
+
   if (messages.length === 0) {
     return null;
   }
@@ -22,7 +36,7 @@ export const ConversationHistory = ({ messages }: ConversationHistoryProps) => {
   return (
     <Card className="shadow-lg border-0 bg-white/90 backdrop-blur-sm">
       <CardContent className="pt-6">
-        <ScrollArea className="h-48 w-full">
+        <ScrollArea ref={scrollAreaRef} className="h-48 w-full">
           <div className="space-y-4">
             {messages.map((message) => (
               <div
