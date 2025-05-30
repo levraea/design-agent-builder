@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 
@@ -13,15 +13,6 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Stable callback refs to avoid infinite loops
-  const onErrorRef = useRef(onError);
-  const onSuccessRef = useRef(onSuccess);
-  
-  useEffect(() => {
-    onErrorRef.current = onError;
-    onSuccessRef.current = onSuccess;
-  });
 
   useEffect(() => {
     console.log('IframeSandbox: code changed', { codeLength: code?.length, hasCode: !!code?.trim() });
@@ -38,6 +29,9 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
 
     const iframe = iframeRef.current;
     
+    // Transform the code to be executable
+    const transformedCode = transformCodeForExecution(code);
+    
     const iframeContent = `
       <!DOCTYPE html>
       <html>
@@ -45,8 +39,9 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Live Preview</title>
-        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
           body { 
@@ -55,21 +50,50 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
             font-family: system-ui, -apple-system, sans-serif;
             background: white;
           }
+          .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+          }
         </style>
       </head>
       <body>
-        <div id="root">
-          <div style="padding: 20px; text-align: center; color: #666;">
-            <h3>Code Preview</h3>
-            <p>Code length: ${code.length} characters</p>
-            <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; text-align: left; overflow-x: auto; max-height: 200px;">${code.substring(0, 500)}${code.length > 500 ? '...' : ''}</pre>
-          </div>
-        </div>
-        <script>
-          console.log('Iframe content loaded');
-          setTimeout(() => {
-            window.parent.postMessage({ type: 'success' }, '*');
-          }, 100);
+        <div id="root"></div>
+        <script type="text/babel">
+          const { useState, useEffect, useRef, useCallback, useMemo } = React;
+          
+          try {
+            ${transformedCode}
+            
+            // Create React root and render
+            const container = document.getElementById('root');
+            const root = ReactDOM.createRoot(container);
+            
+            // If there's a default export, render it
+            if (typeof App !== 'undefined') {
+              root.render(React.createElement(App));
+            } else if (typeof Component !== 'undefined') {
+              root.render(React.createElement(Component));
+            } else {
+              root.render(React.createElement('div', null, 'Component rendered successfully'));
+            }
+            
+            setTimeout(() => {
+              window.parent.postMessage({ type: 'success' }, '*');
+            }, 100);
+            
+          } catch (error) {
+            console.error('Execution error:', error);
+            const container = document.getElementById('root');
+            container.innerHTML = '<div class="error"><strong>Error:</strong> ' + error.message + '</div>';
+            window.parent.postMessage({ 
+              type: 'error', 
+              message: error.message 
+            }, '*');
+          }
         </script>
       </body>
       </html>
@@ -79,8 +103,8 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       console.log('IframeSandbox: load timeout reached');
       setIsLoading(false);
       setError('Preview loading timeout');
-      onErrorRef.current?.('Preview loading timeout');
-    }, 5000);
+      onError?.('Preview loading timeout');
+    }, 10000);
 
     const handleLoad = () => {
       console.log('IframeSandbox: iframe loaded');
@@ -93,7 +117,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       clearTimeout(loadTimeout);
       setIsLoading(false);
       setError('Failed to load iframe');
-      onErrorRef.current?.('Failed to load iframe');
+      onError?.('Failed to load iframe');
     };
 
     console.log('IframeSandbox: setting iframe srcdoc');
@@ -104,9 +128,9 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       clearTimeout(loadTimeout);
     };
 
-  }, [code]); // Only depend on code, not callback functions
+  }, [code]); // Only depend on code
 
-  // Separate effect for message handling
+  // Handle messages from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       console.log('IframeSandbox: received message', event.data);
@@ -114,18 +138,18 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       if (event.data.type === 'error') {
         setError(event.data.message);
         setIsLoading(false);
-        onErrorRef.current?.(event.data.message);
+        onError?.(event.data.message);
       } else if (event.data.type === 'success') {
         console.log('IframeSandbox: success message received');
         setError(null);
         setIsLoading(false);
-        onSuccessRef.current?.();
+        onSuccess?.();
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []); // No dependencies needed
+  }, [onError, onSuccess]);
 
   console.log('IframeSandbox: rendering', { isLoading, error, hasCode: !!code });
 
@@ -159,3 +183,25 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
     </div>
   );
 };
+
+// Helper function to transform code for execution
+function transformCodeForExecution(code: string): string {
+  let transformed = code;
+  
+  // Remove import statements (we'll provide React globally)
+  transformed = transformed.replace(/import\s+.*?from\s+['"].*?['"];?\s*/g, '');
+  
+  // Handle export default
+  transformed = transformed.replace(/export\s+default\s+function\s+(\w+)/g, 'function App');
+  transformed = transformed.replace(/export\s+default\s+(\w+)/g, 'const App = $1');
+  
+  // Handle const/function component exports
+  if (transformed.includes('const ') && !transformed.includes('function App')) {
+    const componentMatch = transformed.match(/const\s+(\w+)\s*=/);
+    if (componentMatch) {
+      transformed = transformed.replace(/const\s+(\w+)\s*=/, 'const App =');
+    }
+  }
+  
+  return transformed;
+}
