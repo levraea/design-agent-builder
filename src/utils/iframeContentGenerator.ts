@@ -1,5 +1,6 @@
 
 
+
 export const generateIframeContent = (cleanCode: string): string => {
   return `
     <!DOCTYPE html>
@@ -114,14 +115,14 @@ export const generateIframeContent = (cleanCode: string): string => {
           for (let i = 0; i < corsProxies.length; i++) {
             const proxy = corsProxies[i];
             try {
-              console.log(\`Trying proxy \${i + 1}/\${corsProxies.length}: \${proxy.name}\`);
+              console.log('Trying proxy ' + (i + 1) + '/' + corsProxies.length + ': ' + proxy.name);
               const proxyUrl = proxy.url + encodeURIComponent(targetUrl);
               const response = await fetch(proxyUrl, options);
               
               if (response.ok) {
                 const data = await response.json();
                 const transformedData = proxy.transform(data);
-                console.log(\`Proxy \${proxy.name} successful\`);
+                console.log('Proxy ' + proxy.name + ' successful');
                 
                 // Return a Response-like object for consistency
                 return {
@@ -131,7 +132,7 @@ export const generateIframeContent = (cleanCode: string): string => {
                 };
               }
             } catch (error) {
-              console.warn(\`Proxy \${proxy.name} failed:`, error);
+              console.warn('Proxy ' + proxy.name + ' failed:', error);
               continue;
             }
           }
@@ -182,22 +183,22 @@ export const generateIframeContent = (cleanCode: string): string => {
             
             // Mock UI components for the sandbox
             const Card = ({ children, className = '' }) => 
-              React.createElement('div', { className: \`bg-white border rounded-lg shadow-sm \${className}\` }, children);
+              React.createElement('div', { className: 'bg-white border rounded-lg shadow-sm ' + className }, children);
             
             const CardHeader = ({ children, className = '' }) => 
-              React.createElement('div', { className: \`px-6 py-4 border-b \${className}\` }, children);
+              React.createElement('div', { className: 'px-6 py-4 border-b ' + className }, children);
             
             const CardTitle = ({ children, className = '' }) => 
-              React.createElement('h3', { className: \`text-lg font-semibold \${className}\` }, children);
+              React.createElement('h3', { className: 'text-lg font-semibold ' + className }, children);
             
             const CardContent = ({ children, className = '' }) => 
-              React.createElement('div', { className: \`px-6 py-4 \${className}\` }, children);
+              React.createElement('div', { className: 'px-6 py-4 ' + className }, children);
             
             const Button = ({ children, onClick, disabled, className = '' }) => 
               React.createElement('button', { 
                 onClick, 
                 disabled,
-                className: \`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 \${className}\`
+                className: 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 ' + className
               }, children);
             
             const Input = ({ placeholder, value, onChange, className = '' }) => 
@@ -205,12 +206,12 @@ export const generateIframeContent = (cleanCode: string): string => {
                 placeholder, 
                 value, 
                 onChange,
-                className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
+                className: 'px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ' + className
               });
 
             // Add missing Title component
             const Title = ({ children, className = '' }) => 
-              React.createElement('h2', { className: \`text-xl font-bold \${className}\` }, children);
+              React.createElement('h2', { className: 'text-xl font-bold ' + className }, children);
 
             // Process the code
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
@@ -252,7 +253,7 @@ export const generateIframeContent = (cleanCode: string): string => {
           } catch (error) {
             console.error('Execution error:', error);
             document.getElementById('root').innerHTML = 
-              \`<div class="error"><strong>Error:</strong> \${error.message}</div>\`;
+              '<div class="error"><strong>Error:</strong> ' + error.message + '</div>';
             
             // Signal error to parent
             window.parent.postMessage({ 
@@ -267,3 +268,4 @@ export const generateIframeContent = (cleanCode: string): string => {
     </html>
   `;
 };
+
