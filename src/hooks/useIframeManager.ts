@@ -1,5 +1,5 @@
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 
 interface UseIframeManagerProps {
   code: string;
@@ -11,24 +11,51 @@ export const useIframeManager = ({ code, onError, onSuccess }: UseIframeManagerP
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const lastCodeRef = useRef<string>('');
+  const messageHandlerRef = useRef<((event: MessageEvent) => void) | null>(null);
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'error') {
-        setError(event.data.message);
-        onError?.(event.data.message);
-      } else if (event.data.type === 'success') {
-        setError(null);
-        onSuccess?.();
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+  // Stable message handler that doesn't change on every render
+  const handleMessage = useCallback((event: MessageEvent) => {
+    // Only handle messages from our iframe
+    if (event.source !== iframeRef.current?.contentWindow) return;
+    
+    if (event.data.type === 'error') {
+      setError(event.data.message);
+      setIsLoading(false);
+      onError?.(event.data.message);
+    } else if (event.data.type === 'success') {
+      setError(null);
+      setIsLoading(false);
+      onSuccess?.();
+    }
   }, [onError, onSuccess]);
 
-  const writeToIframe = (content: string) => {
+  // Set up message listener only once
+  useEffect(() => {
+    // Remove previous listener if it exists
+    if (messageHandlerRef.current) {
+      window.removeEventListener('message', messageHandlerRef.current);
+    }
+
+    // Store the new handler reference
+    messageHandlerRef.current = handleMessage;
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      if (messageHandlerRef.current) {
+        window.removeEventListener('message', messageHandlerRef.current);
+      }
+    };
+  }, [handleMessage]);
+
+  const writeToIframe = useCallback((content: string) => {
     if (!iframeRef.current) return;
+
+    // Prevent writing the same content multiple times
+    if (lastCodeRef.current === content) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const iframe = iframeRef.current;
@@ -38,11 +65,14 @@ export const useIframeManager = ({ code, onError, onSuccess }: UseIframeManagerP
         throw new Error('Cannot access iframe document');
       }
 
+      // Store the content we're writing
+      lastCodeRef.current = content;
+
       iframeDoc.open();
       iframeDoc.write(content);
       iframeDoc.close();
 
-      setIsLoading(false);
+      // Don't immediately set loading to false, wait for success message
       onSuccess?.();
 
     } catch (err) {
@@ -51,7 +81,7 @@ export const useIframeManager = ({ code, onError, onSuccess }: UseIframeManagerP
       setIsLoading(false);
       onError?.(errorMessage);
     }
-  };
+  }, [onError, onSuccess]);
 
   return {
     iframeRef,

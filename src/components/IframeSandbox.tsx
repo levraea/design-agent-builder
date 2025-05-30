@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useIframeManager } from '@/hooks/useIframeManager';
 import { IframeSandboxError } from '@/components/IframeSandboxError';
 import { generateIframeContent } from '@/utils/iframeContentGenerator';
@@ -21,15 +21,29 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
     writeToIframe
   } = useIframeManager({ code, onError, onSuccess });
 
+  const lastProcessedCodeRef = useRef<string>('');
+
   useEffect(() => {
     if (!code.trim() || !iframeRef.current) return;
 
+    const processedCode = cleanCode(code);
+    
+    // Prevent processing the same code multiple times
+    if (lastProcessedCodeRef.current === processedCode) {
+      return;
+    }
+
+    lastProcessedCodeRef.current = processedCode;
     setIsLoading(true);
     setError(null);
 
-    const processedCode = cleanCode(code);
-    const iframeContent = generateIframeContent(processedCode);
-    writeToIframe(iframeContent);
+    // Add a small delay to prevent rapid re-renders
+    const timeoutId = setTimeout(() => {
+      const iframeContent = generateIframeContent(processedCode);
+      writeToIframe(iframeContent);
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [code, writeToIframe, setIsLoading, setError]);
 
   if (error) {
