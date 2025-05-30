@@ -9,6 +9,9 @@ export const useCodeGeneration = () => {
   // Hardcoded API key
   const GEMINI_API_KEY = 'AIzaSyCQdatAJtVX1MulVsd2DtUfFKi7xHYhkSY';
   
+  // Default APIs to use when none are selected
+  const DEFAULT_API_IDS = ['openmeteo', 'restcountries', 'fda-drugs'];
+  
   const addToConversationHistory = (type: 'user' | 'ai', content: string) => {
     const newMessage: ConversationMessage = {
       id: Date.now().toString(),
@@ -94,7 +97,14 @@ export const useCodeGeneration = () => {
     try {
       // Get selected API details from mockAPIs
       const { mockAPIs } = await import('@/data/mockAPIs');
-      const selectedAPIDetails = mockAPIs.filter(api => selectedAPIs.includes(api.id));
+      
+      // Use default APIs if none are selected
+      const apisToUse = selectedAPIs.length > 0 ? selectedAPIs : DEFAULT_API_IDS;
+      const selectedAPIDetails = mockAPIs.filter(api => apisToUse.includes(api.id));
+      
+      // Log which APIs are being used
+      console.log('APIs being used:', apisToUse);
+      console.log('Using default APIs:', selectedAPIs.length === 0);
       
       // Augment the prompt with API information and design requirements
       let augmentedPrompt = userPrompt;
@@ -104,9 +114,11 @@ export const useCodeGeneration = () => {
           `- ${api.name} (${api.link}): ${api.description}. Auth: ${api.auth}, HTTPS: ${api.https}, CORS: ${api.cors}`
         ).join('\n');
         
-        augmentedPrompt = `${userPrompt}
-
-IMPORTANT: Use the following selected APIs in your implementation:
+        const apiSelectionNote = selectedAPIs.length === 0 
+          ? '\nNOTE: No APIs were specifically selected, so these default APIs are being used to create a more interesting application:'
+          : '\nIMPORTANT: Use the following selected APIs in your implementation:';
+        
+        augmentedPrompt = `${userPrompt}${apiSelectionNote}
 ${apiContext}
 
 Make sure to integrate these APIs into the generated component to fetch and display relevant data.`;
@@ -243,8 +255,9 @@ REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the ex
       }
     } catch (error) {
       console.error('Error generating code:', error);
-      // Fallback to sample code if API fails, including the error message
-      const fallbackCode = generateSampleCode(userPrompt, selectedAPIs, selectedComponents, error.message);
+      // Use the actual APIs (selected or default) for fallback code
+      const apisToUse = selectedAPIs.length > 0 ? selectedAPIs : DEFAULT_API_IDS;
+      const fallbackCode = generateSampleCode(userPrompt, apisToUse, selectedComponents, error.message);
       setGeneratedCode(fallbackCode);
       
       // Add AI response to conversation history for fallback

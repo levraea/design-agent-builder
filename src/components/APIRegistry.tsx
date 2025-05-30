@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +11,9 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
   const [apis, setApis] = useState<API[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Default APIs that will be used if none are selected
+  const DEFAULT_API_IDS = ['openmeteo', 'restcountries', 'fda-drugs'];
 
   useEffect(() => {
     const loadAPIs = async () => {
@@ -84,6 +86,11 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
           <Database className="w-5 h-5" style={{ color: '#D30F4B' }} />
           <span>API Registry ({apis.length} APIs)</span>
         </CardTitle>
+        {selectedAPIs.length === 0 && (
+          <div className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md border border-blue-200">
+            💡 No APIs selected - defaults will be used: Open-Meteo, REST Countries, OpenFDA Drugs
+          </div>
+        )}
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input

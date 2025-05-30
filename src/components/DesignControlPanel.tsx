@@ -33,6 +33,14 @@ export const DesignControlPanel = ({
     setPrompt(''); // Clear prompt after submission
   };
 
+  // Show info about API usage when generating
+  const getAPIUsageInfo = () => {
+    if (selectedAPIs.length === 0) {
+      return "Using default APIs: Open-Meteo, REST Countries, and OpenFDA Drugs";
+    }
+    return `Using ${selectedAPIs.length} selected API${selectedAPIs.length === 1 ? '' : 's'}`;
+  };
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="chat" className="w-full">
@@ -44,6 +52,11 @@ export const DesignControlPanel = ({
         
         <TabsContent value="chat" className="mt-4 space-y-4">
           <ConversationHistory messages={conversationHistory} />
+          {isGenerating && (
+            <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border">
+              <p>🤖 {getAPIUsageInfo()}</p>
+            </div>
+          )}
           <PromptInput 
             prompt={prompt}
             onPromptChange={setPrompt}
