@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,22 @@ interface PersonaFormData {
   businessGoal: string;
   specialTraits: string;
 }
+
+// Helper function to clean markdown formatting
+const cleanMarkdownText = (text: string): string => {
+  if (!text) return '';
+  
+  return text
+    // Remove bold markdown
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    // Remove italic markdown
+    .replace(/\*(.*?)\*/g, '$1')
+    // Remove any remaining asterisks
+    .replace(/\*/g, '')
+    // Clean up extra whitespace
+    .replace(/\s+/g, ' ')
+    .trim();
+};
 
 export const PersonaModule = () => {
   const [currentStep, setCurrentStep] = useState<'form' | 'generating' | 'output'>('form');
@@ -59,51 +74,14 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
       const response = await callGeminiAPI(prompt);
       console.log('AI Response received:', response);
       
-      // Parse the AI response to extract persona data with improved parsing
+      // Enhanced parsing logic to handle markdown formatting
       const lines = response.split('\n').filter(line => line.trim());
       const personaData: any = {};
       
-      lines.forEach(line => {
-        const trimmedLine = line.trim();
-        // Handle both **NAME:** and NAME: formats
-        if (trimmedLine.includes('NAME:')) {
-          const nameMatch = trimmedLine.match(/\*?\*?NAME:\*?\*?\s*(.+)/);
-          if (nameMatch) personaData.name = nameMatch[1].trim();
-        }
-        if (trimmedLine.includes('ROLE:')) {
-          const roleMatch = trimmedLine.match(/\*?\*?ROLE:\*?\*?\s*(.+)/);
-          if (roleMatch) personaData.role = roleMatch[1].trim();
-        }
-        if (trimmedLine.includes('LIFESTYLE:')) {
-          const lifestyleMatch = trimmedLine.match(/\*?\*?LIFESTYLE:\*?\*?\s*(.+)/);
-          if (lifestyleMatch) personaData.lifestyle = lifestyleMatch[1].trim();
-        }
-        if (trimmedLine.includes('GOALS:')) {
-          const goalsMatch = trimmedLine.match(/\*?\*?GOALS:\*?\*?\s*(.+)/);
-          if (goalsMatch) personaData.goals = goalsMatch[1].trim();
-        }
-        if (trimmedLine.includes('CHALLENGES:')) {
-          const challengesMatch = trimmedLine.match(/\*?\*?CHALLENGES:\*?\*?\s*(.+)/);
-          if (challengesMatch) personaData.challenges = challengesMatch[1].trim();
-        }
-        if (trimmedLine.includes('MOTIVATION:')) {
-          const motivationMatch = trimmedLine.match(/\*?\*?MOTIVATION:\*?\*?\s*(.+)/);
-          if (motivationMatch) personaData.motivation = motivationMatch[1].trim();
-        }
-        if (trimmedLine.includes('TECH_COMFORT:')) {
-          const techMatch = trimmedLine.match(/\*?\*?TECH_COMFORT:\*?\*?\s*(.+)/);
-          if (techMatch) personaData.techComfort = techMatch[1].trim();
-        }
-        if (trimmedLine.includes('PERSONAL_TOUCH:')) {
-          const personalMatch = trimmedLine.match(/\*?\*?PERSONAL_TOUCH:\*?\*?\s*(.+)/);
-          if (personalMatch) personaData.personalTouch = personalMatch[1].trim();
-        }
-      });
-
-      // Also try to extract multi-line content for richer descriptions
+      // Helper function to extract section content with markdown cleaning
       const extractSection = (sectionName: string) => {
         const startPattern = new RegExp(`\\*?\\*?${sectionName}:\\*?\\*?`, 'i');
-        const nextSectionPattern = /\*?\*?(NAME|ROLE|LIFESTYLE|GOALS|CHALLENGES|MOTIVATION|TECH_COMFORT|PERSONAL_TOUCH):\*?\*?/i;
+        const nextSectionPattern = /\*?\*?(NAME|ROLE|LIFESTYLE|GOALS|CHALLENGES|MOTIVATION|TECH_COMFORT|PERSONAL_TOUCH|PREFERRED_CHANNELS|MESSAGING_THAT_RESONATES):\*?\*?/i;
         
         const startIndex = lines.findIndex(line => startPattern.test(line));
         if (startIndex === -1) return null;
@@ -111,7 +89,7 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
         let content = [];
         let currentIndex = startIndex;
         
-        // Get the content from the first line
+        // Get the content from the first line, removing the section header
         const firstLineMatch = lines[currentIndex].match(startPattern);
         if (firstLineMatch) {
           const remainingText = lines[currentIndex].substring(firstLineMatch.index + firstLineMatch[0].length).trim();
@@ -127,19 +105,21 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
           currentIndex++;
         }
         
-        return content.join(' ').trim();
+        // Join content and clean markdown
+        const rawContent = content.join(' ').trim();
+        return cleanMarkdownText(rawContent);
       };
 
-      // Extract richer content if available
+      // Extract and clean all persona data
       const richPersonaData = {
-        name: extractSection('NAME') || personaData.name,
-        role: extractSection('ROLE') || personaData.role,
-        lifestyle: extractSection('LIFESTYLE') || personaData.lifestyle,
-        goals: extractSection('GOALS') || personaData.goals,
-        challenges: extractSection('CHALLENGES') || personaData.challenges,
-        motivation: extractSection('MOTIVATION') || personaData.motivation,
-        techComfort: extractSection('TECH_COMFORT') || personaData.techComfort,
-        personalTouch: extractSection('PERSONAL_TOUCH') || personaData.personalTouch,
+        name: cleanMarkdownText(extractSection('NAME') || ''),
+        role: cleanMarkdownText(extractSection('ROLE') || ''),
+        lifestyle: cleanMarkdownText(extractSection('LIFESTYLE') || ''),
+        goals: cleanMarkdownText(extractSection('GOALS') || ''),
+        challenges: cleanMarkdownText(extractSection('CHALLENGES') || ''),
+        motivation: cleanMarkdownText(extractSection('MOTIVATION') || ''),
+        techComfort: cleanMarkdownText(extractSection('TECH_COMFORT') || ''),
+        personalTouch: cleanMarkdownText(extractSection('PERSONAL_TOUCH') || ''),
       };
 
       console.log('Parsed persona data:', richPersonaData);
