@@ -36,7 +36,7 @@ export const DesignControlPanel = ({
   // Show info about API usage when generating
   const getAPIUsageInfo = () => {
     if (selectedAPIs.length === 0) {
-      return "Using default APIs: Open-Meteo, REST Countries, and OpenFDA Drugs";
+      return "APIs will be automatically selected based on your prompt";
     }
     return `Using ${selectedAPIs.length} selected API${selectedAPIs.length === 1 ? '' : 's'}`;
   };

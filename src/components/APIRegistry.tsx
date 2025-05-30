@@ -88,7 +88,7 @@ export const APIRegistry = ({ selectedAPIs, onSelectionChange }: APIRegistryProp
         </CardTitle>
         {selectedAPIs.length === 0 && (
           <div className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md border border-blue-200">
-            💡 No APIs selected - defaults will be used: Open-Meteo, REST Countries, OpenFDA Drugs
+            🧠 No APIs selected - relevant APIs will be automatically chosen based on your prompt
           </div>
         )}
         <div className="relative">

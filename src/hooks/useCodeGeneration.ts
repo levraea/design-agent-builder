@@ -1,5 +1,7 @@
+
 import { useState } from 'react';
 import { ConversationMessage } from '@/types/conversation';
+import { analyzePromptForAPIs } from '@/utils/promptAnalyzer';
 
 export const useCodeGeneration = () => {
   const [generatedCode, setGeneratedCode] = useState('');
@@ -8,9 +10,6 @@ export const useCodeGeneration = () => {
 
   // Hardcoded API key
   const GEMINI_API_KEY = 'AIzaSyCQdatAJtVX1MulVsd2DtUfFKi7xHYhkSY';
-  
-  // Default APIs to use when none are selected
-  const DEFAULT_API_IDS = ['openmeteo', 'restcountries', 'fda-drugs'];
   
   const addToConversationHistory = (type: 'user' | 'ai', content: string) => {
     const newMessage: ConversationMessage = {
@@ -98,13 +97,17 @@ export const useCodeGeneration = () => {
       // Get selected API details from mockAPIs
       const { mockAPIs } = await import('@/data/mockAPIs');
       
-      // Use default APIs if none are selected
-      const apisToUse = selectedAPIs.length > 0 ? selectedAPIs : DEFAULT_API_IDS;
-      const selectedAPIDetails = mockAPIs.filter(api => apisToUse.includes(api.id));
+      // Use intelligent API selection if none are explicitly selected
+      let apisToUse: string[];
+      if (selectedAPIs.length > 0) {
+        apisToUse = selectedAPIs;
+        console.log('Using explicitly selected APIs:', apisToUse);
+      } else {
+        apisToUse = analyzePromptForAPIs(userPrompt, mockAPIs);
+        console.log('Using AI-inferred APIs based on prompt:', apisToUse);
+      }
       
-      // Log which APIs are being used
-      console.log('APIs being used:', apisToUse);
-      console.log('Using default APIs:', selectedAPIs.length === 0);
+      const selectedAPIDetails = mockAPIs.filter(api => apisToUse.includes(api.id));
       
       // Augment the prompt with API information and design requirements
       let augmentedPrompt = userPrompt;
@@ -115,7 +118,7 @@ export const useCodeGeneration = () => {
         ).join('\n');
         
         const apiSelectionNote = selectedAPIs.length === 0 
-          ? '\nNOTE: No APIs were specifically selected, so these default APIs are being used to create a more interesting application:'
+          ? '\nNOTE: Based on your prompt, these relevant APIs were automatically selected:'
           : '\nIMPORTANT: Use the following selected APIs in your implementation:';
         
         augmentedPrompt = `${userPrompt}${apiSelectionNote}
@@ -247,7 +250,11 @@ REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the ex
       setGeneratedCode(newGeneratedCode);
       
       // Add AI response to conversation history
-      addToConversationHistory('ai', 'Generated a React component based on your prompt and conversation history. The code is now available in the Live Preview and Generated Code tab.');
+      const apiMessage = selectedAPIs.length === 0 
+        ? `Generated a React component based on your prompt. Automatically selected relevant APIs: ${apisToUse.join(', ')}. The code is now available in the Live Preview and Generated Code tab.`
+        : 'Generated a React component based on your prompt and selected APIs. The code is now available in the Live Preview and Generated Code tab.';
+      
+      addToConversationHistory('ai', apiMessage);
       
       // Mark the Design-to-Code Generation module as complete
       if (onModuleComplete) {
@@ -255,8 +262,9 @@ REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the ex
       }
     } catch (error) {
       console.error('Error generating code:', error);
-      // Use the actual APIs (selected or default) for fallback code
-      const apisToUse = selectedAPIs.length > 0 ? selectedAPIs : DEFAULT_API_IDS;
+      // Use the actual APIs (selected or inferred) for fallback code
+      const { mockAPIs } = await import('@/data/mockAPIs');
+      const apisToUse = selectedAPIs.length > 0 ? selectedAPIs : analyzePromptForAPIs(userPrompt, mockAPIs);
       const fallbackCode = generateSampleCode(userPrompt, apisToUse, selectedComponents, error.message);
       setGeneratedCode(fallbackCode);
       
