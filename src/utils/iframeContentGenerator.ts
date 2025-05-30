@@ -11,7 +11,6 @@ export const generateIframeContent = (cleanCode: string): string => {
       <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
       <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
       <script src="https://cdn.tailwindcss.com"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <style>
         body { margin: 0; padding: 16px; font-family: system-ui, -apple-system, sans-serif; }
         .error { color: #dc2626; background: #fef2f2; padding: 12px; border-radius: 6px; border: 1px solid #fecaca; }
@@ -20,26 +19,60 @@ export const generateIframeContent = (cleanCode: string): string => {
     <body>
       <div id="root"></div>
       <script type="module">
-        try {
-          const response = await fetch('https://unpkg.com/recharts@2.12.7/esm/index.js');
-          const moduleText = await response.text();
-          const moduleBlob = new Blob([moduleText], { type: 'application/javascript' });
-          const moduleUrl = URL.createObjectURL(moduleBlob);
-          const module = await import(moduleUrl);
-          
-          // Make recharts available globally
-          window.Recharts = module;
-          Object.keys(module).forEach(key => {
-            window[key] = module[key];
-          });
-          
-          console.log('Recharts loaded successfully');
-          initializeApp();
-        } catch (error) {
-          console.error('Failed to load recharts:', error);
-          // Initialize without recharts
-          initializeApp();
+        async function loadRecharts() {
+          try {
+            console.log('Loading recharts...');
+            const response = await fetch('https://unpkg.com/recharts@2.12.7/esm/index.js');
+            const moduleText = await response.text();
+            const moduleBlob = new Blob([moduleText], { type: 'application/javascript' });
+            const moduleUrl = URL.createObjectURL(moduleBlob);
+            const module = await import(moduleUrl);
+            
+            // Make recharts available globally
+            window.Recharts = module;
+            
+            // Make individual components available globally
+            const components = [
+              'LineChart', 'AreaChart', 'BarChart', 'PieChart', 'ScatterChart', 'RadarChart',
+              'XAxis', 'YAxis', 'CartesianGrid', 'Tooltip', 'Legend', 'ResponsiveContainer',
+              'Line', 'Area', 'Bar', 'Cell', 'ReferenceLine', 'ReferenceArea', 'Brush'
+            ];
+            
+            components.forEach(componentName => {
+              if (module[componentName]) {
+                window[componentName] = module[componentName];
+              }
+            });
+            
+            console.log('Recharts loaded successfully');
+            return true;
+          } catch (error) {
+            console.error('Failed to load recharts:', error);
+            return false;
+          }
         }
+
+        // Load recharts and then initialize the app
+        loadRecharts().then((success) => {
+          if (!success) {
+            // Provide fallback chart components if recharts fails to load
+            window.LineChart = ({ children, ...props }) => 
+              React.createElement('div', { 
+                className: 'w-full h-64 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center',
+                style: { width: props.width || '100%', height: props.height || 256 }
+              }, 'Chart could not be loaded');
+            
+            window.XAxis = () => null;
+            window.YAxis = () => null;
+            window.CartesianGrid = () => null;
+            window.Tooltip = () => null;
+            window.Legend = () => null;
+            window.Line = () => null;
+            window.ResponsiveContainer = ({ children }) => React.createElement('div', { className: 'w-full h-full' }, children);
+          }
+          
+          initializeApp();
+        });
       </script>
       <script>
         function initializeApp() {
