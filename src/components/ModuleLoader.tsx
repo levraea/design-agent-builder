@@ -37,7 +37,10 @@ export const ModuleLoader = ({ modules, onLoaded, onError }: ModuleLoaderProps) 
         } catch (error) {
           console.error(`Failed to load module ${moduleName}:`, error);
           status[moduleName] = 'error';
-          onError(`Failed to load module: ${moduleName}`);
+          // Don't call onError for chart modules as they're optional
+          if (!moduleName.includes('chart')) {
+            onError(`Failed to load module: ${moduleName}`);
+          }
         }
         
         setLoadingStatus({ ...status });
@@ -63,6 +66,9 @@ const getModuleUrl = (moduleName: string): string | null => {
     'axios': 'https://esm.sh/axios',
     'date-fns': 'https://esm.sh/date-fns',
     'lucide-react': 'https://esm.sh/lucide-react',
+    'chart.js': 'https://esm.sh/chart.js',
+    'react-chartjs-2': 'https://esm.sh/react-chartjs-2',
+    'recharts': 'https://esm.sh/recharts',
   };
 
   return moduleMap[moduleName] || null;
