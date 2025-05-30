@@ -1,4 +1,3 @@
-
 export const generateIframeContent = (cleanCode: string): string => {
   return `
     <!DOCTYPE html>
@@ -64,7 +63,8 @@ export const generateIframeContent = (cleanCode: string): string => {
               Chart.Tooltip,
               Chart.Legend,
               Chart.ArcElement,
-              Chart.RadialLinearScale
+              Chart.RadialLinearScale,
+              Chart.Filler
             );
             
             window.Chart = Chart;
@@ -81,6 +81,7 @@ export const generateIframeContent = (cleanCode: string): string => {
             window.Legend = Chart.Legend;
             window.ArcElement = Chart.ArcElement;
             window.RadialLinearScale = Chart.RadialLinearScale;
+            window.Filler = Chart.Filler;
           } else {
             console.warn('Chart.js not loaded properly');
             // Create mock Chart object and components to prevent errors
@@ -97,7 +98,8 @@ export const generateIframeContent = (cleanCode: string): string => {
               Tooltip: mockComponent,
               Legend: mockComponent,
               ArcElement: mockComponent,
-              RadialLinearScale: mockComponent
+              RadialLinearScale: mockComponent,
+              Filler: mockComponent
             };
             window.ChartJS = window.Chart;
             window.CategoryScale = mockComponent;
@@ -110,6 +112,7 @@ export const generateIframeContent = (cleanCode: string): string => {
             window.Legend = mockComponent;
             window.ArcElement = mockComponent;
             window.RadialLinearScale = mockComponent;
+            window.Filler = mockComponent;
           }
           
           // Mock recharts components
