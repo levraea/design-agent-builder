@@ -34,6 +34,9 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
 
+      // Remove any import statements from the code since we'll provide libraries globally
+      cleanCode = cleanCode.replace(/import\s+.*?from\s+['"][^'"]+['"];?\s*/g, '');
+
       // Create the iframe content with JSX transpilation support
       const iframeContent = `
         <!DOCTYPE html>
@@ -46,6 +49,9 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
           <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
           <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
           <script src="https://cdn.tailwindcss.com"></script>
+          <script src="https://unpkg.com/chart.js"></script>
+          <script src="https://unpkg.com/react-chartjs-2"></script>
+          <script src="https://unpkg.com/recharts"></script>
           <style>
             body { margin: 0; padding: 16px; font-family: system-ui, -apple-system, sans-serif; }
             .error { color: #dc2626; background: #fef2f2; padding: 12px; border-radius: 6px; border: 1px solid #fecaca; }
@@ -84,6 +90,11 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
                   onChange,
                   className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
                 });
+
+              // Make Chart.js and related libraries available globally
+              if (window.Chart) {
+                window.Chart = window.Chart;
+              }
 
               // Transpile JSX to JavaScript using Babel
               const jsxCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
