@@ -78,14 +78,20 @@ export const generateIframeContent = (cleanCode: string): string => {
           const Line = ({ dataKey, stroke }) => null;
           const Bar = ({ dataKey, fill }) => null;
 
-          // Process the code to remove any export statements
+          // Process the code to remove any remaining import/export statements
           let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+          
+          // Remove any remaining import statements that might have been missed
+          processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '');
+          processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '');
+          processedCode = processedCode.replace(/import\\s*\\{[^}]*\\}\\s*from\\s+['"][^'"]+['"];?\\s*/g, '');
+          processedCode = processedCode.replace(/import\\s+\\*\\s+as\\s+\\w+\\s+from\\s+['"][^'"]+['"];?\\s*/g, '');
           
           // Remove export statements and convert to regular function declarations
           processedCode = processedCode.replace(/export\\s+default\\s+function\\s+GeneratedApp/g, 'function GeneratedApp');
           processedCode = processedCode.replace(/export\\s+function\\s+GeneratedApp/g, 'function GeneratedApp');
           processedCode = processedCode.replace(/export\\s+default\\s+GeneratedApp/g, '// GeneratedApp exported');
-          processedCode = processedCode.replace(/export\\s+{[^}]*}/g, '// exports removed');
+          processedCode = processedCode.replace(/export\\s+\\{[^}]*\\}/g, '// exports removed');
           processedCode = processedCode.replace(/export\\s+\\*/g, '// export * removed');
 
           // Transpile JSX to JavaScript using Babel

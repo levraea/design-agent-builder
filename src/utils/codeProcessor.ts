@@ -7,8 +7,11 @@ export const cleanCode = (code: string): string => {
     cleanedCode = cleanedCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
   }
 
-  // Remove any import statements from the code since we'll provide libraries globally
+  // Remove all types of import statements
   cleanedCode = cleanedCode.replace(/import\s+.*?from\s+['"][^'"]+['"];?\s*/g, '');
+  cleanedCode = cleanedCode.replace(/import\s+['"][^'"]+['"];?\s*/g, '');
+  cleanedCode = cleanedCode.replace(/import\s*\{[^}]*\}\s*from\s+['"][^'"]+['"];?\s*/g, '');
+  cleanedCode = cleanedCode.replace(/import\s+\*\s+as\s+\w+\s+from\s+['"][^'"]+['"];?\s*/g, '');
 
   return cleanedCode;
 };
