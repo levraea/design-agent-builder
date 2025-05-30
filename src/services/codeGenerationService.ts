@@ -1,11 +1,10 @@
 
 import { Persona } from '@/types/persona';
 
-// CORS proxy helper function
+// CORS proxy helper function - now uses enhanced fetch with multiple fallbacks
 const wrapWithCORSProxy = (url: string): string => {
-  // Use allorigins.win as it's reliable and handles JSON responses well
-  const proxyUrl = 'https://api.allorigins.win/get?url=';
-  return proxyUrl + encodeURIComponent(url);
+  // The iframe now has enhancedFetch function that handles multiple proxies
+  return url; // Return the original URL since enhancedFetch handles the proxy logic
 };
 
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
@@ -26,12 +25,9 @@ export const generateSampleCode = (prompt: string, apis: string[], components: s
   const fetchData = async () => {
     setLoading(true);
     try {
-      // API calls use CORS proxy for cross-origin requests
-      const proxyUrl = 'https://api.allorigins.win/get?url=';
-      const targetUrl = encodeURIComponent('https://api.example.com/sample-endpoint');
-      const response = await fetch(proxyUrl + targetUrl);
-      const proxyData = await response.json();
-      const result = JSON.parse(proxyData.contents);
+      // Use enhanced fetch with multiple CORS proxy fallbacks
+      const response = await enhancedFetch('https://api.example.com/sample-endpoint');
+      const result = await response.json();
       setData(result);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -161,19 +157,22 @@ CODE:
 - Create visually impressive applications with rich interactions and beautiful designs
 - Use JSX syntax for all React elements
 
-CORS HANDLING FOR API CALLS:
-IMPORTANT: All external API calls must use a CORS proxy to avoid cross-origin issues. Use this pattern:
+ENHANCED CORS HANDLING FOR API CALLS:
+IMPORTANT: Use the new enhanced fetch function that automatically handles multiple CORS proxies:
 
 \`\`\`javascript
-// For any external API call, wrap the URL with the CORS proxy:
-const proxyUrl = 'https://api.allorigins.win/get?url=';
-const targetUrl = encodeURIComponent('https://api.example.com/endpoint');
-const response = await fetch(proxyUrl + targetUrl);
-const proxyData = await response.json();
-const actualData = JSON.parse(proxyData.contents); // allorigins wraps the response in 'contents'
+// Use enhancedFetch instead of regular fetch - it handles CORS automatically with fallbacks
+const response = await enhancedFetch('https://api.example.com/endpoint');
+const data = await response.json();
 \`\`\`
 
-ALWAYS use this pattern for external API calls. Never make direct fetch calls to external APIs.
+This new enhancedFetch function:
+- Tries direct fetch first (for APIs that support CORS)
+- Falls back to multiple reliable CORS proxies automatically
+- Provides better error handling and retry logic
+- No need to manually wrap URLs with proxy services
+
+ALWAYS use enhancedFetch for external API calls instead of regular fetch.
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 DESCRIPTION: I created a beautiful weather dashboard that fetches real-time weather data using the OpenWeather API. The app features a gradient background, animated weather icons, and displays current conditions with a 5-day forecast. I added smooth hover effects and loading animations for a great user experience.
@@ -206,5 +205,5 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use the CORS proxy pattern for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };

@@ -1,4 +1,5 @@
 
+
 export const generateIframeContent = (cleanCode: string): string => {
   return `
     <!DOCTYPE html>
@@ -76,6 +77,68 @@ export const generateIframeContent = (cleanCode: string): string => {
         });
       </script>
       <script>
+        // Enhanced CORS proxy with multiple fallbacks for better reliability
+        const corsProxies = [
+          {
+            name: 'corsproxy.io',
+            url: 'https://corsproxy.io/?',
+            transform: (data) => data // Direct response
+          },
+          {
+            name: 'cors-anywhere-herokuapp',
+            url: 'https://cors-anywhere.herokuapp.com/',
+            transform: (data) => data // Direct response
+          },
+          {
+            name: 'allorigins',
+            url: 'https://api.allorigins.win/get?url=',
+            transform: (data) => JSON.parse(data.contents) // Wrapped in contents
+          }
+        ];
+
+        // Enhanced fetch with proxy fallback
+        window.enhancedFetch = async (targetUrl, options = {}) => {
+          // First try direct fetch (might work for some APIs)
+          try {
+            console.log('Attempting direct fetch to:', targetUrl);
+            const response = await fetch(targetUrl, options);
+            if (response.ok) {
+              console.log('Direct fetch successful');
+              return response;
+            }
+          } catch (error) {
+            console.log('Direct fetch failed, trying proxies...');
+          }
+
+          // Try each proxy in order
+          for (let i = 0; i < corsProxies.length; i++) {
+            const proxy = corsProxies[i];
+            try {
+              console.log(\`Trying proxy \${i + 1}/\${corsProxies.length}: \${proxy.name}\`);
+              const proxyUrl = proxy.url + encodeURIComponent(targetUrl);
+              const response = await fetch(proxyUrl, options);
+              
+              if (response.ok) {
+                const data = await response.json();
+                const transformedData = proxy.transform(data);
+                console.log(\`Proxy \${proxy.name} successful\`);
+                
+                // Return a Response-like object for consistency
+                return {
+                  ok: true,
+                  json: async () => transformedData,
+                  text: async () => JSON.stringify(transformedData)
+                };
+              }
+            } catch (error) {
+              console.warn(\`Proxy \${proxy.name} failed:`, error);
+              continue;
+            }
+          }
+          
+          throw new Error('All CORS proxies failed. Please check your internet connection or try again later.');
+        };
+
         function initializeApp() {
           console.log('Initializing app...');
           try {
