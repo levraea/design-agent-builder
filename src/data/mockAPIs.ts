@@ -184,5 +184,31 @@ export const mockAPIs: API[] = [
     auth: 'None',
     https: true,
     cors: 'yes'
+  },
+  {
+    id: 'ensembl',
+    name: 'Ensembl REST API',
+    description: 'Provides access to a wide range of genomic data, including sequences, gene annotations, variants, and comparative genomics across various species',
+    category: 'PH Drug Innovation Platform',
+    version: 'v1',
+    status: 'active',
+    icon: Dna,
+    link: 'https://rest.ensembl.org',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'ucsc-genome',
+    name: 'UCSC Genome Browser API',
+    description: 'Offers access to genomic sequences, annotations, and various genomic data tracks for multiple species',
+    category: 'PH Drug Innovation Platform',
+    version: 'v1',
+    status: 'active',
+    icon: Dna,
+    link: 'https://api.genome.ucsc.edu',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
   }
 ];

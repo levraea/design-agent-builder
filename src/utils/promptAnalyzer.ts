@@ -62,14 +62,18 @@ export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): stri
     if (fdaFoodAPI) relevantAPIs.push(fdaFoodAPI.id);
   }
 
-  // Biological/Genomic research keywords (EBI Search API & LAPIS)
-  const biologicalKeywords = ['protein', 'gene', 'sequence', 'genomic', 'dna', 'rna', 'nucleotide', 'bioinformatics', 'molecular', 'genome', 'sars-cov-2', 'covid', 'virus', 'variant'];
+  // Biological/Genomic research keywords (EBI Search API, LAPIS, Ensembl, UCSC)
+  const biologicalKeywords = ['protein', 'gene', 'sequence', 'genomic', 'dna', 'rna', 'nucleotide', 'bioinformatics', 'molecular', 'genome', 'sars-cov-2', 'covid', 'virus', 'variant', 'ensembl', 'ucsc', 'chromosome', 'annotation', 'brca', 'genomics', 'comparative genomics', 'species'];
   if (biologicalKeywords.some(keyword => lowerPrompt.includes(keyword))) {
     const ebiAPI = availableAPIs.find(api => api.id === 'ebi-search');
     const lapisAPI = availableAPIs.find(api => api.id === 'lapis');
+    const ensemblAPI = availableAPIs.find(api => api.id === 'ensembl');
+    const ucscAPI = availableAPIs.find(api => api.id === 'ucsc-genome');
     
     if (ebiAPI) relevantAPIs.push(ebiAPI.id);
     if (lapisAPI) relevantAPIs.push(lapisAPI.id);
+    if (ensemblAPI) relevantAPIs.push(ensemblAPI.id);
+    if (ucscAPI) relevantAPIs.push(ucscAPI.id);
   }
 
   // Academic/Research keywords (OpenAlex)
