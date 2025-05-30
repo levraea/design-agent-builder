@@ -49,9 +49,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
           <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
           <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
           <script src="https://cdn.tailwindcss.com"></script>
-          <script src="https://unpkg.com/chart.js"></script>
-          <script src="https://unpkg.com/react-chartjs-2"></script>
-          <script src="https://unpkg.com/recharts"></script>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
           <style>
             body { margin: 0; padding: 16px; font-family: system-ui, -apple-system, sans-serif; }
             .error { color: #dc2626; background: #fef2f2; padding: 12px; border-radius: 6px; border: 1px solid #fecaca; }
@@ -91,10 +89,32 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
                   className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
                 });
 
-              // Make Chart.js and related libraries available globally
-              if (window.Chart) {
-                window.Chart = window.Chart;
-              }
+              // Make Chart.js available globally
+              window.Chart = window.Chart;
+              
+              // Mock recharts components
+              const ResponsiveContainer = ({ children, width = '100%', height = 300 }) => 
+                React.createElement('div', { style: { width, height } }, children);
+              
+              const LineChart = ({ data = [], children, ...props }) => 
+                React.createElement('div', { 
+                  className: 'bg-gray-100 rounded flex items-center justify-center',
+                  style: { height: '100%' }
+                }, 'Chart Placeholder (Data: ' + data.length + ' items)');
+              
+              const BarChart = ({ data = [], children, ...props }) => 
+                React.createElement('div', { 
+                  className: 'bg-gray-100 rounded flex items-center justify-center',
+                  style: { height: '100%' }
+                }, 'Bar Chart Placeholder (Data: ' + data.length + ' items)');
+              
+              const XAxis = ({ dataKey }) => null;
+              const YAxis = () => null;
+              const CartesianGrid = ({ strokeDasharray }) => null;
+              const Tooltip = () => null;
+              const Legend = () => null;
+              const Line = ({ dataKey, stroke }) => null;
+              const Bar = ({ dataKey, fill }) => null;
 
               // Transpile JSX to JavaScript using Babel
               const jsxCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
