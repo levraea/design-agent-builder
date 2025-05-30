@@ -34,7 +34,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
 
-      // Create the iframe content with all necessary dependencies
+      // Create the iframe content with all necessary dependencies including Babel
       const iframeContent = `
         <!DOCTYPE html>
         <html>
@@ -44,6 +44,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
           <title>Live Preview</title>
           <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
           <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+          <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
             body { margin: 0; padding: 16px; font-family: system-ui, -apple-system, sans-serif; }
@@ -84,8 +85,13 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
                   className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
                 });
 
-              // Execute the generated code
-              ${cleanCode}
+              // Transpile JSX to JavaScript using Babel
+              const transpiledCode = Babel.transform(\`${cleanCode.replace(/`/g, '\\`')}\`, {
+                presets: ['react']
+              }).code;
+
+              // Execute the transpiled code
+              eval(transpiledCode);
 
               // Render the component
               if (typeof GeneratedApp === 'function') {
