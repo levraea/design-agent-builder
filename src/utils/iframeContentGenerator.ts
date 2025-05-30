@@ -1,4 +1,3 @@
-
 export const generateIframeContent = (cleanCode: string): string => {
   return `
     <!DOCTYPE html>
@@ -20,6 +19,7 @@ export const generateIframeContent = (cleanCode: string): string => {
     <body>
       <div id="root"></div>
       <script type="module">
+        // ... keep existing code (loadRecharts function and recharts loading logic)
         async function loadRecharts() {
           try {
             console.log('Loading recharts...');
@@ -154,110 +154,31 @@ export const generateIframeContent = (cleanCode: string): string => {
         });
       </script>
       <script>
-        // More reliable CORS proxies with better error handling
-        const corsProxies = [
-          {
-            name: 'cors-proxy',
-            url: 'https://cors-proxy.fringe.zone/',
-            transform: (data) => data
-          },
-          {
-            name: 'corsproxy.io',
-            url: 'https://corsproxy.io/?',
-            transform: (data) => data
-          },
-          {
-            name: 'allorigins',
-            url: 'https://api.allorigins.win/get?url=',
-            transform: (data) => {
-              try {
-                return JSON.parse(data.contents);
-              } catch (e) {
-                return data.contents;
-              }
-            }
-          }
-        ];
-
-        // Enhanced fetch with detailed error logging and better proxy handling
+        // Simplified fetch function - direct API calls only
         window.enhancedFetch = async (targetUrl, options = {}) => {
-          console.log('🌐 Enhanced fetch called for:', targetUrl);
+          console.log('🌐 Making direct API call to:', targetUrl);
           
-          // First try direct fetch (might work for some APIs)
           try {
-            console.log('📡 Attempting direct fetch...');
-            const response = await fetch(targetUrl, options);
+            const response = await fetch(targetUrl, {
+              ...options,
+              headers: {
+                ...options.headers,
+                'Accept': 'application/json'
+              }
+            });
+            
+            console.log('📊 Response status:', response.status);
+            
             if (response.ok) {
               console.log('✅ Direct fetch successful!');
               return response;
             } else {
-              console.log('❌ Direct fetch failed with status:', response.status);
+              throw new Error('API request failed with status: ' + response.status);
             }
           } catch (error) {
-            console.log('❌ Direct fetch error:', error.message);
+            console.error('❌ API request failed:', error.message);
+            throw error;
           }
-
-          console.log('🔄 Trying CORS proxies...');
-          const errors = [];
-
-          // Try each proxy in order
-          for (let i = 0; i < corsProxies.length; i++) {
-            const proxy = corsProxies[i];
-            try {
-              console.log('🔧 Proxy attempt ' + (i + 1) + '/' + corsProxies.length + ': ' + proxy.name);
-              
-              let proxyUrl;
-              if (proxy.name === 'cors-proxy') {
-                proxyUrl = proxy.url + targetUrl;
-              } else {
-                proxyUrl = proxy.url + encodeURIComponent(targetUrl);
-              }
-              
-              console.log('🔗 Proxy URL:', proxyUrl);
-              
-              const response = await fetch(proxyUrl, {
-                ...options,
-                headers: {
-                  ...options.headers,
-                  'Accept': 'application/json'
-                }
-              });
-              
-              console.log('📊 Proxy response status:', response.status);
-              
-              if (response.ok) {
-                try {
-                  const data = await response.json();
-                  console.log('📦 Raw proxy data:', data);
-                  
-                  const transformedData = proxy.transform(data);
-                  console.log('✨ Transformed data:', transformedData);
-                  console.log('✅ Proxy ' + proxy.name + ' successful!');
-                  
-                  // Return a Response-like object for consistency
-                  return {
-                    ok: true,
-                    status: 200,
-                    json: async () => transformedData,
-                    text: async () => typeof transformedData === 'string' ? transformedData : JSON.stringify(transformedData)
-                  };
-                } catch (parseError) {
-                  console.error('❌ JSON parse error for ' + proxy.name + ':', parseError);
-                  errors.push(proxy.name + ': JSON parse failed - ' + parseError.message);
-                }
-              } else {
-                const errorText = await response.text().catch(() => 'No error text available');
-                console.error('❌ Proxy ' + proxy.name + ' HTTP error:', response.status, errorText);
-                errors.push(proxy.name + ': HTTP ' + response.status + ' - ' + errorText);
-              }
-            } catch (error) {
-              console.error('❌ Proxy ' + proxy.name + ' network error:', error);
-              errors.push(proxy.name + ': ' + error.message);
-            }
-          }
-          
-          console.error('💥 All proxies failed. Errors:', errors);
-          throw new Error('All CORS proxies failed. Errors: ' + errors.join('; '));
         };
 
         function initializeApp() {

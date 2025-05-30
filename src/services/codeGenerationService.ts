@@ -1,12 +1,6 @@
 
 import { Persona } from '@/types/persona';
 
-// CORS proxy helper function - now uses enhanced fetch with multiple fallbacks
-const wrapWithCORSProxy = (url: string): string => {
-  // The iframe now has enhancedFetch function that handles multiple proxies
-  return url; // Return the original URL since enhancedFetch handles the proxy logic
-};
-
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
   return `function GeneratedApp() {
   const [data, setData] = useState([]);
@@ -25,7 +19,7 @@ export const generateSampleCode = (prompt: string, apis: string[], components: s
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Use enhanced fetch with multiple CORS proxy fallbacks
+      // Use enhancedFetch for direct API calls (no CORS proxy)
       const response = await enhancedFetch('https://api.example.com/sample-endpoint');
       const result = await response.json();
       setData(result);
@@ -157,20 +151,20 @@ CODE:
 - Create visually impressive applications with rich interactions and beautiful designs
 - Use JSX syntax for all React elements
 
-ENHANCED CORS HANDLING FOR API CALLS:
-IMPORTANT: Use the new enhanced fetch function that automatically handles multiple CORS proxies:
+API CALLS - DIRECT FETCH ONLY:
+IMPORTANT: Use the enhancedFetch function for direct API calls only:
 
 \`\`\`javascript
-// Use enhancedFetch instead of regular fetch - it handles CORS automatically with fallbacks
+// Use enhancedFetch for direct API calls - it makes direct requests to APIs
 const response = await enhancedFetch('https://api.example.com/endpoint');
 const data = await response.json();
 \`\`\`
 
-This new enhancedFetch function:
-- Tries direct fetch first (for APIs that support CORS)
-- Falls back to multiple reliable CORS proxies automatically
-- Provides better error handling and retry logic
-- No need to manually wrap URLs with proxy services
+This enhancedFetch function:
+- Makes direct API calls to the target URL
+- Only works with APIs that support CORS or are publicly accessible
+- Provides error handling for failed requests
+- No proxy services are used
 
 ALWAYS use enhancedFetch for external API calls instead of regular fetch.
 
