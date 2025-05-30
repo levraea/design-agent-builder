@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -258,12 +259,14 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
                       <SelectValue placeholder="Select your primary business goal" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="increase-sales">Increase Sales</SelectItem>
-                      <SelectItem value="improve-ux">Improve User Experience</SelectItem>
-                      <SelectItem value="better-marketing">Better Marketing Targeting</SelectItem>
-                      <SelectItem value="user-acquisition">User Acquisition</SelectItem>
-                      <SelectItem value="retention">Improve User Retention</SelectItem>
-                      <SelectItem value="product-development">Product Development</SelectItem>
+                      <SelectItem value="improve-employee-experience">Improve Employee Experience</SelectItem>
+                      <SelectItem value="enhance-internal-processes">Enhance Internal Processes</SelectItem>
+                      <SelectItem value="drive-innovation">Drive Innovation & R&D</SelectItem>
+                      <SelectItem value="strengthen-compliance">Strengthen Compliance & Safety</SelectItem>
+                      <SelectItem value="optimize-operations">Optimize Operations & Efficiency</SelectItem>
+                      <SelectItem value="improve-collaboration">Improve Cross-Team Collaboration</SelectItem>
+                      <SelectItem value="accelerate-decision-making">Accelerate Decision Making</SelectItem>
+                      <SelectItem value="enhance-training">Enhance Training & Development</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
