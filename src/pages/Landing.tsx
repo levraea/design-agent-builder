@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -139,7 +138,7 @@ const Landing = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/design-to-code">
+                <Link to="/dashboard">
                   <Button size="lg" className="bg-brand-blue hover:bg-brand-blue/90 text-white px-8 py-6 text-lg">
                     Get Started
                     <ArrowRight className="ml-2 w-5 h-5" />
@@ -276,7 +275,7 @@ const Landing = () => {
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
             Join thousands of teams already using AI to create better user experiences.
           </p>
-          <Link to="/design-to-code">
+          <Link to="/dashboard">
             <Button size="lg" className="bg-white text-brand-blue hover:bg-gray-50 px-8 py-6 text-lg font-semibold">
               Start Designing with AI
               <ArrowRight className="ml-2 w-5 h-5" />
