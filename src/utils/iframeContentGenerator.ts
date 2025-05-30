@@ -11,6 +11,7 @@ export const generateIframeContent = (cleanCode: string): string => {
       <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
       <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
       <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
       <style>
         body { margin: 0; padding: 16px; font-family: system-ui, -apple-system, sans-serif; }
         .error { color: #dc2626; background: #fef2f2; padding: 12px; border-radius: 6px; border: 1px solid #fecaca; }
@@ -79,6 +80,20 @@ export const generateIframeContent = (cleanCode: string): string => {
           console.log('Initializing app...');
           try {
             const { useState, useEffect, useMemo, useCallback } = React;
+            
+            // Make Chart.js available globally (from the CDN script)
+            if (typeof Chart !== 'undefined') {
+              window.ChartJS = Chart;
+              console.log('Chart.js loaded and available as ChartJS');
+            } else {
+              console.warn('Chart.js not loaded, providing fallback');
+              window.ChartJS = {
+                Chart: () => null,
+                Line: () => null,
+                Bar: () => null,
+                Pie: () => null
+              };
+            }
             
             // Mock UI components for the sandbox
             const Card = ({ children, className = '' }) => 
