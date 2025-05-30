@@ -1,3 +1,4 @@
+
 export const generateIframeContent = (cleanCode: string): string => {
   return `
     <!DOCTYPE html>
@@ -143,6 +144,10 @@ export const generateIframeContent = (cleanCode: string): string => {
                 onChange,
                 className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
               });
+
+            // Add missing Title component
+            const Title = ({ children, className = '' }) => 
+              React.createElement('h2', { className: \`text-xl font-bold \${className}\` }, children);
 
             // Process the code
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
