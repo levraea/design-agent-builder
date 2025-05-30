@@ -5,6 +5,7 @@ import { parseAIResponse } from '@/utils/aiResponseParser';
 import { generateSampleCode, buildPrompt } from '@/services/codeGenerationService';
 import { callGeminiAPI } from '@/services/geminiApiService';
 import { useConversationHistory } from '@/hooks/useConversationHistory';
+import { Persona } from '@/types/persona';
 
 export const useCodeGeneration = () => {
   const [generatedCode, setGeneratedCode] = useState('');
@@ -16,7 +17,8 @@ export const useCodeGeneration = () => {
     userPrompt: string, 
     selectedAPIs: string[], 
     selectedComponents: string[],
-    onModuleComplete?: (moduleUrl: string) => void
+    onModuleComplete?: (moduleUrl: string) => void,
+    persona?: Persona | null
   ) => {
     setIsGenerating(true);
     
@@ -42,6 +44,21 @@ export const useCodeGeneration = () => {
       // Augment the prompt with API information and design requirements
       let augmentedPrompt = userPrompt;
       
+      // Add persona context if available
+      if (persona) {
+        augmentedPrompt = `${userPrompt}
+
+PERSONA CONTEXT:
+You are designing for: ${persona.name}
+Role: ${persona.role}
+Goals: ${persona.goals}
+Challenges: ${persona.challenges}
+Tech Comfort: ${persona.techComfort}
+Motivation: ${persona.motivation}
+
+IMPORTANT: Design the interface and interactions to match this persona's needs, technical comfort level, and goals. Consider their challenges when structuring the user experience.`;
+      }
+      
       if (selectedAPIDetails.length > 0) {
         const apiContext = selectedAPIDetails.map(api => 
           `- ${api.name} (${api.link}): ${api.description}. Auth: ${api.auth}, HTTPS: ${api.https}, CORS: ${api.cors}`
@@ -51,7 +68,7 @@ export const useCodeGeneration = () => {
           ? '\nNOTE: Based on your prompt, these relevant APIs were automatically selected:'
           : '\nIMPORTANT: Use the following selected APIs in your implementation:';
         
-        augmentedPrompt = `${userPrompt}${apiSelectionNote}
+        augmentedPrompt = `${augmentedPrompt}${apiSelectionNote}
 ${apiContext}
 
 Make sure to integrate these APIs into the generated component to fetch and display relevant data.`;
@@ -69,9 +86,10 @@ DESIGN GUIDELINES:
 - Include loading states, success states, and engaging visual feedback
 - Create rich data visualizations and interactive elements
 - Use proper spacing, typography, and visual hierarchy
-- Ensure accessibility with ARIA labels and semantic HTML`;
+- Ensure accessibility with ARIA labels and semantic HTML${persona ? `
+- PERSONA-SPECIFIC: Design for ${persona.name}'s tech comfort level and workflow preferences` : ''}`;
 
-      const fullPrompt = buildPrompt(userPrompt, selectedAPIDetails, selectedAPIs, conversationHistory, generatedCode, augmentedPrompt);
+      const fullPrompt = buildPrompt(userPrompt, selectedAPIDetails, selectedAPIs, conversationHistory, generatedCode, augmentedPrompt, persona);
 
       // Log the complete prompt that will be sent to the AI
       console.log('=== FULL PROMPT SENT TO GEMINI API ===');

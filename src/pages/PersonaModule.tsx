@@ -27,6 +27,23 @@ const cleanMarkdownText = (text: string): string => {
     .trim();
 };
 
+// Helper function to save persona to localStorage
+const savePersonaToStorage = (persona: Persona) => {
+  try {
+    const existingPersonas = localStorage.getItem('saved-personas');
+    const personas = existingPersonas ? JSON.parse(existingPersonas) : [];
+    
+    // Add the new persona to the array
+    personas.push(persona);
+    
+    // Save back to localStorage
+    localStorage.setItem('saved-personas', JSON.stringify(personas));
+    console.log('Persona saved to localStorage:', persona.name);
+  } catch (error) {
+    console.error('Error saving persona to localStorage:', error);
+  }
+};
+
 export const PersonaModule = () => {
   const [currentStep, setCurrentStep] = useState<'form' | 'generating' | 'output'>('form');
   const [persona, setPersona] = useState<Persona | null>(null);
@@ -134,6 +151,10 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
       };
 
       console.log('Final persona object:', newPersona);
+      
+      // Save persona to localStorage for use in other modules
+      savePersonaToStorage(newPersona);
+      
       setPersona(newPersona);
       setCurrentStep('output');
     } catch (error) {
@@ -153,6 +174,10 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
         createdAt: new Date()
       };
       console.log('Using fallback persona:', fallbackPersona);
+      
+      // Save fallback persona as well
+      savePersonaToStorage(fallbackPersona);
+      
       setPersona(fallbackPersona);
       setCurrentStep('output');
     }

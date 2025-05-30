@@ -1,4 +1,6 @@
 
+import { Persona } from '@/types/persona';
+
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
   return `function GeneratedApp() {
   const [data, setData] = useState([]);
@@ -66,7 +68,8 @@ export const buildPrompt = (
   selectedAPIs: string[],
   conversationHistory: any[],
   generatedCode: string,
-  augmentedPrompt: string
+  augmentedPrompt: string,
+  persona?: Persona | null
 ): string => {
   // Build conversation context for the AI model
   let conversationContext = '';
@@ -103,9 +106,33 @@ MODIFICATION INSTRUCTIONS:
 `;
   }
 
+  // Add persona-specific instructions
+  let personaContext = '';
+  if (persona) {
+    personaContext = `
+PERSONA-CENTERED DESIGN:
+You are designing for ${persona.name}: ${persona.purpose}
+
+Key Persona Insights:
+- Role: ${persona.role}
+- Tech Comfort: ${persona.techComfort}
+- Goals: ${persona.goals}
+- Challenges: ${persona.challenges}
+- Motivation: ${persona.motivation}
+
+DESIGN FOR THIS PERSONA:
+- Match the UI complexity to their tech comfort level
+- Structure the interface to support their primary goals
+- Minimize friction around their main challenges
+- Use interaction patterns that align with their motivation style
+- Choose appropriate information density and visual hierarchy
+
+`;
+  }
+
   return `You are a React component generator. Generate a complete React functional component in PLAIN JAVASCRIPT using React.createElement() calls ONLY.
 
-${conversationContext}${currentCodeContext}
+${personaContext}${conversationContext}${currentCodeContext}
 
 CRITICAL REQUIREMENTS:
 - Use React hooks (useState, useEffect) as needed
@@ -146,5 +173,5 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built.`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };

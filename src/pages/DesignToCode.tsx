@@ -4,6 +4,7 @@ import { Code } from 'lucide-react';
 import { useCodeGeneration } from '@/hooks/useCodeGeneration';
 import { DesignControlPanel } from '@/components/DesignControlPanel';
 import { PreviewPanel } from '@/components/PreviewPanel';
+import { Persona } from '@/types/persona';
 
 interface DesignToCodeProps {
   onModuleComplete?: (moduleUrl: string) => void;
@@ -20,8 +21,8 @@ const DesignToCode = ({ onModuleComplete }: DesignToCodeProps) => {
     handleGenerateApp
   } = useCodeGeneration();
 
-  const onGenerate = (prompt: string) => {
-    handleGenerateApp(prompt, selectedAPIs, selectedComponents, onModuleComplete);
+  const onGenerate = (prompt: string, persona?: Persona | null) => {
+    handleGenerateApp(prompt, selectedAPIs, selectedComponents, onModuleComplete, persona);
   };
 
   return (
