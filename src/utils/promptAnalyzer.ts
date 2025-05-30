@@ -33,20 +33,6 @@ export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): stri
     if (newsAPI) relevantAPIs.push(newsAPI.id);
   }
 
-  // Cat-related keywords
-  const catKeywords = ['cat', 'kitten', 'feline', 'meow', 'pet'];
-  if (catKeywords.some(keyword => lowerPrompt.includes(keyword))) {
-    const catAPI = availableAPIs.find(api => api.id === 'catfacts');
-    if (catAPI) relevantAPIs.push(catAPI.id);
-  }
-
-  // Dog-related keywords
-  const dogKeywords = ['dog', 'puppy', 'canine', 'bark', 'breed'];
-  if (dogKeywords.some(keyword => lowerPrompt.includes(keyword))) {
-    const dogAPI = availableAPIs.find(api => api.id === 'dog-ceo');
-    if (dogAPI) relevantAPIs.push(dogAPI.id);
-  }
-
   // Finance-related keywords
   const financeKeywords = ['crypto', 'cryptocurrency', 'bitcoin', 'exchange', 'trading', 'price', 'market'];
   if (financeKeywords.some(keyword => lowerPrompt.includes(keyword))) {
@@ -54,7 +40,29 @@ export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): stri
     if (cryptoAPI) relevantAPIs.push(cryptoAPI.id);
   }
 
-  // If no specific APIs were identified, return a balanced default set
+  // Agriculture-related keywords
+  const agricultureKeywords = ['agriculture', 'farming', 'crop', 'harvest', 'food', 'agricultural', 'farm'];
+  if (agricultureKeywords.some(keyword => lowerPrompt.includes(keyword))) {
+    const worldBankAgriAPI = availableAPIs.find(api => api.id === 'world-bank-agriculture');
+    const faoAPI = availableAPIs.find(api => api.id === 'fao-agricultural-data');
+    const dataGovAgriAPI = availableAPIs.find(api => api.id === 'data-gov-agriculture');
+    
+    if (worldBankAgriAPI) relevantAPIs.push(worldBankAgriAPI.id);
+    if (faoAPI) relevantAPIs.push(faoAPI.id);
+    if (dataGovAgriAPI) relevantAPIs.push(dataGovAgriAPI.id);
+  }
+
+  // Health/Food Safety-related keywords
+  const healthKeywords = ['health', 'safety', 'recall', 'cdc', 'public health', 'disease', 'outbreak'];
+  if (healthKeywords.some(keyword => lowerPrompt.includes(keyword))) {
+    const cdcAPI = availableAPIs.find(api => api.id === 'cdc-health-data');
+    const fdaFoodAPI = availableAPIs.find(api => api.id === 'fda-food');
+    
+    if (cdcAPI) relevantAPIs.push(cdcAPI.id);
+    if (fdaFoodAPI) relevantAPIs.push(fdaFoodAPI.id);
+  }
+
+  // If no specific APIs were identified, return a balanced default set focused on core business areas
   if (relevantAPIs.length === 0) {
     const defaultAPIs = ['openmeteo', 'restcountries', 'fda-drugs'];
     return defaultAPIs.filter(id => availableAPIs.some(api => api.id === id));
