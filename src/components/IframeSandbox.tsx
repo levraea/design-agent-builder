@@ -17,6 +17,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
   useEffect(() => {
     if (!code.trim() || !iframeRef.current) return;
 
+    console.log('IframeSandbox: Starting to load code');
     setIsLoading(true);
     setError(null);
 
@@ -29,7 +30,9 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
 
-      // Create the iframe content with multiple CDN fallbacks
+      console.log('IframeSandbox: Creating iframe content');
+
+      // Create the iframe content with simpler, more reliable loading
       const iframeContent = `
         <!DOCTYPE html>
         <html>
@@ -54,6 +57,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
               border: 1px solid #fecaca;
               margin: 16px;
               font-family: monospace;
+              white-space: pre-wrap;
             }
             #root {
               min-height: calc(100vh - 32px);
@@ -69,12 +73,14 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         </head>
         <body>
           <div id="root">
-            <div class="loading">Loading dependencies...</div>
+            <div class="loading">Loading...</div>
           </div>
           <script>
+            console.log('Iframe: Starting initialization');
+            
             // Global error handling
             window.onerror = function(msg, url, lineNo, columnNo, error) {
-              console.error('Runtime Error:', error || msg);
+              console.error('Iframe Runtime Error:', error || msg);
               const rootEl = document.getElementById('root');
               if (rootEl) {
                 rootEl.innerHTML = '<div class="error"><strong>Runtime Error:</strong><br>' + (error ? error.message : msg) + '</div>';
@@ -87,7 +93,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
             };
 
             window.addEventListener('unhandledrejection', function(event) {
-              console.error('Promise Rejection:', event.reason);
+              console.error('Iframe Promise Rejection:', event.reason);
               const rootEl = document.getElementById('root');
               if (rootEl) {
                 rootEl.innerHTML = '<div class="error"><strong>Promise Error:</strong><br>' + event.reason + '</div>';
@@ -98,25 +104,30 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
               }, '*');
             });
 
-            // Load dependencies with multiple fallbacks
-            function loadScript(src, fallbackSrc) {
+            // Simplified dependency loading with faster timeout
+            function loadScript(src) {
               return new Promise((resolve, reject) => {
+                console.log('Iframe: Loading script:', src);
                 const script = document.createElement('script');
                 script.crossOrigin = 'anonymous';
-                script.onload = resolve;
-                script.onerror = () => {
-                  if (fallbackSrc) {
-                    console.warn('Primary CDN failed, trying fallback:', fallbackSrc);
-                    const fallbackScript = document.createElement('script');
-                    fallbackScript.crossOrigin = 'anonymous';
-                    fallbackScript.onload = resolve;
-                    fallbackScript.onerror = reject;
-                    fallbackScript.src = fallbackSrc;
-                    document.head.appendChild(fallbackScript);
-                  } else {
-                    reject(new Error('Failed to load script: ' + src));
-                  }
+                
+                const timeout = setTimeout(() => {
+                  console.error('Iframe: Script load timeout:', src);
+                  reject(new Error('Script load timeout: ' + src));
+                }, 8000); // Reduced timeout to 8 seconds
+                
+                script.onload = () => {
+                  console.log('Iframe: Script loaded successfully:', src);
+                  clearTimeout(timeout);
+                  resolve();
                 };
+                
+                script.onerror = () => {
+                  console.error('Iframe: Script load error:', src);
+                  clearTimeout(timeout);
+                  reject(new Error('Failed to load script: ' + src));
+                };
+                
                 script.src = src;
                 document.head.appendChild(script);
               });
@@ -124,42 +135,24 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
 
             async function loadDependencies() {
               try {
+                console.log('Iframe: Starting dependency loading');
+                
+                // Load React (using jsDelivr as primary)
                 document.getElementById('root').innerHTML = '<div class="loading">Loading React...</div>';
+                await loadScript('https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js');
                 
-                // Load React with fallbacks
-                await loadScript(
-                  'https://unpkg.com/react@18/umd/react.production.min.js',
-                  'https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js'
-                );
-                
+                // Load ReactDOM
                 document.getElementById('root').innerHTML = '<div class="loading">Loading ReactDOM...</div>';
+                await loadScript('https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js');
                 
-                // Load ReactDOM with fallbacks
-                await loadScript(
-                  'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
-                  'https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js'
-                );
-                
-                document.getElementById('root').innerHTML = '<div class="loading">Loading Recharts...</div>';
-                
-                // Load Recharts (optional)
-                try {
-                  await loadScript(
-                    'https://unpkg.com/recharts@2.12.7/umd/Recharts.js',
-                    'https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.js'
-                  );
-                } catch (e) {
-                  console.warn('Recharts failed to load, continuing without it');
-                }
-                
-                console.log('All dependencies loaded successfully');
+                console.log('Iframe: All dependencies loaded successfully');
                 initializeApp();
                 
               } catch (error) {
-                console.error('Failed to load dependencies:', error);
+                console.error('Iframe: Failed to load dependencies:', error);
                 document.getElementById('root').innerHTML = 
                   '<div class="error"><strong>Dependency Load Error:</strong><br>' + 
-                  error.message + '<br><br>Please try refreshing the page.</div>';
+                  error.message + '<br><br>Network connectivity issue or CDN unavailable.</div>';
                 
                 window.parent.postMessage({ 
                   type: 'error', 
@@ -170,57 +163,18 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
 
             function initializeApp() {
               try {
-                document.getElementById('root').innerHTML = '<div class="loading">Initializing app...</div>';
+                console.log('Iframe: Initializing app');
+                document.getElementById('root').innerHTML = '<div class="loading">Initializing...</div>';
                 
                 // Check if React is loaded
                 if (!window.React || !window.ReactDOM) {
                   throw new Error('React libraries not available');
                 }
 
-                console.log('React loaded successfully');
+                console.log('Iframe: React loaded successfully');
                 
                 // Get React hooks
                 const { useState, useEffect, useMemo, useCallback } = React;
-                
-                // Set up Recharts if available
-                if (window.Recharts) {
-                  const { 
-                    LineChart, 
-                    BarChart, 
-                    AreaChart, 
-                    PieChart, 
-                    XAxis, 
-                    YAxis, 
-                    CartesianGrid, 
-                    Tooltip, 
-                    Legend, 
-                    ResponsiveContainer,
-                    Line,
-                    Bar,
-                    Area,
-                    Pie,
-                    Cell
-                  } = Recharts;
-                  
-                  // Make Recharts available globally
-                  window.LineChart = LineChart;
-                  window.BarChart = BarChart;
-                  window.AreaChart = AreaChart;
-                  window.PieChart = PieChart;
-                  window.XAxis = XAxis;
-                  window.YAxis = YAxis;
-                  window.CartesianGrid = CartesianGrid;
-                  window.Tooltip = Tooltip;
-                  window.Legend = Legend;
-                  window.ResponsiveContainer = ResponsiveContainer;
-                  window.Line = Line;
-                  window.Bar = Bar;
-                  window.Area = Area;
-                  window.Pie = Pie;
-                  window.Cell = Cell;
-                  
-                  console.log('Recharts components loaded');
-                }
                 
                 // Mock UI components
                 const Card = ({ children, className = '' }) => 
@@ -258,26 +212,28 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
                 window.Button = Button;
                 window.Input = Input;
 
-                console.log('UI components initialized');
+                console.log('Iframe: UI components initialized');
+                console.log('Iframe: Executing user code');
 
                 // Execute the user's code
                 ${cleanCode}
 
                 // Render the component
                 if (typeof GeneratedApp === 'function') {
-                  console.log('GeneratedApp function found, rendering...');
+                  console.log('Iframe: GeneratedApp function found, rendering...');
                   const root = ReactDOM.createRoot(document.getElementById('root'));
                   root.render(React.createElement(GeneratedApp));
                   
                   // Signal success to parent
                   setTimeout(() => {
+                    console.log('Iframe: Sending success message to parent');
                     window.parent.postMessage({ type: 'success' }, '*');
                   }, 100);
                 } else {
                   throw new Error('GeneratedApp function not found or not properly defined');
                 }
               } catch (error) {
-                console.error('App initialization error:', error);
+                console.error('Iframe: App initialization error:', error);
                 const rootEl = document.getElementById('root');
                 if (rootEl) {
                   rootEl.innerHTML = \`<div class="error"><strong>Initialization Error:</strong><br>\${error.message}<br><br><small>Check the console for more details</small></div>\`;
@@ -291,6 +247,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
             }
 
             // Start loading dependencies
+            console.log('Iframe: Starting dependency loading process');
             loadDependencies();
           </script>
         </body>
@@ -300,15 +257,17 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       // Write content to iframe
       iframe.srcdoc = iframeContent;
       
-      // Set up timeout for loading (increased to 15 seconds)
+      // Set up timeout for loading (reduced to 12 seconds)
       const timeoutId = setTimeout(() => {
+        console.error('IframeSandbox: Preview timeout occurred');
         setIsLoading(false);
-        setError('Preview timeout - dependencies may have failed to load. Please try again.');
+        setError('Preview timeout - network connectivity issue or CDN unavailable. Please check your internet connection and try again.');
         onError?.('Preview timeout');
-      }, 15000);
+      }, 12000);
 
       // Clear timeout when iframe loads
       iframe.onload = () => {
+        console.log('IframeSandbox: Iframe onload fired');
         clearTimeout(timeoutId);
       };
       
@@ -316,6 +275,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       onSuccess?.();
 
     } catch (err) {
+      console.error('IframeSandbox: Setup error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
       setIsLoading(false);
@@ -326,11 +286,13 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
   // Listen for messages from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      console.log('IframeSandbox: Received message from iframe:', event.data);
       if (event.data.type === 'error') {
         setError(event.data.message);
         setIsLoading(false);
         onError?.(event.data.message);
       } else if (event.data.type === 'success') {
+        console.log('IframeSandbox: Success message received');
         setError(null);
         setIsLoading(false);
         onSuccess?.();
