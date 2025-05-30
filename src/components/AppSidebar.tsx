@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -161,7 +162,6 @@ export function AppSidebar({ completedModules = [] }: AppSidebarProps) {
                 </div>
                 <span>Design Agent</span>
               </h2>
-              <p className="text-sm text-gray-600">Turn ideas into digital products</p>
             </Link>
             <div className="group-data-[collapsible=icon]:mx-auto">
               <SidebarTrigger className="ml-2 group-data-[collapsible=icon]:ml-0" />
