@@ -10,6 +10,33 @@ export const generateAppInitializer = (cleanCode: string): string => {
           try {
             const { useState, useEffect, useMemo, useCallback } = React;
             
+            // Check if Recharts is already available from script tag
+            if (window.Recharts) {
+              console.log('✅ Recharts already available via script tag');
+              const recharts = window.Recharts;
+              
+              // Make individual components available globally
+              window.LineChart = recharts.LineChart;
+              window.AreaChart = recharts.AreaChart;
+              window.BarChart = recharts.BarChart;
+              window.PieChart = recharts.PieChart;
+              window.ScatterChart = recharts.ScatterChart;
+              window.RadarChart = recharts.RadarChart;
+              window.XAxis = recharts.XAxis;
+              window.YAxis = recharts.YAxis;
+              window.CartesianGrid = recharts.CartesianGrid;
+              window.Tooltip = recharts.Tooltip;
+              window.Legend = recharts.Legend;
+              window.ResponsiveContainer = recharts.ResponsiveContainer;
+              window.Line = recharts.Line;
+              window.Area = recharts.Area;
+              window.Bar = recharts.Bar;
+              window.Cell = recharts.Cell;
+              window.ReferenceLine = recharts.ReferenceLine;
+              window.ReferenceArea = recharts.ReferenceArea;
+              window.Brush = recharts.Brush;
+            }
+            
             ${generateChartJSSetup()}
             
             ${generateMockUIComponents()}
