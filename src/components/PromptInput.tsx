@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,19 +6,25 @@ import { Wand2, Loader2 } from 'lucide-react';
 import { ConversationMessage } from '@/types/conversation';
 
 interface PromptInputProps {
+  prompt: string;
+  onPromptChange: (prompt: string) => void;
   onGenerate: (prompt: string) => void;
   isGenerating: boolean;
   conversationHistory?: ConversationMessage[];
 }
 
-export const PromptInput = ({ onGenerate, isGenerating, conversationHistory = [] }: PromptInputProps) => {
-  const [prompt, setPrompt] = useState('');
+export const PromptInput = ({ 
+  prompt, 
+  onPromptChange, 
+  onGenerate, 
+  isGenerating, 
+  conversationHistory = [] 
+}: PromptInputProps) => {
   const hasConversationHistory = conversationHistory.length > 0;
 
   const handleSubmit = () => {
     if (prompt.trim()) {
       onGenerate(prompt);
-      setPrompt(''); // Clear the prompt after submission
     }
   };
 
@@ -37,7 +42,7 @@ export const PromptInput = ({ onGenerate, isGenerating, conversationHistory = []
         <Textarea
           placeholder="Ask the agent..."
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          onChange={(e) => onPromptChange(e.target.value)}
           className="min-h-[120px] resize-none border-gray-200 focus:border-brand-blue focus:ring-brand-blue/20"
         />
         

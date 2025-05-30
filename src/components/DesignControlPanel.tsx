@@ -1,3 +1,5 @@
+
+import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConversationHistory } from '@/components/ConversationHistory';
 import { PromptInput } from '@/components/PromptInput';
@@ -24,6 +26,13 @@ export const DesignControlPanel = ({
   onGenerate,
   isGenerating
 }: DesignControlPanelProps) => {
+  const [prompt, setPrompt] = useState('');
+
+  const handleGenerate = (promptText: string) => {
+    onGenerate(promptText);
+    setPrompt(''); // Clear prompt after submission
+  };
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="chat" className="w-full">
@@ -36,7 +45,9 @@ export const DesignControlPanel = ({
         <TabsContent value="chat" className="mt-4 space-y-4">
           <ConversationHistory messages={conversationHistory} />
           <PromptInput 
-            onGenerate={onGenerate}
+            prompt={prompt}
+            onPromptChange={setPrompt}
+            onGenerate={handleGenerate}
             isGenerating={isGenerating}
             conversationHistory={conversationHistory}
           />
