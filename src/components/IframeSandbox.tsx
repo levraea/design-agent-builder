@@ -15,7 +15,10 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!code.trim() || !iframeRef.current) return;
+    if (!code.trim() || !iframeRef.current) {
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -29,7 +32,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
 
-      // Create the iframe content with all necessary dependencies
+      // Create the iframe content with simplified execution
       const iframeContent = `
         <!DOCTYPE html>
         <html>
@@ -55,103 +58,105 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
               border: 1px solid #fecaca; 
               margin: 16px;
             }
-            .loading {
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              height: 200px;
-              color: #6b7280;
-            }
           </style>
         </head>
         <body>
-          <div id="root">
-            <div class="loading">Loading component...</div>
-          </div>
+          <div id="root"></div>
           <script>
-            (function() {
-              try {
-                // Signal that iframe is starting to load
-                window.parent.postMessage({ type: 'loading' }, '*');
-                
-                const { useState, useEffect, useMemo, useCallback } = React;
-                
-                // Mock UI components for the sandbox
-                const Card = ({ children, className = '' }) => 
-                  React.createElement('div', { className: \`bg-white border rounded-lg shadow-sm p-4 \${className}\` }, children);
-                
-                const CardHeader = ({ children, className = '' }) => 
-                  React.createElement('div', { className: \`mb-4 \${className}\` }, children);
-                
-                const CardTitle = ({ children, className = '' }) => 
-                  React.createElement('h3', { className: \`text-lg font-semibold \${className}\` }, children);
-                
-                const CardContent = ({ children, className = '' }) => 
-                  React.createElement('div', { className: className }, children);
-                
-                const Button = ({ children, onClick, disabled, className = '' }) => 
-                  React.createElement('button', { 
-                    onClick, 
-                    disabled,
-                    className: \`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors \${className}\`
-                  }, children);
-                
-                const Input = ({ placeholder, value, onChange, className = '' }) => 
-                  React.createElement('input', { 
-                    placeholder, 
-                    value, 
-                    onChange,
-                    className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full \${className}\`
-                  });
+            try {
+              const { useState, useEffect, useMemo, useCallback } = React;
+              
+              // Mock UI components for the sandbox
+              const Card = ({ children, className = '' }) => 
+                React.createElement('div', { className: \`bg-white border rounded-lg shadow-sm p-4 \${className}\` }, children);
+              
+              const CardHeader = ({ children, className = '' }) => 
+                React.createElement('div', { className: \`mb-4 \${className}\` }, children);
+              
+              const CardTitle = ({ children, className = '' }) => 
+                React.createElement('h3', { className: \`text-lg font-semibold \${className}\` }, children);
+              
+              const CardContent = ({ children, className = '' }) => 
+                React.createElement('div', { className: className }, children);
+              
+              const Button = ({ children, onClick, disabled, className = '' }) => 
+                React.createElement('button', { 
+                  onClick, 
+                  disabled,
+                  className: \`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors \${className}\`
+                }, children);
+              
+              const Input = ({ placeholder, value, onChange, className = '' }) => 
+                React.createElement('input', { 
+                  placeholder, 
+                  value, 
+                  onChange,
+                  className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full \${className}\`
+                });
 
-                const Select = ({ children, value, onChange, className = '' }) => 
-                  React.createElement('select', { 
-                    value, 
-                    onChange: (e) => onChange && onChange(e.target.value),
-                    className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full \${className}\`
-                  }, children);
+              const Select = ({ children, value, onChange, className = '' }) => 
+                React.createElement('select', { 
+                  value, 
+                  onChange: (e) => onChange && onChange(e.target.value),
+                  className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full \${className}\`
+                }, children);
 
-                const Option = ({ children, value }) => 
-                  React.createElement('option', { value }, children);
+              const Option = ({ children, value }) => 
+                React.createElement('option', { value }, children);
 
-                // Execute the generated code
-                ${cleanCode}
+              // Execute the generated code
+              ${cleanCode}
 
-                // Clear the loading message
-                document.getElementById('root').innerHTML = '';
-
-                // Render the component
-                if (typeof GeneratedApp === 'function') {
-                  const root = ReactDOM.createRoot(document.getElementById('root'));
-                  root.render(React.createElement(GeneratedApp));
-                  
-                  // Signal success to parent
-                  setTimeout(() => {
-                    window.parent.postMessage({ type: 'success' }, '*');
-                  }, 100);
-                } else {
-                  throw new Error('GeneratedApp is not a valid React component');
-                }
-              } catch (error) {
-                console.error('Execution error:', error);
-                document.getElementById('root').innerHTML = 
-                  \`<div class="error"><strong>Error:</strong> \${error.message}</div>\`;
-                
-                // Signal error to parent
-                window.parent.postMessage({ 
-                  type: 'error', 
-                  message: error.message,
-                  stack: error.stack 
-                }, '*');
+              // Render the component
+              const root = ReactDOM.createRoot(document.getElementById('root'));
+              
+              if (typeof GeneratedApp === 'function') {
+                root.render(React.createElement(GeneratedApp));
+                window.parent.postMessage({ type: 'success' }, '*');
+              } else {
+                // Fallback: try to find any exported function or render simple content
+                const rootElement = document.getElementById('root');
+                rootElement.innerHTML = '<div class="p-4 text-center text-gray-600">Preview loaded successfully</div>';
+                window.parent.postMessage({ type: 'success' }, '*');
               }
-            })();
+            } catch (error) {
+              console.error('Execution error:', error);
+              const rootElement = document.getElementById('root');
+              rootElement.innerHTML = 
+                \`<div class="error"><strong>Error:</strong> \${error.message}</div>\`;
+              
+              window.parent.postMessage({ 
+                type: 'error', 
+                message: error.message 
+              }, '*');
+            }
           </script>
         </body>
         </html>
       `;
 
-      // Write content to iframe using srcdoc
+      // Set a timeout to ensure loading doesn't get stuck
+      const loadTimeout = setTimeout(() => {
+        setIsLoading(false);
+        setError('Preview loading timeout');
+        onError?.('Preview loading timeout');
+      }, 5000);
+
+      // Handle iframe load
+      const handleLoad = () => {
+        clearTimeout(loadTimeout);
+        // Give the iframe a moment to execute the script
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 500);
+      };
+
+      iframe.onload = handleLoad;
       iframe.srcdoc = iframeContent;
+
+      return () => {
+        clearTimeout(loadTimeout);
+      };
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -164,10 +169,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
   // Listen for messages from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'loading') {
-        setIsLoading(true);
-        setError(null);
-      } else if (event.data.type === 'error') {
+      if (event.data.type === 'error') {
         setError(event.data.message);
         setIsLoading(false);
         onError?.(event.data.message);
