@@ -55,55 +55,62 @@ MOTIVATION: [What drives them and how they discover tools]
 TECH_COMFORT: [Technology comfort level and preferred devices]
 PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
 
+      console.log('Sending prompt to AI:', prompt);
       const response = await callGeminiAPI(prompt);
+      console.log('AI Response received:', response);
       
       // Parse the AI response to extract persona data
       const lines = response.split('\n').filter(line => line.trim());
       const personaData: any = {};
       
       lines.forEach(line => {
-        if (line.startsWith('NAME:')) personaData.name = line.replace('NAME:', '').trim();
-        if (line.startsWith('ROLE:')) personaData.role = line.replace('ROLE:', '').trim();
-        if (line.startsWith('LIFESTYLE:')) personaData.lifestyle = line.replace('LIFESTYLE:', '').trim();
-        if (line.startsWith('GOALS:')) personaData.goals = line.replace('GOALS:', '').trim();
-        if (line.startsWith('CHALLENGES:')) personaData.challenges = line.replace('CHALLENGES:', '').trim();
-        if (line.startsWith('MOTIVATION:')) personaData.motivation = line.replace('MOTIVATION:', '').trim();
-        if (line.startsWith('TECH_COMFORT:')) personaData.techComfort = line.replace('TECH_COMFORT:', '').trim();
-        if (line.startsWith('PERSONAL_TOUCH:')) personaData.personalTouch = line.replace('PERSONAL_TOUCH:', '').trim();
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith('NAME:')) personaData.name = trimmedLine.replace('NAME:', '').trim();
+        if (trimmedLine.startsWith('ROLE:')) personaData.role = trimmedLine.replace('ROLE:', '').trim();
+        if (trimmedLine.startsWith('LIFESTYLE:')) personaData.lifestyle = trimmedLine.replace('LIFESTYLE:', '').trim();
+        if (trimmedLine.startsWith('GOALS:')) personaData.goals = trimmedLine.replace('GOALS:', '').trim();
+        if (trimmedLine.startsWith('CHALLENGES:')) personaData.challenges = trimmedLine.replace('CHALLENGES:', '').trim();
+        if (trimmedLine.startsWith('MOTIVATION:')) personaData.motivation = trimmedLine.replace('MOTIVATION:', '').trim();
+        if (trimmedLine.startsWith('TECH_COMFORT:')) personaData.techComfort = trimmedLine.replace('TECH_COMFORT:', '').trim();
+        if (trimmedLine.startsWith('PERSONAL_TOUCH:')) personaData.personalTouch = trimmedLine.replace('PERSONAL_TOUCH:', '').trim();
       });
+
+      console.log('Parsed persona data:', personaData);
 
       const newPersona: Persona = {
         id: Date.now().toString(),
-        name: personaData.name || 'Generated Persona',
+        name: personaData.name || `${formData.targetAudience} Persona`,
         purpose: `Persona for ${formData.product} targeting ${formData.targetAudience}`,
-        role: personaData.role || '',
-        lifestyle: personaData.lifestyle || '',
-        goals: personaData.goals || '',
-        challenges: personaData.challenges || '',
-        motivation: personaData.motivation || '',
-        techComfort: personaData.techComfort || '',
-        personalTouch: personaData.personalTouch || '',
+        role: personaData.role || 'Professional seeking solutions for their daily challenges',
+        lifestyle: personaData.lifestyle || 'Active lifestyle with focus on efficiency and personal growth',
+        goals: personaData.goals || 'Achieve success while maintaining work-life balance and personal wellbeing',
+        challenges: personaData.challenges || 'Time constraints, information overload, and competing priorities',
+        motivation: personaData.motivation || 'Driven by results and recommendations from trusted sources',
+        techComfort: personaData.techComfort || 'Comfortable with technology but prefers intuitive, user-friendly interfaces',
+        personalTouch: personaData.personalTouch || 'Values authenticity and practical solutions that fit into their busy lifestyle',
         createdAt: new Date()
       };
 
+      console.log('Final persona object:', newPersona);
       setPersona(newPersona);
       setCurrentStep('output');
     } catch (error) {
       console.error('Error generating persona:', error);
-      // Create a fallback persona
+      // Create a fallback persona with meaningful content
       const fallbackPersona: Persona = {
         id: Date.now().toString(),
-        name: 'Generated Persona',
+        name: `${formData.targetAudience} Persona`,
         purpose: `Persona for ${formData.product} targeting ${formData.targetAudience}`,
-        role: 'Professional in their field with typical daily responsibilities',
-        lifestyle: 'Balanced lifestyle with focus on efficiency and quality',
-        goals: 'Achieve success while maintaining work-life balance',
-        challenges: 'Time constraints and information overload',
-        motivation: 'Driven by results and recommendations from trusted sources',
-        techComfort: 'Comfortable with technology but prefers intuitive interfaces',
-        personalTouch: 'Values authenticity and practical solutions',
+        role: 'Professional in their field with typical daily responsibilities and goals',
+        lifestyle: 'Balanced lifestyle with focus on efficiency, quality, and personal growth',
+        goals: 'Achieve success while maintaining work-life balance and pursuing personal interests',
+        challenges: 'Time constraints, information overload, and balancing multiple priorities',
+        motivation: 'Driven by results, peer recommendations, and solutions that provide clear value',
+        techComfort: 'Comfortable with technology but prefers intuitive interfaces and clear user experiences',
+        personalTouch: 'Values authenticity, practical solutions, and tools that integrate seamlessly into their routine',
         createdAt: new Date()
       };
+      console.log('Using fallback persona:', fallbackPersona);
       setPersona(fallbackPersona);
       setCurrentStep('output');
     }
@@ -143,6 +150,7 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
   }
 
   if (currentStep === 'output' && persona) {
+    console.log('Rendering PersonaOutput with persona:', persona);
     return (
       <PersonaOutput 
         persona={persona}
