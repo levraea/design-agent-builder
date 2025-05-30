@@ -51,8 +51,19 @@ export const generateIframeContent = (cleanCode: string): string => {
               className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
             });
 
-          // Make Chart.js available globally
-          window.Chart = window.Chart;
+          // Make Chart.js available globally - ensure it's loaded
+          if (typeof Chart !== 'undefined') {
+            window.Chart = Chart;
+            window.ChartJS = Chart; // Also expose as ChartJS for compatibility
+          } else {
+            console.warn('Chart.js not loaded properly');
+            // Create a mock Chart object to prevent errors
+            window.Chart = {
+              register: () => {},
+              Chart: function() { return { update: () => {}, destroy: () => {} }; }
+            };
+            window.ChartJS = window.Chart;
+          }
           
           // Mock recharts components
           const ResponsiveContainer = ({ children, width = '100%', height = 300 }) => 
