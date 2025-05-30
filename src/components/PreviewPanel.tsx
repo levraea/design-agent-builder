@@ -21,7 +21,7 @@ export const PreviewPanel = ({ generatedCode, isGenerating }: PreviewPanelProps)
           <LivePreview code={generatedCode} isGenerating={isGenerating} />
         </TabsContent>
         
-        <TabsContent value="code" className="flex-1 m-0 p-4">
+        <TabsContent value="code" className="flex-1 m-0 overflow-hidden">
           <GeneratedCode code={generatedCode} />
         </TabsContent>
       </Tabs>

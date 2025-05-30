@@ -31,43 +31,41 @@ export const GeneratedCode = ({ code }: GeneratedCodeProps) => {
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center justify-end">
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopy}
-              disabled={!code}
-            >
-              <Copy className="w-4 h-4 mr-1" />
-              {copied ? 'Copied!' : 'Copy'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownload}
-              disabled={!code}
-            >
-              <Download className="w-4 h-4 mr-1" />
-              Download
-            </Button>
-          </div>
-        </CardTitle>
-      </CardHeader>
+    <div className="h-full flex flex-col">
+      <div className="flex items-center justify-end p-4 border-b">
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopy}
+            disabled={!code}
+          >
+            <Copy className="w-4 h-4 mr-1" />
+            {copied ? 'Copied!' : 'Copy'}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownload}
+            disabled={!code}
+          >
+            <Download className="w-4 h-4 mr-1" />
+            Download
+          </Button>
+        </div>
+      </div>
       
-      <CardContent className="flex-1 p-0 min-h-0">
+      <div className="flex-1 overflow-hidden">
         {code ? (
           <ScrollArea className="h-full w-full">
             <div className="p-4">
-              <pre className="bg-gray-900 text-gray-100 text-sm font-mono whitespace-pre-wrap break-words">
+              <pre className="bg-gray-900 text-gray-100 text-sm font-mono whitespace-pre-wrap break-words rounded-lg p-4">
                 <code>{code}</code>
               </pre>
             </div>
           </ScrollArea>
         ) : (
-          <div className="h-full flex items-center justify-center text-gray-500 bg-gray-50 rounded-lg m-4">
+          <div className="h-full flex items-center justify-center text-gray-500 bg-gray-50">
             <div className="text-center">
               <Code className="w-12 h-12 mx-auto mb-3 text-gray-400" />
               <p>Generated code will appear here</p>
@@ -75,7 +73,7 @@ export const GeneratedCode = ({ code }: GeneratedCodeProps) => {
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
