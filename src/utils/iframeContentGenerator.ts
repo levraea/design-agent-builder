@@ -1,4 +1,3 @@
-
 export const generateIframeContent = (cleanCode: string): string => {
   return `
     <!DOCTYPE html>
@@ -81,10 +80,30 @@ export const generateIframeContent = (cleanCode: string): string => {
           try {
             const { useState, useEffect, useMemo, useCallback } = React;
             
-            // Make Chart.js available globally (from the CDN script)
+            // Make Chart.js available globally and register necessary components
             if (typeof Chart !== 'undefined') {
+              // Register Chart.js components
+              Chart.register(
+                Chart.CategoryScale,
+                Chart.LinearScale,
+                Chart.PointElement,
+                Chart.LineElement,
+                Chart.BarElement,
+                Chart.Title,
+                Chart.Tooltip,
+                Chart.Legend,
+                Chart.ArcElement,
+                Chart.Filler
+              );
+              
               window.ChartJS = Chart;
-              console.log('Chart.js loaded and available as ChartJS');
+              window.CategoryScale = Chart.CategoryScale;
+              window.LinearScale = Chart.LinearScale;
+              window.PointElement = Chart.PointElement;
+              window.LineElement = Chart.LineElement;
+              window.BarElement = Chart.BarElement;
+              
+              console.log('Chart.js loaded and components registered');
             } else {
               console.warn('Chart.js not loaded, providing fallback');
               window.ChartJS = {
@@ -93,6 +112,8 @@ export const generateIframeContent = (cleanCode: string): string => {
                 Bar: () => null,
                 Pie: () => null
               };
+              window.CategoryScale = () => null;
+              window.LinearScale = () => null;
             }
             
             // Mock UI components for the sandbox
