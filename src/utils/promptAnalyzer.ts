@@ -62,6 +62,30 @@ export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): stri
     if (fdaFoodAPI) relevantAPIs.push(fdaFoodAPI.id);
   }
 
+  // Biological/Genomic research keywords (EBI Search API & LAPIS)
+  const biologicalKeywords = ['protein', 'gene', 'sequence', 'genomic', 'dna', 'rna', 'nucleotide', 'bioinformatics', 'molecular', 'genome', 'sars-cov-2', 'covid', 'virus', 'variant'];
+  if (biologicalKeywords.some(keyword => lowerPrompt.includes(keyword))) {
+    const ebiAPI = availableAPIs.find(api => api.id === 'ebi-search');
+    const lapisAPI = availableAPIs.find(api => api.id === 'lapis');
+    
+    if (ebiAPI) relevantAPIs.push(ebiAPI.id);
+    if (lapisAPI) relevantAPIs.push(lapisAPI.id);
+  }
+
+  // Academic/Research keywords (OpenAlex)
+  const academicKeywords = ['research', 'academic', 'paper', 'publication', 'scholar', 'journal', 'citation', 'author', 'institution', 'bibliometric', 'scientific'];
+  if (academicKeywords.some(keyword => lowerPrompt.includes(keyword))) {
+    const openAlexAPI = availableAPIs.find(api => api.id === 'openalex');
+    if (openAlexAPI) relevantAPIs.push(openAlexAPI.id);
+  }
+
+  // Astronomy/Space keywords (Go-APOD)
+  const astronomyKeywords = ['astronomy', 'space', 'nasa', 'picture', 'apod', 'galaxy', 'planet', 'star', 'universe', 'cosmic', 'telescope', 'nebula'];
+  if (astronomyKeywords.some(keyword => lowerPrompt.includes(keyword))) {
+    const apodAPI = availableAPIs.find(api => api.id === 'go-apod');
+    if (apodAPI) relevantAPIs.push(apodAPI.id);
+  }
+
   // If no specific APIs were identified, return a balanced default set focused on core business areas
   if (relevantAPIs.length === 0) {
     const defaultAPIs = ['openmeteo', 'restcountries', 'fda-drugs'];
