@@ -78,10 +78,18 @@ export const generateIframeContent = (cleanCode: string): string => {
           const Line = ({ dataKey, stroke }) => null;
           const Bar = ({ dataKey, fill }) => null;
 
-          // Transpile JSX to JavaScript using Babel
-          const jsxCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+          // Process the code to remove any export statements
+          let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
           
-          const transformedCode = Babel.transform(jsxCode, {
+          // Remove export statements and convert to regular function declarations
+          processedCode = processedCode.replace(/export\\s+default\\s+function\\s+GeneratedApp/g, 'function GeneratedApp');
+          processedCode = processedCode.replace(/export\\s+function\\s+GeneratedApp/g, 'function GeneratedApp');
+          processedCode = processedCode.replace(/export\\s+default\\s+GeneratedApp/g, '// GeneratedApp exported');
+          processedCode = processedCode.replace(/export\\s+{[^}]*}/g, '// exports removed');
+          processedCode = processedCode.replace(/export\\s+\\*/g, '// export * removed');
+
+          // Transpile JSX to JavaScript using Babel
+          const transformedCode = Babel.transform(processedCode, {
             presets: ['react']
           }).code;
 
