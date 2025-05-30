@@ -1,6 +1,3 @@
-
-
-
 export const generateIframeContent = (cleanCode: string): string => {
   return `
     <!DOCTYPE html>
@@ -78,66 +75,110 @@ export const generateIframeContent = (cleanCode: string): string => {
         });
       </script>
       <script>
-        // Enhanced CORS proxy with multiple fallbacks for better reliability
+        // More reliable CORS proxies with better error handling
         const corsProxies = [
+          {
+            name: 'cors-proxy',
+            url: 'https://cors-proxy.fringe.zone/',
+            transform: (data) => data
+          },
           {
             name: 'corsproxy.io',
             url: 'https://corsproxy.io/?',
-            transform: (data) => data // Direct response
-          },
-          {
-            name: 'cors-anywhere-herokuapp',
-            url: 'https://cors-anywhere.herokuapp.com/',
-            transform: (data) => data // Direct response
+            transform: (data) => data
           },
           {
             name: 'allorigins',
             url: 'https://api.allorigins.win/get?url=',
-            transform: (data) => JSON.parse(data.contents) // Wrapped in contents
+            transform: (data) => {
+              try {
+                return JSON.parse(data.contents);
+              } catch (e) {
+                return data.contents;
+              }
+            }
           }
         ];
 
-        // Enhanced fetch with proxy fallback
+        // Enhanced fetch with detailed error logging and better proxy handling
         window.enhancedFetch = async (targetUrl, options = {}) => {
+          console.log('🌐 Enhanced fetch called for:', targetUrl);
+          
           // First try direct fetch (might work for some APIs)
           try {
-            console.log('Attempting direct fetch to:', targetUrl);
+            console.log('📡 Attempting direct fetch...');
             const response = await fetch(targetUrl, options);
             if (response.ok) {
-              console.log('Direct fetch successful');
+              console.log('✅ Direct fetch successful!');
               return response;
+            } else {
+              console.log('❌ Direct fetch failed with status:', response.status);
             }
           } catch (error) {
-            console.log('Direct fetch failed, trying proxies...');
+            console.log('❌ Direct fetch error:', error.message);
           }
+
+          console.log('🔄 Trying CORS proxies...');
+          const errors = [];
 
           // Try each proxy in order
           for (let i = 0; i < corsProxies.length; i++) {
             const proxy = corsProxies[i];
             try {
-              console.log('Trying proxy ' + (i + 1) + '/' + corsProxies.length + ': ' + proxy.name);
-              const proxyUrl = proxy.url + encodeURIComponent(targetUrl);
-              const response = await fetch(proxyUrl, options);
+              console.log('🔧 Proxy attempt ' + (i + 1) + '/' + corsProxies.length + ': ' + proxy.name);
+              
+              let proxyUrl;
+              if (proxy.name === 'cors-proxy') {
+                proxyUrl = proxy.url + targetUrl;
+              } else {
+                proxyUrl = proxy.url + encodeURIComponent(targetUrl);
+              }
+              
+              console.log('🔗 Proxy URL:', proxyUrl);
+              
+              const response = await fetch(proxyUrl, {
+                ...options,
+                headers: {
+                  ...options.headers,
+                  'Accept': 'application/json'
+                }
+              });
+              
+              console.log('📊 Proxy response status:', response.status);
               
               if (response.ok) {
-                const data = await response.json();
-                const transformedData = proxy.transform(data);
-                console.log('Proxy ' + proxy.name + ' successful');
-                
-                // Return a Response-like object for consistency
-                return {
-                  ok: true,
-                  json: async () => transformedData,
-                  text: async () => JSON.stringify(transformedData)
-                };
+                try {
+                  const data = await response.json();
+                  console.log('📦 Raw proxy data:', data);
+                  
+                  const transformedData = proxy.transform(data);
+                  console.log('✨ Transformed data:', transformedData);
+                  console.log('✅ Proxy ' + proxy.name + ' successful!');
+                  
+                  // Return a Response-like object for consistency
+                  return {
+                    ok: true,
+                    status: 200,
+                    json: async () => transformedData,
+                    text: async () => typeof transformedData === 'string' ? transformedData : JSON.stringify(transformedData)
+                  };
+                } catch (parseError) {
+                  console.error('❌ JSON parse error for ' + proxy.name + ':', parseError);
+                  errors.push(proxy.name + ': JSON parse failed - ' + parseError.message);
+                }
+              } else {
+                const errorText = await response.text().catch(() => 'No error text available');
+                console.error('❌ Proxy ' + proxy.name + ' HTTP error:', response.status, errorText);
+                errors.push(proxy.name + ': HTTP ' + response.status + ' - ' + errorText);
               }
             } catch (error) {
-              console.warn('Proxy ' + proxy.name + ' failed:', error);
-              continue;
+              console.error('❌ Proxy ' + proxy.name + ' network error:', error);
+              errors.push(proxy.name + ': ' + error.message);
             }
           }
           
-          throw new Error('All CORS proxies failed. Please check your internet connection or try again later.');
+          console.error('💥 All proxies failed. Errors:', errors);
+          throw new Error('All CORS proxies failed. Errors: ' + errors.join('; '));
         };
 
         function initializeApp() {
@@ -268,4 +309,3 @@ export const generateIframeContent = (cleanCode: string): string => {
     </html>
   `;
 };
-
