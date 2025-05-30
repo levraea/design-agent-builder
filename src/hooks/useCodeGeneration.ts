@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ConversationMessage } from '@/types/conversation';
 
@@ -161,7 +162,7 @@ MODIFICATION INSTRUCTIONS:
 `;
       }
 
-      const fullPrompt = `You are a React component generator. Generate a complete React functional component in PLAIN JAVASCRIPT using React.createElement() calls ONLY.
+      const fullPrompt = `You are a React component generator. Generate a complete React functional component using modern JSX syntax.
 
 ${conversationContext}${currentCodeContext}
 
@@ -170,33 +171,38 @@ CRITICAL REQUIREMENTS:
 - Return ONLY the component code, no explanations or markdown
 - Make it a complete, working component
 - The component MUST be named "GeneratedApp"
+- Use normal JSX syntax with angle brackets
 - Create visually impressive applications with rich interactions and beautiful designs
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 function GeneratedApp() {
   const [count, setCount] = useState(0);
   
-  return React.createElement('div', { className: 'p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50' },
-    React.createElement(Card, { className: 'max-w-2xl mx-auto shadow-xl' },
-      React.createElement(CardHeader, { className: 'text-center bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-t-lg' },
-        React.createElement(CardTitle, { className: 'text-2xl font-bold' }, 'My Beautiful App')
-      ),
-      React.createElement(CardContent, { className: 'p-8 space-y-6' },
-        React.createElement('div', { className: 'text-center' },
-          React.createElement('p', { className: 'text-xl font-semibold text-gray-700 mb-4' }, 'Count: ' + count),
-          React.createElement(Button, { 
-            onClick: () => setCount(count + 1),
-            className: 'bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white px-8 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200'
-          }, 'Increment')
-        )
-      )
-    )
+  return (
+    <div className="p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+      <Card className="max-w-2xl mx-auto shadow-xl">
+        <CardHeader className="text-center bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-t-lg">
+          <CardTitle className="text-2xl font-bold">My Beautiful App</CardTitle>
+        </CardHeader>
+        <CardContent className="p-8 space-y-6">
+          <div className="text-center">
+            <p className="text-xl font-semibold text-gray-700 mb-4">Count: {count}</p>
+            <Button 
+              onClick={() => setCount(count + 1)}
+              className="bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white px-8 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              Increment
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the example format above. No explanations, no markdown, just the pure JavaScript function.`;
+REMEMBER: Return ONLY the GeneratedApp function code using JSX syntax, exactly as shown in the example format above. No explanations, no markdown, just the pure JavaScript function with JSX.`;
 
       // Log the complete prompt that will be sent to the AI
       console.log('=== FULL PROMPT SENT TO GEMINI API ===');
