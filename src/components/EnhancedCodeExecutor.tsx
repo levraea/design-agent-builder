@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';
 import { IframeSandbox } from './IframeSandbox';
 import { ModuleLoader } from './ModuleLoader';
 import { LiveUpdateManager } from './LiveUpdateManager';
@@ -17,7 +16,6 @@ export const EnhancedCodeExecutor = ({
   enableLiveUpdates = true 
 }: EnhancedCodeExecutorProps) => {
   const [currentCode, setCurrentCode] = useState(code);
-  const [executionMode, setExecutionMode] = useState<'iframe' | 'eval'>('iframe');
   const [error, setError] = useState<string | null>(null);
   const [modules, setModules] = useState<string[]>([]);
   const [loadedModules, setLoadedModules] = useState<Record<string, any>>({});
@@ -70,11 +68,6 @@ export const EnhancedCodeExecutor = ({
     setError(`Module loading error: ${errorMessage}`);
   };
 
-  const toggleExecutionMode = () => {
-    setExecutionMode(prev => prev === 'iframe' ? 'eval' : 'iframe');
-    setError(null);
-  };
-
   if (!currentCode.trim()) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
@@ -89,29 +82,6 @@ export const EnhancedCodeExecutor = ({
 
   return (
     <div className="w-full h-full flex flex-col">
-      {/* Execution Mode Controls */}
-      <div className="flex items-center justify-between p-2 border-b bg-gray-50">
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleExecutionMode}
-            className="text-xs"
-          >
-            <RefreshCw className="w-3 h-3 mr-1" />
-            Mode: {executionMode === 'iframe' ? 'Sandbox' : 'Direct'}
-          </Button>
-          {modules.length > 0 && (
-            <span className="text-xs text-gray-600">
-              Modules: {modules.join(', ')}
-            </span>
-          )}
-        </div>
-        {enableLiveUpdates && (
-          <span className="text-xs text-green-600">● Live Updates</span>
-        )}
-      </div>
-
       {/* Error Display */}
       {error && (
         <Alert variant="destructive" className="m-2">
@@ -137,19 +107,13 @@ export const EnhancedCodeExecutor = ({
         />
       )}
 
-      {/* Code Execution */}
+      {/* Code Execution - Sandbox Only */}
       <div className="flex-1 overflow-hidden">
-        {executionMode === 'iframe' ? (
-          <IframeSandbox
-            code={currentCode}
-            onError={handleExecutionError}
-            onSuccess={handleExecutionSuccess}
-          />
-        ) : (
-          <div className="p-4 text-center text-gray-500">
-            Direct execution mode - implement fallback here
-          </div>
-        )}
+        <IframeSandbox
+          code={currentCode}
+          onError={handleExecutionError}
+          onSuccess={handleExecutionSuccess}
+        />
       </div>
     </div>
   );
