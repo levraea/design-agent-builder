@@ -1,6 +1,6 @@
 
 import { Monitor, Loader2 } from 'lucide-react';
-import { EnhancedCodeExecutor } from './EnhancedCodeExecutor';
+import { AdvancedCodeExecutor } from './AdvancedCodeExecutor';
 
 interface LivePreviewProps {
   code: string;
@@ -23,15 +23,20 @@ export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
           </div>
         ) : code ? (
           <div className="h-full">
-            <EnhancedCodeExecutor code={code} enableLiveUpdates={true} />
+            <AdvancedCodeExecutor 
+              code={code} 
+              enableLiveUpdates={true}
+              enableWebSocket={false}
+              enableTransformation={true}
+            />
           </div>
         ) : (
           <div className="h-full flex items-center justify-center text-gray-500">
             <div className="text-center">
               <Monitor className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-medium mb-2">Enhanced Live Preview</h3>
+              <h3 className="text-lg font-medium mb-2">Advanced Live Preview</h3>
               <p>Your generated application will appear here</p>
-              <p className="text-sm mt-2">Now with iframe sandboxing and live updates</p>
+              <p className="text-sm mt-2">Now with WebSocket support, code transformation, and state management</p>
             </div>
           </div>
         )}
