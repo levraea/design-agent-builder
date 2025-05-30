@@ -230,7 +230,7 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
                     id="product"
                     value={formData.product}
                     onChange={(e) => setFormData(prev => ({ ...prev, product: e.target.value }))}
-                    placeholder="e.g., New oncology treatment for early-stage breast cancer"
+                    placeholder="e.g., Digital health platform for chronic disease management, new crop protection solution, or consumer pain relief product"
                     required
                   />
                 </div>
@@ -243,7 +243,7 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
                     id="audience"
                     value={formData.targetAudience}
                     onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value }))}
-                    placeholder="e.g., Oncologists at academic medical centers, 35-55 years old, treating 50+ cancer patients monthly"
+                    placeholder="e.g., Healthcare providers in primary care, farmers managing 500+ acres, or consumers aged 25-45 seeking wellness solutions"
                     className="min-h-[80px]"
                     required
                   />
@@ -276,7 +276,7 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
                     id="traits"
                     value={formData.specialTraits}
                     onChange={(e) => setFormData(prev => ({ ...prev, specialTraits: e.target.value }))}
-                    placeholder="e.g., Evidence-based decision making, prefers peer-reviewed data, limited time for sales meetings"
+                    placeholder="e.g., Values scientific evidence and regulatory compliance, cost-conscious decision making, prefers digital solutions that integrate with existing workflows"
                     className="min-h-[80px]"
                   />
                 </div>
