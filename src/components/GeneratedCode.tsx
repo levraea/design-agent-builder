@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Code, Copy, Download } from 'lucide-react';
 import { useState } from 'react';
 
@@ -56,13 +57,15 @@ export const GeneratedCode = ({ code }: GeneratedCodeProps) => {
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="flex-1 overflow-hidden">
+      <CardContent className="flex-1 overflow-hidden p-0">
         {code ? (
-          <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg h-full overflow-auto text-sm font-mono">
-            <code>{code}</code>
-          </pre>
+          <ScrollArea className="h-full">
+            <pre className="bg-gray-900 text-gray-100 p-4 text-sm font-mono whitespace-pre-wrap break-words">
+              <code>{code}</code>
+            </pre>
+          </ScrollArea>
         ) : (
-          <div className="h-full flex items-center justify-center text-gray-500 bg-gray-50 rounded-lg">
+          <div className="h-full flex items-center justify-center text-gray-500 bg-gray-50 rounded-lg m-4">
             <div className="text-center">
               <Code className="w-12 h-12 mx-auto mb-3 text-gray-400" />
               <p>Generated code will appear here</p>
