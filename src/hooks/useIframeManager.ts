@@ -11,10 +11,8 @@ export const useIframeManager = ({ code, onError, onSuccess }: UseIframeManagerP
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const lastCodeRef = useRef<string>('');
-  const messageHandlerRef = useRef<((event: MessageEvent) => void) | null>(null);
 
-  // Stable message handler that doesn't change on every render
+  // Simple message handler
   const handleMessage = useCallback((event: MessageEvent) => {
     // Only handle messages from our iframe
     if (event.source !== iframeRef.current?.contentWindow) return;
@@ -30,32 +28,14 @@ export const useIframeManager = ({ code, onError, onSuccess }: UseIframeManagerP
     }
   }, [onError, onSuccess]);
 
-  // Set up message listener only once
+  // Set up message listener
   useEffect(() => {
-    // Remove previous listener if it exists
-    if (messageHandlerRef.current) {
-      window.removeEventListener('message', messageHandlerRef.current);
-    }
-
-    // Store the new handler reference
-    messageHandlerRef.current = handleMessage;
     window.addEventListener('message', handleMessage);
-
-    return () => {
-      if (messageHandlerRef.current) {
-        window.removeEventListener('message', messageHandlerRef.current);
-      }
-    };
+    return () => window.removeEventListener('message', handleMessage);
   }, [handleMessage]);
 
   const writeToIframe = useCallback((content: string) => {
     if (!iframeRef.current) return;
-
-    // Prevent writing the same content multiple times
-    if (lastCodeRef.current === content) {
-      setIsLoading(false);
-      return;
-    }
 
     try {
       const iframe = iframeRef.current;
@@ -65,15 +45,9 @@ export const useIframeManager = ({ code, onError, onSuccess }: UseIframeManagerP
         throw new Error('Cannot access iframe document');
       }
 
-      // Store the content we're writing
-      lastCodeRef.current = content;
-
       iframeDoc.open();
       iframeDoc.write(content);
       iframeDoc.close();
-
-      // Don't immediately set loading to false, wait for success message
-      onSuccess?.();
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -81,7 +55,7 @@ export const useIframeManager = ({ code, onError, onSuccess }: UseIframeManagerP
       setIsLoading(false);
       onError?.(errorMessage);
     }
-  }, [onError, onSuccess]);
+  }, [onError]);
 
   return {
     iframeRef,

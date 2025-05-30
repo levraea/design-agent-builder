@@ -21,29 +21,25 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
     writeToIframe
   } = useIframeManager({ code, onError, onSuccess });
 
-  const lastProcessedCodeRef = useRef<string>('');
+  const lastCodeRef = useRef<string>('');
 
   useEffect(() => {
     if (!code.trim() || !iframeRef.current) return;
 
     const processedCode = cleanCode(code);
     
-    // Prevent processing the same code multiple times
-    if (lastProcessedCodeRef.current === processedCode) {
+    // Only process if code actually changed
+    if (lastCodeRef.current === processedCode) {
       return;
     }
 
-    lastProcessedCodeRef.current = processedCode;
+    lastCodeRef.current = processedCode;
     setIsLoading(true);
     setError(null);
 
-    // Add a small delay to prevent rapid re-renders
-    const timeoutId = setTimeout(() => {
-      const iframeContent = generateIframeContent(processedCode);
-      writeToIframe(iframeContent);
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
+    // Generate and write iframe content immediately
+    const iframeContent = generateIframeContent(processedCode);
+    writeToIframe(iframeContent);
   }, [code, writeToIframe, setIsLoading, setError]);
 
   if (error) {
