@@ -59,35 +59,102 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
       const response = await callGeminiAPI(prompt);
       console.log('AI Response received:', response);
       
-      // Parse the AI response to extract persona data
+      // Parse the AI response to extract persona data with improved parsing
       const lines = response.split('\n').filter(line => line.trim());
       const personaData: any = {};
       
       lines.forEach(line => {
         const trimmedLine = line.trim();
-        if (trimmedLine.startsWith('NAME:')) personaData.name = trimmedLine.replace('NAME:', '').trim();
-        if (trimmedLine.startsWith('ROLE:')) personaData.role = trimmedLine.replace('ROLE:', '').trim();
-        if (trimmedLine.startsWith('LIFESTYLE:')) personaData.lifestyle = trimmedLine.replace('LIFESTYLE:', '').trim();
-        if (trimmedLine.startsWith('GOALS:')) personaData.goals = trimmedLine.replace('GOALS:', '').trim();
-        if (trimmedLine.startsWith('CHALLENGES:')) personaData.challenges = trimmedLine.replace('CHALLENGES:', '').trim();
-        if (trimmedLine.startsWith('MOTIVATION:')) personaData.motivation = trimmedLine.replace('MOTIVATION:', '').trim();
-        if (trimmedLine.startsWith('TECH_COMFORT:')) personaData.techComfort = trimmedLine.replace('TECH_COMFORT:', '').trim();
-        if (trimmedLine.startsWith('PERSONAL_TOUCH:')) personaData.personalTouch = trimmedLine.replace('PERSONAL_TOUCH:', '').trim();
+        // Handle both **NAME:** and NAME: formats
+        if (trimmedLine.includes('NAME:')) {
+          const nameMatch = trimmedLine.match(/\*?\*?NAME:\*?\*?\s*(.+)/);
+          if (nameMatch) personaData.name = nameMatch[1].trim();
+        }
+        if (trimmedLine.includes('ROLE:')) {
+          const roleMatch = trimmedLine.match(/\*?\*?ROLE:\*?\*?\s*(.+)/);
+          if (roleMatch) personaData.role = roleMatch[1].trim();
+        }
+        if (trimmedLine.includes('LIFESTYLE:')) {
+          const lifestyleMatch = trimmedLine.match(/\*?\*?LIFESTYLE:\*?\*?\s*(.+)/);
+          if (lifestyleMatch) personaData.lifestyle = lifestyleMatch[1].trim();
+        }
+        if (trimmedLine.includes('GOALS:')) {
+          const goalsMatch = trimmedLine.match(/\*?\*?GOALS:\*?\*?\s*(.+)/);
+          if (goalsMatch) personaData.goals = goalsMatch[1].trim();
+        }
+        if (trimmedLine.includes('CHALLENGES:')) {
+          const challengesMatch = trimmedLine.match(/\*?\*?CHALLENGES:\*?\*?\s*(.+)/);
+          if (challengesMatch) personaData.challenges = challengesMatch[1].trim();
+        }
+        if (trimmedLine.includes('MOTIVATION:')) {
+          const motivationMatch = trimmedLine.match(/\*?\*?MOTIVATION:\*?\*?\s*(.+)/);
+          if (motivationMatch) personaData.motivation = motivationMatch[1].trim();
+        }
+        if (trimmedLine.includes('TECH_COMFORT:')) {
+          const techMatch = trimmedLine.match(/\*?\*?TECH_COMFORT:\*?\*?\s*(.+)/);
+          if (techMatch) personaData.techComfort = techMatch[1].trim();
+        }
+        if (trimmedLine.includes('PERSONAL_TOUCH:')) {
+          const personalMatch = trimmedLine.match(/\*?\*?PERSONAL_TOUCH:\*?\*?\s*(.+)/);
+          if (personalMatch) personaData.personalTouch = personalMatch[1].trim();
+        }
       });
 
-      console.log('Parsed persona data:', personaData);
+      // Also try to extract multi-line content for richer descriptions
+      const extractSection = (sectionName: string) => {
+        const startPattern = new RegExp(`\\*?\\*?${sectionName}:\\*?\\*?`, 'i');
+        const nextSectionPattern = /\*?\*?(NAME|ROLE|LIFESTYLE|GOALS|CHALLENGES|MOTIVATION|TECH_COMFORT|PERSONAL_TOUCH):\*?\*?/i;
+        
+        const startIndex = lines.findIndex(line => startPattern.test(line));
+        if (startIndex === -1) return null;
+        
+        let content = [];
+        let currentIndex = startIndex;
+        
+        // Get the content from the first line
+        const firstLineMatch = lines[currentIndex].match(startPattern);
+        if (firstLineMatch) {
+          const remainingText = lines[currentIndex].substring(firstLineMatch.index + firstLineMatch[0].length).trim();
+          if (remainingText) content.push(remainingText);
+        }
+        
+        // Continue reading until we hit another section or end
+        currentIndex++;
+        while (currentIndex < lines.length) {
+          const line = lines[currentIndex].trim();
+          if (nextSectionPattern.test(line)) break;
+          if (line) content.push(line);
+          currentIndex++;
+        }
+        
+        return content.join(' ').trim();
+      };
+
+      // Extract richer content if available
+      const richPersonaData = {
+        name: extractSection('NAME') || personaData.name,
+        role: extractSection('ROLE') || personaData.role,
+        lifestyle: extractSection('LIFESTYLE') || personaData.lifestyle,
+        goals: extractSection('GOALS') || personaData.goals,
+        challenges: extractSection('CHALLENGES') || personaData.challenges,
+        motivation: extractSection('MOTIVATION') || personaData.motivation,
+        techComfort: extractSection('TECH_COMFORT') || personaData.techComfort,
+        personalTouch: extractSection('PERSONAL_TOUCH') || personaData.personalTouch,
+      };
+
+      console.log('Parsed persona data:', richPersonaData);
 
       const newPersona: Persona = {
         id: Date.now().toString(),
-        name: personaData.name || `${formData.targetAudience} Persona`,
+        name: richPersonaData.name || `${formData.targetAudience} Persona`,
         purpose: `Persona for ${formData.product} targeting ${formData.targetAudience}`,
-        role: personaData.role || 'Professional seeking solutions for their daily challenges',
-        lifestyle: personaData.lifestyle || 'Active lifestyle with focus on efficiency and personal growth',
-        goals: personaData.goals || 'Achieve success while maintaining work-life balance and personal wellbeing',
-        challenges: personaData.challenges || 'Time constraints, information overload, and competing priorities',
-        motivation: personaData.motivation || 'Driven by results and recommendations from trusted sources',
-        techComfort: personaData.techComfort || 'Comfortable with technology but prefers intuitive, user-friendly interfaces',
-        personalTouch: personaData.personalTouch || 'Values authenticity and practical solutions that fit into their busy lifestyle',
+        role: richPersonaData.role || 'Professional seeking solutions for their daily challenges',
+        lifestyle: richPersonaData.lifestyle || 'Active lifestyle with focus on efficiency and personal growth',
+        goals: richPersonaData.goals || 'Achieve success while maintaining work-life balance and personal wellbeing',
+        challenges: richPersonaData.challenges || 'Time constraints, information overload, and competing priorities',
+        motivation: richPersonaData.motivation || 'Driven by results and recommendations from trusted sources',
+        techComfort: richPersonaData.techComfort || 'Comfortable with technology but prefers intuitive, user-friendly interfaces',
+        personalTouch: richPersonaData.personalTouch || 'Values authenticity and practical solutions that fit into their busy lifestyle',
         createdAt: new Date()
       };
 
