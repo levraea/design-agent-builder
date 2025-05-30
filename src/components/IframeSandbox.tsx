@@ -29,7 +29,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
 
-      // Create the iframe content with all necessary dependencies
+      // Create the iframe content with reliable CDN dependencies
       const iframeContent = `
         <!DOCTYPE html>
         <html>
@@ -37,8 +37,8 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Live Preview</title>
-          <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-          <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+          <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+          <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
           <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
@@ -56,35 +56,44 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
               border-radius: 6px; 
               border: 1px solid #fecaca;
               margin: 16px;
+              font-family: monospace;
             }
             #root {
               min-height: calc(100vh - 32px);
             }
+            .loading {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 200px;
+              color: #6b7280;
+            }
           </style>
         </head>
         <body>
-          <div id="root">Loading...</div>
+          <div id="root">
+            <div class="loading">Loading preview...</div>
+          </div>
           <script>
-            // Error handling wrapper
+            // Global error handling
             window.onerror = function(msg, url, lineNo, columnNo, error) {
-              console.error('Global error:', error);
+              console.error('Runtime Error:', error || msg);
               const rootEl = document.getElementById('root');
               if (rootEl) {
-                rootEl.innerHTML = '<div class="error"><strong>Runtime Error:</strong> ' + msg + '</div>';
+                rootEl.innerHTML = '<div class="error"><strong>Runtime Error:</strong><br>' + (error ? error.message : msg) + '</div>';
               }
               window.parent.postMessage({ 
                 type: 'error', 
-                message: msg,
-                stack: error ? error.stack : 'No stack trace available'
+                message: error ? error.message : msg
               }, '*');
               return true;
             };
 
             window.addEventListener('unhandledrejection', function(event) {
-              console.error('Unhandled promise rejection:', event.reason);
+              console.error('Promise Rejection:', event.reason);
               const rootEl = document.getElementById('root');
               if (rootEl) {
-                rootEl.innerHTML = '<div class="error"><strong>Promise Error:</strong> ' + event.reason + '</div>';
+                rootEl.innerHTML = '<div class="error"><strong>Promise Error:</strong><br>' + event.reason + '</div>';
               }
               window.parent.postMessage({ 
                 type: 'error', 
@@ -92,30 +101,21 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
               }, '*');
             });
 
-            try {
-              // Wait for all dependencies to load
-              function waitForDependencies(callback) {
-                let attempts = 0;
-                const maxAttempts = 50;
-                
-                function check() {
-                  attempts++;
-                  if (window.React && window.ReactDOM && window.Recharts) {
-                    callback();
-                  } else if (attempts < maxAttempts) {
-                    setTimeout(check, 100);
-                  } else {
-                    throw new Error('Failed to load required dependencies (React, ReactDOM, Recharts)');
-                  }
+            // Wait for dependencies and execute code
+            function initializeApp() {
+              try {
+                // Check if React is loaded
+                if (!window.React || !window.ReactDOM) {
+                  throw new Error('React libraries failed to load');
                 }
-                check();
-              }
 
-              waitForDependencies(() => {
-                try {
-                  const { useState, useEffect, useMemo, useCallback } = React;
-                  
-                  // Expose Recharts components globally
+                console.log('React loaded successfully');
+                
+                // Get React hooks
+                const { useState, useEffect, useMemo, useCallback } = React;
+                
+                // Set up Recharts if available
+                if (window.Recharts) {
                   const { 
                     LineChart, 
                     BarChart, 
@@ -151,99 +151,130 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
                   window.Pie = Pie;
                   window.Cell = Cell;
                   
-                  // Mock UI components for the sandbox
-                  const Card = ({ children, className = '' }) => 
-                    React.createElement('div', { className: \`bg-white border rounded-lg shadow-sm \${className}\` }, children);
-                  
-                  const CardHeader = ({ children, className = '' }) => 
-                    React.createElement('div', { className: \`px-6 py-4 border-b \${className}\` }, children);
-                  
-                  const CardTitle = ({ children, className = '' }) => 
-                    React.createElement('h3', { className: \`text-lg font-semibold \${className}\` }, children);
-                  
-                  const CardContent = ({ children, className = '' }) => 
-                    React.createElement('div', { className: \`px-6 py-4 \${className}\` }, children);
-                  
-                  const Button = ({ children, onClick, disabled, className = '' }) => 
-                    React.createElement('button', { 
-                      onClick, 
-                      disabled,
-                      className: \`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 \${className}\`
-                    }, children);
-                  
-                  const Input = ({ placeholder, value, onChange, className = '' }) => 
-                    React.createElement('input', { 
-                      placeholder, 
-                      value, 
-                      onChange,
-                      className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
-                    });
-
-                  // Execute the generated code
-                  ${cleanCode}
-
-                  // Render the component
-                  if (typeof GeneratedApp === 'function') {
-                    const root = ReactDOM.createRoot(document.getElementById('root'));
-                    root.render(React.createElement(GeneratedApp));
-                    
-                    // Signal success to parent
-                    setTimeout(() => {
-                      window.parent.postMessage({ type: 'success' }, '*');
-                    }, 100);
-                  } else {
-                    throw new Error('GeneratedApp is not a valid React component');
-                  }
-                } catch (error) {
-                  console.error('Component execution error:', error);
-                  const rootEl = document.getElementById('root');
-                  if (rootEl) {
-                    rootEl.innerHTML = \`<div class="error"><strong>Component Error:</strong> \${error.message}</div>\`;
-                  }
-                  
-                  // Signal error to parent
-                  window.parent.postMessage({ 
-                    type: 'error', 
-                    message: error.message,
-                    stack: error.stack 
-                  }, '*');
+                  console.log('Recharts components loaded');
                 }
-              });
-            } catch (error) {
-              console.error('Initialization error:', error);
-              const rootEl = document.getElementById('root');
-              if (rootEl) {
-                rootEl.innerHTML = \`<div class="error"><strong>Initialization Error:</strong> \${error.message}</div>\`;
+                
+                // Mock UI components
+                const Card = ({ children, className = '' }) => 
+                  React.createElement('div', { className: \`bg-white border border-gray-200 rounded-lg shadow-sm \${className}\` }, children);
+                
+                const CardHeader = ({ children, className = '' }) => 
+                  React.createElement('div', { className: \`px-6 py-4 border-b border-gray-200 \${className}\` }, children);
+                
+                const CardTitle = ({ children, className = '' }) => 
+                  React.createElement('h3', { className: \`text-lg font-semibold text-gray-900 \${className}\` }, children);
+                
+                const CardContent = ({ children, className = '' }) => 
+                  React.createElement('div', { className: \`px-6 py-4 \${className}\` }, children);
+                
+                const Button = ({ children, onClick, disabled, className = '' }) => 
+                  React.createElement('button', { 
+                    onClick, 
+                    disabled,
+                    className: \`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors \${className}\`
+                  }, children);
+                
+                const Input = ({ placeholder, value, onChange, className = '' }) => 
+                  React.createElement('input', { 
+                    placeholder, 
+                    value, 
+                    onChange,
+                    className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent \${className}\`
+                  });
+
+                // Make components available globally
+                window.Card = Card;
+                window.CardHeader = CardHeader;
+                window.CardTitle = CardTitle;
+                window.CardContent = CardContent;
+                window.Button = Button;
+                window.Input = Input;
+
+                console.log('UI components initialized');
+
+                // Execute the user's code
+                ${cleanCode}
+
+                // Render the component
+                if (typeof GeneratedApp === 'function') {
+                  console.log('GeneratedApp function found, rendering...');
+                  const root = ReactDOM.createRoot(document.getElementById('root'));
+                  root.render(React.createElement(GeneratedApp));
+                  
+                  // Signal success to parent
+                  setTimeout(() => {
+                    window.parent.postMessage({ type: 'success' }, '*');
+                  }, 100);
+                } else {
+                  throw new Error('GeneratedApp function not found or not properly defined');
+                }
+              } catch (error) {
+                console.error('App initialization error:', error);
+                const rootEl = document.getElementById('root');
+                if (rootEl) {
+                  rootEl.innerHTML = \`<div class="error"><strong>Initialization Error:</strong><br>\${error.message}<br><br><small>Check the console for more details</small></div>\`;
+                }
+                
+                window.parent.postMessage({ 
+                  type: 'error', 
+                  message: error.message
+                }, '*');
               }
-              
-              // Signal error to parent
-              window.parent.postMessage({ 
-                type: 'error', 
-                message: error.message,
-                stack: error.stack 
-              }, '*');
             }
+
+            // Wait for all scripts to load, then initialize
+            let loadAttempts = 0;
+            const maxAttempts = 50; // 5 seconds max
+            
+            function checkDependencies() {
+              loadAttempts++;
+              
+              if (window.React && window.ReactDOM) {
+                console.log('All dependencies loaded, initializing app...');
+                initializeApp();
+              } else if (loadAttempts < maxAttempts) {
+                setTimeout(checkDependencies, 100);
+              } else {
+                const missingDeps = [];
+                if (!window.React) missingDeps.push('React');
+                if (!window.ReactDOM) missingDeps.push('ReactDOM');
+                
+                const error = \`Failed to load dependencies: \${missingDeps.join(', ')}\`;
+                console.error(error);
+                
+                const rootEl = document.getElementById('root');
+                if (rootEl) {
+                  rootEl.innerHTML = \`<div class="error"><strong>Dependency Error:</strong><br>\${error}<br><br>Please try refreshing the page.</div>\`;
+                }
+                
+                window.parent.postMessage({ 
+                  type: 'error', 
+                  message: error
+                }, '*');
+              }
+            }
+
+            // Start checking for dependencies
+            setTimeout(checkDependencies, 100);
           </script>
         </body>
         </html>
       `;
 
-      // Write content to iframe using srcdoc for better control
+      // Write content to iframe
       iframe.srcdoc = iframeContent;
       
-      // Set up a timeout to handle cases where the iframe never responds
+      // Set up timeout for loading
       const timeoutId = setTimeout(() => {
         setIsLoading(false);
-        setError('Preview timeout - the code may have an infinite loop or other issue');
+        setError('Preview timeout - dependencies may have failed to load');
         onError?.('Preview timeout');
       }, 10000);
 
-      // Clear timeout if we get a response
-      const clearTimeoutOnMessage = () => {
+      // Clear timeout when iframe loads
+      iframe.onload = () => {
         clearTimeout(timeoutId);
       };
-
-      iframe.onload = clearTimeoutOnMessage;
       
       setIsLoading(false);
       onSuccess?.();
@@ -279,7 +310,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       <Alert variant="destructive" className="m-4">
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          <strong>Sandbox Error:</strong> {error}
+          <strong>Preview Error:</strong> {error}
         </AlertDescription>
       </Alert>
     );
