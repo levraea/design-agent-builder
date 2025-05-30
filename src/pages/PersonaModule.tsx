@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -231,7 +230,7 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
                     id="product"
                     value={formData.product}
                     onChange={(e) => setFormData(prev => ({ ...prev, product: e.target.value }))}
-                    placeholder="e.g., Meditation app for busy professionals"
+                    placeholder="e.g., New oncology treatment for early-stage breast cancer"
                     required
                   />
                 </div>
@@ -244,7 +243,7 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
                     id="audience"
                     value={formData.targetAudience}
                     onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value }))}
-                    placeholder="e.g., Working parents, 30-45, stressed about work-life balance"
+                    placeholder="e.g., Oncologists at academic medical centers, 35-55 years old, treating 50+ cancer patients monthly"
                     className="min-h-[80px]"
                     required
                   />
@@ -277,7 +276,7 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
                     id="traits"
                     value={formData.specialTraits}
                     onChange={(e) => setFormData(prev => ({ ...prev, specialTraits: e.target.value }))}
-                    placeholder="e.g., Time-constrained, skeptical of wellness trends"
+                    placeholder="e.g., Evidence-based decision making, prefers peer-reviewed data, limited time for sales meetings"
                     className="min-h-[80px]"
                   />
                 </div>
