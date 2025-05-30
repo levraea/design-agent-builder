@@ -165,19 +165,6 @@ MODIFICATION INSTRUCTIONS:
 
 ${conversationContext}${currentCodeContext}
 
-CRITICAL REQUIREMENTS:
-- Use ONLY React.createElement() - NO JSX syntax at all
-- NO angle brackets < > anywhere in the code
-- Use plain JavaScript, NO TypeScript syntax or type annotations
-- Use React hooks (useState, useEffect) as needed
-- Use these available components: Card, CardContent, CardHeader, CardTitle, Button, Input
-- Return ONLY the component code, no explanations or markdown
-- Make it a complete, working component
-- The component should be named "GeneratedApp"
-- DO NOT include any import statements
-- DO NOT include any export statements
-- DO NOT include any TypeScript interfaces or types
-
 EXAMPLE FORMAT:
 function GeneratedApp() {
   const [count, setCount] = useState(0);
