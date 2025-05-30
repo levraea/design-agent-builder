@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 
@@ -13,6 +13,15 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Stable callback refs to avoid infinite loops
+  const onErrorRef = useRef(onError);
+  const onSuccessRef = useRef(onSuccess);
+  
+  useEffect(() => {
+    onErrorRef.current = onError;
+    onSuccessRef.current = onSuccess;
+  });
 
   useEffect(() => {
     console.log('IframeSandbox: code changed', { codeLength: code?.length, hasCode: !!code?.trim() });
@@ -29,7 +38,6 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
 
     const iframe = iframeRef.current;
     
-    // Simple iframe content that just shows the code exists
     const iframeContent = `
       <!DOCTYPE html>
       <html>
@@ -58,30 +66,25 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
           </div>
         </div>
         <script>
-          console.log('Iframe loaded successfully');
-          window.parent.postMessage({ type: 'success' }, '*');
+          console.log('Iframe content loaded');
+          setTimeout(() => {
+            window.parent.postMessage({ type: 'success' }, '*');
+          }, 100);
         </script>
       </body>
       </html>
     `;
 
-    // Set timeout to prevent endless loading
     const loadTimeout = setTimeout(() => {
       console.log('IframeSandbox: load timeout reached');
       setIsLoading(false);
-      setError('Preview loading timeout - iframe took too long to respond');
-      onError?.('Preview loading timeout');
-    }, 3000);
+      setError('Preview loading timeout');
+      onErrorRef.current?.('Preview loading timeout');
+    }, 5000);
 
-    // Handle iframe load
     const handleLoad = () => {
       console.log('IframeSandbox: iframe loaded');
       clearTimeout(loadTimeout);
-      // Give iframe time to execute and send message
-      setTimeout(() => {
-        console.log('IframeSandbox: setting loading to false after delay');
-        setIsLoading(false);
-      }, 1000);
     };
 
     iframe.onload = handleLoad;
@@ -90,6 +93,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       clearTimeout(loadTimeout);
       setIsLoading(false);
       setError('Failed to load iframe');
+      onErrorRef.current?.('Failed to load iframe');
     };
 
     console.log('IframeSandbox: setting iframe srcdoc');
@@ -100,9 +104,9 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       clearTimeout(loadTimeout);
     };
 
-  }, [code, onError, onSuccess]);
+  }, [code]); // Only depend on code, not callback functions
 
-  // Listen for messages from iframe
+  // Separate effect for message handling
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       console.log('IframeSandbox: received message', event.data);
@@ -110,18 +114,18 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       if (event.data.type === 'error') {
         setError(event.data.message);
         setIsLoading(false);
-        onError?.(event.data.message);
+        onErrorRef.current?.(event.data.message);
       } else if (event.data.type === 'success') {
         console.log('IframeSandbox: success message received');
         setError(null);
         setIsLoading(false);
-        onSuccess?.();
+        onSuccessRef.current?.();
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [onError, onSuccess]);
+  }, []); // No dependencies needed
 
   console.log('IframeSandbox: rendering', { isLoading, error, hasCode: !!code });
 
