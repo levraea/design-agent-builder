@@ -20,14 +20,9 @@ interface PersonaFormData {
 const cleanMarkdownText = (text: string): string => {
   if (!text) return '';
   
+  // Keep the markdown formatting instead of removing it
   return text
-    // Remove bold markdown
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    // Remove italic markdown
-    .replace(/\*(.*?)\*/g, '$1')
-    // Remove any remaining asterisks
-    .replace(/\*/g, '')
-    // Clean up extra whitespace
+    // Clean up extra whitespace but preserve formatting
     .replace(/\s+/g, ' ')
     .trim();
 };
@@ -60,25 +55,25 @@ Special Focus: "${formData.specialTraits || 'N/A'}"
 
 Generate a comprehensive persona including demographics, motivations, pain points, behaviors, preferred channels, and messaging that would resonate. Make it realistic with specific details and quotes.
 
-Please format your response as follows:
+Please format your response as follows with markdown formatting for emphasis and lists:
 NAME: [Persona name]
-ROLE: [Their occupation and daily routine]
-LIFESTYLE: [Interests, habits, and lifestyle traits]
-GOALS: [Primary objectives and aspirations]
-CHALLENGES: [Pain points and obstacles]
-MOTIVATION: [What drives them and how they discover tools]
-TECH_COMFORT: [Technology comfort level and preferred devices]
+ROLE: [Their occupation and daily routine - use **bold** for key points and bullet lists with - for multiple items]
+LIFESTYLE: [Interests, habits, and lifestyle traits - use **bold** for key points and bullet lists with - for multiple items]
+GOALS: [Primary objectives and aspirations - use **bold** for key points and bullet lists with - for multiple items]
+CHALLENGES: [Pain points and obstacles - use **bold** for key points and bullet lists with - for multiple items]
+MOTIVATION: [What drives them and how they discover tools - use **bold** for key points and bullet lists with - for multiple items]
+TECH_COMFORT: [Technology comfort level and preferred devices - use **bold** for key points and bullet lists with - for multiple items]
 PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
 
       console.log('Sending prompt to AI:', prompt);
       const response = await callGeminiAPI(prompt);
       console.log('AI Response received:', response);
       
-      // Enhanced parsing logic to handle markdown formatting
+      // Enhanced parsing logic to preserve markdown formatting
       const lines = response.split('\n').filter(line => line.trim());
       const personaData: any = {};
       
-      // Helper function to extract section content with markdown cleaning
+      // Helper function to extract section content while preserving markdown
       const extractSection = (sectionName: string) => {
         const startPattern = new RegExp(`\\*?\\*?${sectionName}:\\*?\\*?`, 'i');
         const nextSectionPattern = /\*?\*?(NAME|ROLE|LIFESTYLE|GOALS|CHALLENGES|MOTIVATION|TECH_COMFORT|PERSONAL_TOUCH|PREFERRED_CHANNELS|MESSAGING_THAT_RESONATES):\*?\*?/i;
@@ -105,12 +100,12 @@ PERSONAL_TOUCH: [A personal quote or humanizing detail]`;
           currentIndex++;
         }
         
-        // Join content and clean markdown
-        const rawContent = content.join(' ').trim();
+        // Join content and preserve markdown formatting
+        const rawContent = content.join('\n').trim();
         return cleanMarkdownText(rawContent);
       };
 
-      // Extract and clean all persona data
+      // Extract and preserve markdown in all persona data
       const richPersonaData = {
         name: cleanMarkdownText(extractSection('NAME') || ''),
         role: cleanMarkdownText(extractSection('ROLE') || ''),
