@@ -57,12 +57,14 @@ export const GeneratedCode = ({ code }: GeneratedCodeProps) => {
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="flex-1 overflow-hidden p-0">
+      <CardContent className="flex-1 p-0 min-h-0">
         {code ? (
-          <ScrollArea className="h-full">
-            <pre className="bg-gray-900 text-gray-100 p-4 text-sm font-mono whitespace-pre-wrap break-words">
-              <code>{code}</code>
-            </pre>
+          <ScrollArea className="h-full w-full">
+            <div className="p-4">
+              <pre className="bg-gray-900 text-gray-100 text-sm font-mono whitespace-pre-wrap break-words">
+                <code>{code}</code>
+              </pre>
+            </div>
           </ScrollArea>
         ) : (
           <div className="h-full flex items-center justify-center text-gray-500 bg-gray-50 rounded-lg m-4">
