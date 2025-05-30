@@ -21,6 +21,34 @@ export const useCodeGeneration = () => {
     setConversationHistory(prev => [...prev, newMessage]);
   };
 
+  const parseAIResponse = (response: string): { description: string; code: string } => {
+    // Look for DESCRIPTION: and CODE: markers
+    const descriptionMatch = response.match(/DESCRIPTION:\s*(.*?)(?=\n\s*CODE:|\n\s*```|$)/s);
+    const codeMatch = response.match(/CODE:\s*(.*?)$/s) || response.match(/```(?:javascript|js)?\s*(.*?)```/s);
+    
+    if (descriptionMatch && codeMatch) {
+      return {
+        description: descriptionMatch[1].trim(),
+        code: codeMatch[1].trim()
+      };
+    }
+    
+    // Fallback: if structured format not found, try to extract function
+    const functionMatch = response.match(/(function GeneratedApp\(\)[^]*)/);
+    if (functionMatch) {
+      return {
+        description: "Generated a React component based on your request.",
+        code: functionMatch[1].trim()
+      };
+    }
+    
+    // Last resort: treat entire response as code
+    return {
+      description: "Generated a React component based on your request.",
+      code: response.trim()
+    };
+  };
+
   const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
     return `function GeneratedApp() {
   const [data, setData] = useState([]);
@@ -182,12 +210,20 @@ ${conversationContext}${currentCodeContext}
 
 CRITICAL REQUIREMENTS:
 - Use React hooks (useState, useEffect) as needed
-- Return ONLY the component code, no explanations or markdown
-- Make it a complete, working component
+- Return your response in this EXACT format:
+
+DESCRIPTION: [Write a brief, conversational description of what you built, what features it includes, and any APIs you integrated. This should sound natural as if you're explaining to the user what you just created.]
+
+CODE:
+[Insert the complete GeneratedApp function here]
+
 - The component MUST be named "GeneratedApp"
 - Create visually impressive applications with rich interactions and beautiful designs
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
+DESCRIPTION: I created a beautiful weather dashboard that fetches real-time weather data using the OpenWeather API. The app features a gradient background, animated weather icons, and displays current conditions with a 5-day forecast. I added smooth hover effects and loading animations for a great user experience.
+
+CODE:
 function GeneratedApp() {
   const [count, setCount] = useState(0);
   
@@ -211,7 +247,7 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the example format above. No explanations, no markdown, just the pure JavaScript function.`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built.`;
 
       // Log the complete prompt that will be sent to the AI
       console.log('=== FULL PROMPT SENT TO GEMINI API ===');
@@ -245,16 +281,15 @@ REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the ex
       }
 
       const data = await response.json();
-      const newGeneratedCode = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const rawResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
       
-      setGeneratedCode(newGeneratedCode);
+      // Parse the AI response to extract description and code
+      const { description, code } = parseAIResponse(rawResponse);
       
-      // Add AI response to conversation history
-      const apiMessage = selectedAPIs.length === 0 
-        ? `Generated a React component based on your prompt. Automatically selected relevant APIs: ${apisToUse.join(', ')}. The code is now available in the Live Preview and Generated Code tab.`
-        : 'Generated a React component based on your prompt and selected APIs. The code is now available in the Live Preview and Generated Code tab.';
+      setGeneratedCode(code);
       
-      addToConversationHistory('ai', apiMessage);
+      // Add AI response to conversation history using the extracted description
+      addToConversationHistory('ai', description);
       
       // Mark the Design-to-Code Generation module as complete
       if (onModuleComplete) {
@@ -269,7 +304,7 @@ REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the ex
       setGeneratedCode(fallbackCode);
       
       // Add AI response to conversation history for fallback
-      addToConversationHistory('ai', `API request failed: ${error.message}. Generated a fallback React component instead.`);
+      addToConversationHistory('ai', `I encountered an API error: ${error.message}. I've generated a fallback React component instead that demonstrates the basic structure of what you requested.`);
       
       // Still mark as complete even with fallback
       if (onModuleComplete) {
