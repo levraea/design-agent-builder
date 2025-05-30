@@ -29,7 +29,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
 
-      // Create the iframe content with reliable CDN dependencies
+      // Create the iframe content with multiple CDN fallbacks
       const iframeContent = `
         <!DOCTYPE html>
         <html>
@@ -37,9 +37,6 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Live Preview</title>
-          <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-          <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-          <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
             body { 
@@ -72,7 +69,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         </head>
         <body>
           <div id="root">
-            <div class="loading">Loading preview...</div>
+            <div class="loading">Loading dependencies...</div>
           </div>
           <script>
             // Global error handling
@@ -101,12 +98,83 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
               }, '*');
             });
 
-            // Wait for dependencies and execute code
+            // Load dependencies with multiple fallbacks
+            function loadScript(src, fallbackSrc) {
+              return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.crossOrigin = 'anonymous';
+                script.onload = resolve;
+                script.onerror = () => {
+                  if (fallbackSrc) {
+                    console.warn('Primary CDN failed, trying fallback:', fallbackSrc);
+                    const fallbackScript = document.createElement('script');
+                    fallbackScript.crossOrigin = 'anonymous';
+                    fallbackScript.onload = resolve;
+                    fallbackScript.onerror = reject;
+                    fallbackScript.src = fallbackSrc;
+                    document.head.appendChild(fallbackScript);
+                  } else {
+                    reject(new Error('Failed to load script: ' + src));
+                  }
+                };
+                script.src = src;
+                document.head.appendChild(script);
+              });
+            }
+
+            async function loadDependencies() {
+              try {
+                document.getElementById('root').innerHTML = '<div class="loading">Loading React...</div>';
+                
+                // Load React with fallbacks
+                await loadScript(
+                  'https://unpkg.com/react@18/umd/react.production.min.js',
+                  'https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js'
+                );
+                
+                document.getElementById('root').innerHTML = '<div class="loading">Loading ReactDOM...</div>';
+                
+                // Load ReactDOM with fallbacks
+                await loadScript(
+                  'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
+                  'https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js'
+                );
+                
+                document.getElementById('root').innerHTML = '<div class="loading">Loading Recharts...</div>';
+                
+                // Load Recharts (optional)
+                try {
+                  await loadScript(
+                    'https://unpkg.com/recharts@2.12.7/umd/Recharts.js',
+                    'https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.js'
+                  );
+                } catch (e) {
+                  console.warn('Recharts failed to load, continuing without it');
+                }
+                
+                console.log('All dependencies loaded successfully');
+                initializeApp();
+                
+              } catch (error) {
+                console.error('Failed to load dependencies:', error);
+                document.getElementById('root').innerHTML = 
+                  '<div class="error"><strong>Dependency Load Error:</strong><br>' + 
+                  error.message + '<br><br>Please try refreshing the page.</div>';
+                
+                window.parent.postMessage({ 
+                  type: 'error', 
+                  message: 'Failed to load dependencies: ' + error.message
+                }, '*');
+              }
+            }
+
             function initializeApp() {
               try {
+                document.getElementById('root').innerHTML = '<div class="loading">Initializing app...</div>';
+                
                 // Check if React is loaded
                 if (!window.React || !window.ReactDOM) {
-                  throw new Error('React libraries failed to load');
+                  throw new Error('React libraries not available');
                 }
 
                 console.log('React loaded successfully');
@@ -222,40 +290,8 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
               }
             }
 
-            // Wait for all scripts to load, then initialize
-            let loadAttempts = 0;
-            const maxAttempts = 50; // 5 seconds max
-            
-            function checkDependencies() {
-              loadAttempts++;
-              
-              if (window.React && window.ReactDOM) {
-                console.log('All dependencies loaded, initializing app...');
-                initializeApp();
-              } else if (loadAttempts < maxAttempts) {
-                setTimeout(checkDependencies, 100);
-              } else {
-                const missingDeps = [];
-                if (!window.React) missingDeps.push('React');
-                if (!window.ReactDOM) missingDeps.push('ReactDOM');
-                
-                const error = \`Failed to load dependencies: \${missingDeps.join(', ')}\`;
-                console.error(error);
-                
-                const rootEl = document.getElementById('root');
-                if (rootEl) {
-                  rootEl.innerHTML = \`<div class="error"><strong>Dependency Error:</strong><br>\${error}<br><br>Please try refreshing the page.</div>\`;
-                }
-                
-                window.parent.postMessage({ 
-                  type: 'error', 
-                  message: error
-                }, '*');
-              }
-            }
-
-            // Start checking for dependencies
-            setTimeout(checkDependencies, 100);
+            // Start loading dependencies
+            loadDependencies();
           </script>
         </body>
         </html>
@@ -264,12 +300,12 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       // Write content to iframe
       iframe.srcdoc = iframeContent;
       
-      // Set up timeout for loading
+      // Set up timeout for loading (increased to 15 seconds)
       const timeoutId = setTimeout(() => {
         setIsLoading(false);
-        setError('Preview timeout - dependencies may have failed to load');
+        setError('Preview timeout - dependencies may have failed to load. Please try again.');
         onError?.('Preview timeout');
-      }, 10000);
+      }, 15000);
 
       // Clear timeout when iframe loads
       iframe.onload = () => {
