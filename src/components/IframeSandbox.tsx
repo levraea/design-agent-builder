@@ -34,10 +34,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
       }
 
-      // Add common fixes for variable naming issues
-      cleanCode = cleanCode.replace(/\bCapital\b/g, 'capital');
-
-      // Create the iframe content with all necessary dependencies including Babel
+      // Create the iframe content with all necessary dependencies
       const iframeContent = `
         <!DOCTYPE html>
         <html>
@@ -47,7 +44,6 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
           <title>Live Preview</title>
           <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
           <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-          <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
           <script src="https://cdn.tailwindcss.com"></script>
           <style>
             body { margin: 0; padding: 16px; font-family: system-ui, -apple-system, sans-serif; }
@@ -57,18 +53,6 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
         <body>
           <div id="root"></div>
           <script>
-            // Enhanced error handling
-            window.addEventListener('error', function(e) {
-              console.error('Global error caught:', e.error);
-              document.getElementById('root').innerHTML = 
-                \`<div class="error"><strong>Runtime Error:</strong> \${e.error.message}<br><small>\${e.error.stack}</small></div>\`;
-              window.parent.postMessage({ 
-                type: 'error', 
-                message: e.error.message,
-                stack: e.error.stack 
-              }, '*');
-            });
-
             try {
               const { useState, useEffect, useMemo, useCallback } = React;
               
@@ -100,24 +84,8 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
                   className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
                 });
 
-              const Select = ({ children, value, onValueChange, className = '' }) => 
-                React.createElement('select', { 
-                  value, 
-                  onChange: (e) => onValueChange && onValueChange(e.target.value),
-                  className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
-                }, children);
-
-              // Transpile JSX to JavaScript using Babel
-              console.log('Original code:', \`${cleanCode.replace(/`/g, '\\`')}\`);
-              
-              const transpiledCode = Babel.transform(\`${cleanCode.replace(/`/g, '\\`')}\`, {
-                presets: ['react']
-              }).code;
-
-              console.log('Transpiled code:', transpiledCode);
-
-              // Execute the transpiled code
-              eval(transpiledCode);
+              // Execute the generated code
+              ${cleanCode}
 
               // Render the component
               if (typeof GeneratedApp === 'function') {
@@ -132,7 +100,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
             } catch (error) {
               console.error('Execution error:', error);
               document.getElementById('root').innerHTML = 
-                \`<div class="error"><strong>Error:</strong> \${error.message}<br><small>\${error.stack}</small></div>\`;
+                \`<div class="error"><strong>Error:</strong> \${error.message}</div>\`;
               
               // Signal error to parent
               window.parent.postMessage({ 

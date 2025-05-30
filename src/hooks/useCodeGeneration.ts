@@ -100,47 +100,16 @@ export const useCodeGeneration = () => {
       let augmentedPrompt = userPrompt;
       
       if (selectedAPIDetails.length > 0) {
-        const apiContext = selectedAPIDetails.map(api => {
-          let apiDetails = `- ${api.name} (${api.link}): ${api.description}. Auth: ${api.auth}, HTTPS: ${api.https}, CORS: ${api.cors}`;
-          
-          // Add specific API response structure information
-          if (api.name === 'REST Countries') {
-            apiDetails += `
-            
-REST Countries API Response Structure:
-- Endpoint: https://restcountries.com/v3.1/all
-- Each country object contains:
-  * name.common (string) - Country name
-  * capital (array) - Array of capital cities
-  * population (number) - Population count
-  * region (string) - Geographic region
-  * flags.png (string) - Flag image URL
-- IMPORTANT: Use lowercase 'capital' not 'Capital'`;
-          }
-          
-          if (api.name === 'Open-Meteo') {
-            apiDetails += `
-
-Open-Meteo API Response Structure:
-- Endpoint: https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=auto
-- Response contains:
-  * daily.temperature_2m_max (array) - Max temperatures
-  * daily.temperature_2m_min (array) - Min temperatures  
-  * daily.precipitation_sum (array) - Precipitation amounts
-  * daily.weathercode (array) - Weather condition codes
-  * daily.time (array) - Date strings
-- Weather codes: 0=clear, 1-3=partly cloudy, 45-48=fog, 51-67=rain, 71-77=snow, 80-99=thunderstorm`;
-          }
-          
-          return apiDetails;
-        }).join('\n');
+        const apiContext = selectedAPIDetails.map(api => 
+          `- ${api.name} (${api.link}): ${api.description}. Auth: ${api.auth}, HTTPS: ${api.https}, CORS: ${api.cors}`
+        ).join('\n');
         
         augmentedPrompt = `${userPrompt}
 
 IMPORTANT: Use the following selected APIs in your implementation:
 ${apiContext}
 
-Make sure to integrate these APIs into the generated component to fetch and display relevant data. Pay careful attention to the exact property names in the API responses.`;
+Make sure to integrate these APIs into the generated component to fetch and display relevant data.`;
       }
 
       // Add comprehensive design requirements to the prompt
@@ -155,14 +124,7 @@ DESIGN GUIDELINES:
 - Include loading states, success states, and engaging visual feedback
 - Create rich data visualizations and interactive elements
 - Use proper spacing, typography, and visual hierarchy
-- Ensure accessibility with ARIA labels and semantic HTML
-
-CODING REQUIREMENTS:
-- Use exact property names from API responses (case-sensitive)
-- Add proper error handling for API calls
-- Include loading states while fetching data
-- Use modern React patterns with hooks
-- Ensure all variables are properly defined before use`;
+- Ensure accessibility with ARIA labels and semantic HTML`;
 
       // Build conversation context for the AI model
       let conversationContext = '';
@@ -199,7 +161,7 @@ MODIFICATION INSTRUCTIONS:
 `;
       }
 
-      const fullPrompt = `You are a React component generator. Generate a complete React functional component using modern JSX syntax.
+      const fullPrompt = `You are a React component generator. Generate a complete React functional component in PLAIN JAVASCRIPT using React.createElement() calls ONLY.
 
 ${conversationContext}${currentCodeContext}
 
@@ -208,40 +170,33 @@ CRITICAL REQUIREMENTS:
 - Return ONLY the component code, no explanations or markdown
 - Make it a complete, working component
 - The component MUST be named "GeneratedApp"
-- Use normal JSX syntax with angle brackets
 - Create visually impressive applications with rich interactions and beautiful designs
-- ENSURE ALL VARIABLES ARE DEFINED: Check that every variable you reference exists
-- USE EXACT API PROPERTY NAMES: Match the exact case and structure from API documentation
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 function GeneratedApp() {
   const [count, setCount] = useState(0);
   
-  return (
-    <div className="p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      <Card className="max-w-2xl mx-auto shadow-xl">
-        <CardHeader className="text-center bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-t-lg">
-          <CardTitle className="text-2xl font-bold">My Beautiful App</CardTitle>
-        </CardHeader>
-        <CardContent className="p-8 space-y-6">
-          <div className="text-center">
-            <p className="text-xl font-semibold text-gray-700 mb-4">Count: {count}</p>
-            <Button 
-              onClick={() => setCount(count + 1)}
-              className="bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white px-8 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Increment
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+  return React.createElement('div', { className: 'p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50' },
+    React.createElement(Card, { className: 'max-w-2xl mx-auto shadow-xl' },
+      React.createElement(CardHeader, { className: 'text-center bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-t-lg' },
+        React.createElement(CardTitle, { className: 'text-2xl font-bold' }, 'My Beautiful App')
+      ),
+      React.createElement(CardContent, { className: 'p-8 space-y-6' },
+        React.createElement('div', { className: 'text-center' },
+          React.createElement('p', { className: 'text-xl font-semibold text-gray-700 mb-4' }, 'Count: ' + count),
+          React.createElement(Button, { 
+            onClick: () => setCount(count + 1),
+            className: 'bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white px-8 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200'
+          }, 'Increment')
+        )
+      )
+    )
   );
 }
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY the GeneratedApp function code using JSX syntax, exactly as shown in the example format above. No explanations, no markdown, just the pure JavaScript function with JSX. Ensure all variables are properly defined and use exact API property names.`;
+REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the example format above. No explanations, no markdown, just the pure JavaScript function.`;
 
       // Log the complete prompt that will be sent to the AI
       console.log('=== FULL PROMPT SENT TO GEMINI API ===');
