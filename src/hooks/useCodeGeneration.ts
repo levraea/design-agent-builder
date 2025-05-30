@@ -220,7 +220,7 @@ REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the ex
           ],
           generationConfig: {
             temperature: 0.0,
-            maxOutputTokens: 2000,
+            maxOutputTokens: 8000, // Increased from 2000 to 8000
           }
         })
       });
