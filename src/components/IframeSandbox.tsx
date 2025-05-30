@@ -56,7 +56,7 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
       <iframe
         ref={iframeRef}
         className="w-full h-full border-0"
-        sandbox="allow-scripts allow-same-origin"
+        sandbox="allow-scripts allow-same-origin allow-forms"
         title="Code Preview"
       />
     </div>
