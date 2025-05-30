@@ -15,165 +15,104 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!code.trim() || !iframeRef.current) {
+    console.log('IframeSandbox: code changed', { codeLength: code?.length, hasCode: !!code?.trim() });
+    
+    if (!code?.trim() || !iframeRef.current) {
+      console.log('IframeSandbox: no code or iframe, stopping loading');
       setIsLoading(false);
       return;
     }
 
+    console.log('IframeSandbox: starting execution');
     setIsLoading(true);
     setError(null);
 
-    try {
-      const iframe = iframeRef.current;
-      
-      // Clean code (remove markdown if present)
-      let cleanCode = code;
-      if (cleanCode.includes('```')) {
-        cleanCode = cleanCode.replace(/```[a-z]*\n?/g, '').replace(/```/g, '');
-      }
+    const iframe = iframeRef.current;
+    
+    // Simple iframe content that just shows the code exists
+    const iframeContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Live Preview</title>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+          body { 
+            margin: 0; 
+            padding: 20px; 
+            font-family: system-ui, -apple-system, sans-serif;
+            background: white;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="root">
+          <div style="padding: 20px; text-align: center; color: #666;">
+            <h3>Code Preview</h3>
+            <p>Code length: ${code.length} characters</p>
+            <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; text-align: left; overflow-x: auto; max-height: 200px;">${code.substring(0, 500)}${code.length > 500 ? '...' : ''}</pre>
+          </div>
+        </div>
+        <script>
+          console.log('Iframe loaded successfully');
+          window.parent.postMessage({ type: 'success' }, '*');
+        </script>
+      </body>
+      </html>
+    `;
 
-      // Create the iframe content with simplified execution
-      const iframeContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Live Preview</title>
-          <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-          <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-          <script src="https://cdn.tailwindcss.com"></script>
-          <style>
-            body { 
-              margin: 0; 
-              padding: 16px; 
-              font-family: system-ui, -apple-system, sans-serif;
-              background: white;
-            }
-            .error { 
-              color: #dc2626; 
-              background: #fef2f2; 
-              padding: 12px; 
-              border-radius: 6px; 
-              border: 1px solid #fecaca; 
-              margin: 16px;
-            }
-          </style>
-        </head>
-        <body>
-          <div id="root"></div>
-          <script>
-            try {
-              const { useState, useEffect, useMemo, useCallback } = React;
-              
-              // Mock UI components for the sandbox
-              const Card = ({ children, className = '' }) => 
-                React.createElement('div', { className: \`bg-white border rounded-lg shadow-sm p-4 \${className}\` }, children);
-              
-              const CardHeader = ({ children, className = '' }) => 
-                React.createElement('div', { className: \`mb-4 \${className}\` }, children);
-              
-              const CardTitle = ({ children, className = '' }) => 
-                React.createElement('h3', { className: \`text-lg font-semibold \${className}\` }, children);
-              
-              const CardContent = ({ children, className = '' }) => 
-                React.createElement('div', { className: className }, children);
-              
-              const Button = ({ children, onClick, disabled, className = '' }) => 
-                React.createElement('button', { 
-                  onClick, 
-                  disabled,
-                  className: \`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors \${className}\`
-                }, children);
-              
-              const Input = ({ placeholder, value, onChange, className = '' }) => 
-                React.createElement('input', { 
-                  placeholder, 
-                  value, 
-                  onChange,
-                  className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full \${className}\`
-                });
-
-              const Select = ({ children, value, onChange, className = '' }) => 
-                React.createElement('select', { 
-                  value, 
-                  onChange: (e) => onChange && onChange(e.target.value),
-                  className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full \${className}\`
-                }, children);
-
-              const Option = ({ children, value }) => 
-                React.createElement('option', { value }, children);
-
-              // Execute the generated code
-              ${cleanCode}
-
-              // Render the component
-              const root = ReactDOM.createRoot(document.getElementById('root'));
-              
-              if (typeof GeneratedApp === 'function') {
-                root.render(React.createElement(GeneratedApp));
-                window.parent.postMessage({ type: 'success' }, '*');
-              } else {
-                // Fallback: try to find any exported function or render simple content
-                const rootElement = document.getElementById('root');
-                rootElement.innerHTML = '<div class="p-4 text-center text-gray-600">Preview loaded successfully</div>';
-                window.parent.postMessage({ type: 'success' }, '*');
-              }
-            } catch (error) {
-              console.error('Execution error:', error);
-              const rootElement = document.getElementById('root');
-              rootElement.innerHTML = 
-                \`<div class="error"><strong>Error:</strong> \${error.message}</div>\`;
-              
-              window.parent.postMessage({ 
-                type: 'error', 
-                message: error.message 
-              }, '*');
-            }
-          </script>
-        </body>
-        </html>
-      `;
-
-      // Set a timeout to ensure loading doesn't get stuck
-      const loadTimeout = setTimeout(() => {
-        setIsLoading(false);
-        setError('Preview loading timeout');
-        onError?.('Preview loading timeout');
-      }, 5000);
-
-      // Handle iframe load
-      const handleLoad = () => {
-        clearTimeout(loadTimeout);
-        // Give the iframe a moment to execute the script
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 500);
-      };
-
-      iframe.onload = handleLoad;
-      iframe.srcdoc = iframeContent;
-
-      return () => {
-        clearTimeout(loadTimeout);
-      };
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
+    // Set timeout to prevent endless loading
+    const loadTimeout = setTimeout(() => {
+      console.log('IframeSandbox: load timeout reached');
       setIsLoading(false);
-      onError?.(errorMessage);
-    }
+      setError('Preview loading timeout - iframe took too long to respond');
+      onError?.('Preview loading timeout');
+    }, 3000);
+
+    // Handle iframe load
+    const handleLoad = () => {
+      console.log('IframeSandbox: iframe loaded');
+      clearTimeout(loadTimeout);
+      // Give iframe time to execute and send message
+      setTimeout(() => {
+        console.log('IframeSandbox: setting loading to false after delay');
+        setIsLoading(false);
+      }, 1000);
+    };
+
+    iframe.onload = handleLoad;
+    iframe.onerror = () => {
+      console.log('IframeSandbox: iframe error');
+      clearTimeout(loadTimeout);
+      setIsLoading(false);
+      setError('Failed to load iframe');
+    };
+
+    console.log('IframeSandbox: setting iframe srcdoc');
+    iframe.srcdoc = iframeContent;
+
+    return () => {
+      console.log('IframeSandbox: cleanup');
+      clearTimeout(loadTimeout);
+    };
+
   }, [code, onError, onSuccess]);
 
   // Listen for messages from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      console.log('IframeSandbox: received message', event.data);
+      
       if (event.data.type === 'error') {
         setError(event.data.message);
         setIsLoading(false);
         onError?.(event.data.message);
       } else if (event.data.type === 'success') {
+        console.log('IframeSandbox: success message received');
         setError(null);
         setIsLoading(false);
         onSuccess?.();
@@ -183,6 +122,8 @@ export const IframeSandbox = ({ code, onError, onSuccess }: IframeSandboxProps) 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, [onError, onSuccess]);
+
+  console.log('IframeSandbox: rendering', { isLoading, error, hasCode: !!code });
 
   if (error) {
     return (
