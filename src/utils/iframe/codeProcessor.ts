@@ -4,7 +4,23 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             // Process the code
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
             
-            // Remove import/export statements
+            // Remove import/export statements and replace with global references
+            processedCode = processedCode.replace(/import\\s+.*?from\\s+['"]@material-tailwind\\/react['"];?\\s*/g, '');
+            processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]@material-tailwind\\/react['"];?\\s*/g, (match, imports) => {
+              // Map Material Tailwind imports to global references
+              const importList = imports.split(',').map(imp => imp.trim());
+              let replacements = '';
+              importList.forEach(imp => {
+                if (imp === 'Card') replacements += 'const Card = window.MaterialCard;\\n';
+                else if (imp === 'CardHeader') replacements += 'const CardHeader = window.MaterialCardHeader;\\n';
+                else if (imp === 'CardBody') replacements += 'const CardBody = window.MaterialCardBody;\\n';
+                else if (imp === 'Button') replacements += 'const Button = window.MaterialButton;\\n';
+                else if (imp === 'Typography') replacements += 'const Typography = window.MaterialTypography;\\n';
+              });
+              return replacements;
+            });
+            
+            // Remove other import/export statements
             processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '');
             processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '');
             processedCode = processedCode.replace(/import\\s*\\{[^}]*\\}\\s*from\\s+['"][^'"]+['"];?\\s*/g, '');
@@ -15,16 +31,12 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             processedCode = processedCode.replace(/export\\s+\\{[^}]*\\}/g, '// exports removed');
 
             console.log('Processing code...');
-            console.log('Recharts components available:', {
-              LineChart: typeof window.LineChart,
-              BarChart: typeof window.BarChart,
-              XAxis: typeof window.XAxis,
-              YAxis: typeof window.YAxis,
-              CartesianGrid: typeof window.CartesianGrid,
-              Tooltip: typeof window.Tooltip,
-              Legend: typeof window.Legend,
-              Line: typeof window.Line,
-              ResponsiveContainer: typeof window.ResponsiveContainer
+            console.log('Available components:', {
+              Card: typeof window.Card,
+              Button: typeof window.Button,
+              MaterialCard: typeof window.MaterialCard,
+              MaterialButton: typeof window.MaterialButton,
+              ArcElement: typeof window.ArcElement
             });
             
             // Transpile JSX to JavaScript
