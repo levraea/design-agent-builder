@@ -117,14 +117,15 @@ Make sure to integrate these APIs into the generated component to fetch and disp
       augmentedPrompt = `${augmentedPrompt}
 
 DESIGN GUIDELINES:
-- Ensure intuitive navigation and responsive design for desktop, tablet, and mobile
-- Utilize Material UI design system and Roboto font family
-- Create a modern, appealing interface with a clean, card-based layout
-- Incorporate smooth animations, hover effects, and a color palette of #0091DF (blue), #66B512 (green), and #D30F4B (red)
-- Include appropriate icons and smooth transitions for an engaging user experience
-- Ensure accessibility compliance with WCAG 2.2 standards
-- Use semantic HTML elements and proper ARIA labels
-- Ensure sufficient color contrast and keyboard navigation support`;
+- Create visually stunning, modern applications with rich interactions
+- Use gradients, shadows, animations, and visual effects for maximum impact
+- Implement responsive layouts with beautiful card-based designs
+- Use vibrant color schemes with #0091DF (blue), #66B512 (green), and #D30F4B (red)
+- Add hover effects, transitions, and micro-interactions
+- Include loading states, success states, and engaging visual feedback
+- Create rich data visualizations and interactive elements
+- Use proper spacing, typography, and visual hierarchy
+- Ensure accessibility with ARIA labels and semantic HTML`;
 
       // Build conversation context for the AI model
       let conversationContext = '';
@@ -165,24 +166,45 @@ MODIFICATION INSTRUCTIONS:
 
 ${conversationContext}${currentCodeContext}
 
-EXAMPLE FORMAT:
+CRITICAL REQUIREMENTS:
+- Use ONLY React.createElement() - NO JSX syntax at all
+- NO angle brackets < > anywhere in the code
+- Use plain JavaScript, NO TypeScript syntax or type annotations
+- Use React hooks (useState, useEffect) as needed
+- Use these available components: Card, CardContent, CardHeader, CardTitle, Button, Input
+- Return ONLY the component code, no explanations or markdown
+- Make it a complete, working component
+- The component MUST be named "GeneratedApp"
+- DO NOT include any import statements
+- DO NOT include any export statements
+- DO NOT include any TypeScript interfaces or types
+- Create visually impressive applications with rich interactions and beautiful designs
+
+EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 function GeneratedApp() {
   const [count, setCount] = useState(0);
   
-  return React.createElement('div', { className: 'p-4' },
-    React.createElement(Card, null,
-      React.createElement(CardHeader, null,
-        React.createElement(CardTitle, null, 'My App')
+  return React.createElement('div', { className: 'p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50' },
+    React.createElement(Card, { className: 'max-w-2xl mx-auto shadow-xl' },
+      React.createElement(CardHeader, { className: 'text-center bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-t-lg' },
+        React.createElement(CardTitle, { className: 'text-2xl font-bold' }, 'My Beautiful App')
       ),
-      React.createElement(CardContent, null,
-        React.createElement('p', null, 'Count: ' + count),
-        React.createElement(Button, { onClick: () => setCount(count + 1) }, 'Increment')
+      React.createElement(CardContent, { className: 'p-8 space-y-6' },
+        React.createElement('div', { className: 'text-center' },
+          React.createElement('p', { className: 'text-xl font-semibold text-gray-700 mb-4' }, 'Count: ' + count),
+          React.createElement(Button, { 
+            onClick: () => setCount(count + 1),
+            className: 'bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white px-8 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200'
+          }, 'Increment')
+        )
       )
     )
   );
 }
 
-${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}`;
+${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
+
+REMEMBER: Return ONLY the GeneratedApp function code, exactly as shown in the example format above. No explanations, no markdown, just the pure JavaScript function.`;
 
       // Log the complete prompt that will be sent to the AI
       console.log('=== FULL PROMPT SENT TO GEMINI API ===');
