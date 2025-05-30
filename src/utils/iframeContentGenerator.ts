@@ -51,18 +51,65 @@ export const generateIframeContent = (cleanCode: string): string => {
               className: \`px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`
             });
 
-          // Make Chart.js available globally - ensure it's loaded
+          // Make Chart.js available globally and register components
           if (typeof Chart !== 'undefined') {
+            // Register Chart.js components
+            Chart.register(
+              Chart.CategoryScale,
+              Chart.LinearScale,
+              Chart.PointElement,
+              Chart.LineElement,
+              Chart.BarElement,
+              Chart.Title,
+              Chart.Tooltip,
+              Chart.Legend,
+              Chart.ArcElement,
+              Chart.RadialLinearScale
+            );
+            
             window.Chart = Chart;
-            window.ChartJS = Chart; // Also expose as ChartJS for compatibility
+            window.ChartJS = Chart;
+            
+            // Make Chart.js components available globally
+            window.CategoryScale = Chart.CategoryScale;
+            window.LinearScale = Chart.LinearScale;
+            window.PointElement = Chart.PointElement;
+            window.LineElement = Chart.LineElement;
+            window.BarElement = Chart.BarElement;
+            window.Title = Chart.Title;
+            window.Tooltip = Chart.Tooltip;
+            window.Legend = Chart.Legend;
+            window.ArcElement = Chart.ArcElement;
+            window.RadialLinearScale = Chart.RadialLinearScale;
           } else {
             console.warn('Chart.js not loaded properly');
-            // Create a mock Chart object to prevent errors
+            // Create mock Chart object and components to prevent errors
+            const mockComponent = () => ({});
             window.Chart = {
               register: () => {},
-              Chart: function() { return { update: () => {}, destroy: () => {} }; }
+              Chart: function() { return { update: () => {}, destroy: () => {} }; },
+              CategoryScale: mockComponent,
+              LinearScale: mockComponent,
+              PointElement: mockComponent,
+              LineElement: mockComponent,
+              BarElement: mockComponent,
+              Title: mockComponent,
+              Tooltip: mockComponent,
+              Legend: mockComponent,
+              ArcElement: mockComponent,
+              RadialLinearScale: mockComponent
             };
             window.ChartJS = window.Chart;
+            window.CategoryScale = mockComponent;
+            window.LinearScale = mockComponent;
+            window.PointElement = mockComponent;
+            window.LineElement = mockComponent;
+            window.BarElement = mockComponent;
+            window.Title = mockComponent;
+            window.Tooltip = mockComponent;
+            window.Legend = mockComponent;
+            window.ArcElement = mockComponent;
+            window.RadialLinearScale = mockComponent;
           }
           
           // Mock recharts components
