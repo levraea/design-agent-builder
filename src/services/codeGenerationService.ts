@@ -25,12 +25,17 @@ export const generateSampleCode = (prompt: string, apis: string[], components: s
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Use enhanced fetch with multiple CORS proxy fallbacks
-      const response = await enhancedFetch('https://api.example.com/sample-endpoint');
+      // Use properly formatted OpenFDA API URL without problematic quote encoding
+      const response = await enhancedFetch('https://api.fda.gov/drug/label.json?search=openfda.generic_name:acetaminophen&limit=5');
       const result = await response.json();
-      setData(result);
+      setData(result.results || []);
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Fallback to sample data if API fails
+      setData([
+        { id: 1, name: 'Sample Drug 1', description: 'Sample description' },
+        { id: 2, name: 'Sample Drug 2', description: 'Another sample' }
+      ]);
     }
     setLoading(false);
   };
@@ -174,6 +179,15 @@ This new enhancedFetch function:
 
 ALWAYS use enhancedFetch for external API calls instead of regular fetch.
 
+CRITICAL API URL FORMATTING:
+When using OpenFDA API, use proper URL format WITHOUT URL-encoded quotes:
+- CORRECT: "https://api.fda.gov/drug/label.json?search=openfda.generic_name:acetaminophen&limit=5"
+- INCORRECT: "https://api.fda.gov/drug/label.json?search=openfda.generic_name:%22Acetam%22&limit=1"
+
+For search terms with spaces, use + instead of %20:
+- CORRECT: "search=openfda.generic_name:drug+name"
+- Use simple search terms without quotes or complex encoding
+
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 DESCRIPTION: I created a beautiful weather dashboard that fetches real-time weather data using the OpenWeather API. The app features a gradient background, animated weather icons, and displays current conditions with a 5-day forecast. I added smooth hover effects and loading animations for a great user experience.
 
@@ -205,5 +219,5 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls. Fix OpenFDA API URLs by removing URL-encoded quotes and using simple search terms.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
