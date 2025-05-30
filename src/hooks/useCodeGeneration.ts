@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { ConversationMessage } from '@/types/conversation';
 
@@ -101,16 +100,47 @@ export const useCodeGeneration = () => {
       let augmentedPrompt = userPrompt;
       
       if (selectedAPIDetails.length > 0) {
-        const apiContext = selectedAPIDetails.map(api => 
-          `- ${api.name} (${api.link}): ${api.description}. Auth: ${api.auth}, HTTPS: ${api.https}, CORS: ${api.cors}`
-        ).join('\n');
+        const apiContext = selectedAPIDetails.map(api => {
+          let apiDetails = `- ${api.name} (${api.link}): ${api.description}. Auth: ${api.auth}, HTTPS: ${api.https}, CORS: ${api.cors}`;
+          
+          // Add specific API response structure information
+          if (api.name === 'REST Countries') {
+            apiDetails += `
+            
+REST Countries API Response Structure:
+- Endpoint: https://restcountries.com/v3.1/all
+- Each country object contains:
+  * name.common (string) - Country name
+  * capital (array) - Array of capital cities
+  * population (number) - Population count
+  * region (string) - Geographic region
+  * flags.png (string) - Flag image URL
+- IMPORTANT: Use lowercase 'capital' not 'Capital'`;
+          }
+          
+          if (api.name === 'Open-Meteo') {
+            apiDetails += `
+
+Open-Meteo API Response Structure:
+- Endpoint: https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=auto
+- Response contains:
+  * daily.temperature_2m_max (array) - Max temperatures
+  * daily.temperature_2m_min (array) - Min temperatures  
+  * daily.precipitation_sum (array) - Precipitation amounts
+  * daily.weathercode (array) - Weather condition codes
+  * daily.time (array) - Date strings
+- Weather codes: 0=clear, 1-3=partly cloudy, 45-48=fog, 51-67=rain, 71-77=snow, 80-99=thunderstorm`;
+          }
+          
+          return apiDetails;
+        }).join('\n');
         
         augmentedPrompt = `${userPrompt}
 
 IMPORTANT: Use the following selected APIs in your implementation:
 ${apiContext}
 
-Make sure to integrate these APIs into the generated component to fetch and display relevant data.`;
+Make sure to integrate these APIs into the generated component to fetch and display relevant data. Pay careful attention to the exact property names in the API responses.`;
       }
 
       // Add comprehensive design requirements to the prompt
@@ -125,7 +155,14 @@ DESIGN GUIDELINES:
 - Include loading states, success states, and engaging visual feedback
 - Create rich data visualizations and interactive elements
 - Use proper spacing, typography, and visual hierarchy
-- Ensure accessibility with ARIA labels and semantic HTML`;
+- Ensure accessibility with ARIA labels and semantic HTML
+
+CODING REQUIREMENTS:
+- Use exact property names from API responses (case-sensitive)
+- Add proper error handling for API calls
+- Include loading states while fetching data
+- Use modern React patterns with hooks
+- Ensure all variables are properly defined before use`;
 
       // Build conversation context for the AI model
       let conversationContext = '';
@@ -173,6 +210,8 @@ CRITICAL REQUIREMENTS:
 - The component MUST be named "GeneratedApp"
 - Use normal JSX syntax with angle brackets
 - Create visually impressive applications with rich interactions and beautiful designs
+- ENSURE ALL VARIABLES ARE DEFINED: Check that every variable you reference exists
+- USE EXACT API PROPERTY NAMES: Match the exact case and structure from API documentation
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 function GeneratedApp() {
@@ -202,7 +241,7 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY the GeneratedApp function code using JSX syntax, exactly as shown in the example format above. No explanations, no markdown, just the pure JavaScript function with JSX.`;
+REMEMBER: Return ONLY the GeneratedApp function code using JSX syntax, exactly as shown in the example format above. No explanations, no markdown, just the pure JavaScript function with JSX. Ensure all variables are properly defined and use exact API property names.`;
 
       // Log the complete prompt that will be sent to the AI
       console.log('=== FULL PROMPT SENT TO GEMINI API ===');
