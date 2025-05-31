@@ -10,6 +10,17 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             // Process the code
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
             
+            // Add data validation helpers at the top
+            processedCode = 'const ensureArray = (data) => Array.isArray(data) ? data : [];\\n' + 
+                           'const safeReduce = (arr, fn, initial) => ensureArray(arr).reduce(fn, initial);\\n' + 
+                           'const safeFilter = (arr, fn) => ensureArray(arr).filter(fn);\\n' + 
+                           'const safeMap = (arr, fn) => ensureArray(arr).map(fn);\\n' + processedCode;
+            
+            // Replace array operations with safe versions
+            processedCode = processedCode.replace(/([a-zA-Z_$][a-zA-Z0-9_$]*)\\.reduce\\(/g, 'safeReduce($1, ');
+            processedCode = processedCode.replace(/([a-zA-Z_$][a-zA-Z0-9_$]*)\\.filter\\(/g, 'safeFilter($1, ');
+            processedCode = processedCode.replace(/([a-zA-Z_$][a-zA-Z0-9_$]*)\\.map\\(/g, 'safeMap($1, ');
+            
             // Remove import/export statements and replace with global references
             processedCode = processedCode.replace(/import\\s+.*?from\\s+['"]@material-tailwind\\/react['"];?\\s*/g, '');
             processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]@material-tailwind\\/react['"];?\\s*/g, (match, imports) => {
