@@ -1,5 +1,4 @@
-
-import { Database, Cloud, Globe, Apple, Pill, Wheat, Heart, Building2, Microscope, Dna, GraduationCap, Telescope } from 'lucide-react';
+import { Database, Cloud, Globe, Apple, Pill, Wheat, Heart, Building2, Microscope, Dna, GraduationCap, Telescope, Users, Baby } from 'lucide-react';
 import { API } from '@/types/api';
 
 export const mockAPIs: API[] = [
@@ -207,6 +206,45 @@ export const mockAPIs: API[] = [
     status: 'active',
     icon: Dna,
     link: 'https://api.genome.ucsc.edu',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'faostat-agriculture',
+    name: 'FAOSTAT Agriculture',
+    description: 'FAO statistical agriculture data including production, trade, and consumption statistics',
+    category: 'CS Global Data Assets & Analytics Platform',
+    version: 'v1',
+    status: 'active',
+    icon: Wheat,
+    link: 'https://ft9rfwu9wi.execute-api.us-east-2.amazonaws.com/agriculture',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'who-health',
+    name: 'WHO Health',
+    description: 'World Health Organization global health statistics and indicators',
+    category: 'CH Data Assets, Analytics, and AI Platform',
+    version: 'v1',
+    status: 'active',
+    icon: Users,
+    link: 'https://yem7yxwgge.execute-api.us-east-2.amazonaws.com/health',
+    auth: 'None',
+    https: true,
+    cors: 'yes'
+  },
+  {
+    id: 'unicef-nutrition',
+    name: 'UNICEF Nutrition',
+    description: 'UNICEF nutrition data and child malnutrition statistics worldwide',
+    category: 'CH Data Assets, Analytics, and AI Platform',
+    version: 'v1',
+    status: 'active',
+    icon: Baby,
+    link: 'https://0ih68gj8ei.execute-api.us-east-2.amazonaws.com/nutrition',
     auth: 'None',
     https: true,
     cors: 'yes'
