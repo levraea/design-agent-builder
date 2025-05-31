@@ -1,4 +1,5 @@
 
+
 export const generateCodeProcessor = (cleanCode: string): string => {
   return `
             // Process the code
@@ -16,6 +17,9 @@ export const generateCodeProcessor = (cleanCode: string): string => {
                 else if (imp === 'CardBody') replacements += 'const CardBody = window.MaterialCardBody;\\n';
                 else if (imp === 'Button') replacements += 'const Button = window.MaterialButton;\\n';
                 else if (imp === 'Typography') replacements += 'const Typography = window.MaterialTypography;\\n';
+                else if (imp === 'Select') replacements += 'const Select = window.MaterialSelect || window.Select;\\n';
+                else if (imp === 'Option') replacements += 'const Option = window.MaterialOption || window.Option;\\n';
+                else if (imp === 'Spinner') replacements += 'const Spinner = window.MaterialSpinner || (() => React.createElement("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" }));\\n';
               });
               return replacements;
             });
@@ -55,7 +59,7 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               importList.forEach(imp => {
                 // Map unsupported Lucide icons to supported ones
                 const supportedIconMap = {
-                  'HeartHandshake': 'Heart', // Use Heart instead of HeartHandshake
+                  'HeartHandshake': 'Heart',
                   'ActivitySquare': 'Activity',
                   'BarChart3': 'BarChart',
                   'LineChart': 'TrendingUp',
@@ -71,17 +75,19 @@ export const generateCodeProcessor = (cleanCode: string): string => {
                 };
                 
                 const finalIcon = supportedIconMap[imp] || imp;
+                
                 // Only include commonly supported icons
                 const commonIcons = [
                   'Heart', 'Handshake', 'Activity', 'BarChart', 'TrendingUp', 'Circle', 'Users', 'Map', 
                   'HardDrive', 'Globe', 'ArrowDown', 'ArrowUp', 'Loader', 'AlertCircle', 'Search', 
                   'Plus', 'X', 'Check', 'Home', 'Settings', 'Bell', 'MessageCircle', 'ArrowLeft', 
                   'ArrowRight', 'ChevronDown', 'ChevronUp', 'Filter', 'RefreshCw', 'Download', 'Upload',
-                  'Eye', 'EyeOff', 'Edit', 'Trash', 'Save', 'Cancel', 'Play', 'Pause', 'Stop'
+                  'Eye', 'EyeOff', 'Edit', 'Trash', 'Save', 'Cancel', 'Play', 'Pause', 'Stop', 'Info', 'Table', 'Leaf'
                 ];
                 
                 if (commonIcons.includes(finalIcon)) {
-                  replacements += \`const \${imp} = window.Lucide.\${finalIcon} || (() => React.createElement('div', { className: 'w-4 h-4 bg-gray-300 rounded' }));\\n\`;
+                  // Use the mapped icon name for both the variable and the window reference
+                  replacements += \`const \${imp} = window.Lucide.\${finalIcon} || (() => React.createElement('div', { className: 'w-4 h-4 bg-gray-300 rounded', title: '\${imp} icon' }));\\n\`;
                 } else {
                   // Fallback to a simple div for unsupported icons
                   replacements += \`const \${imp} = () => React.createElement('div', { className: 'w-4 h-4 bg-gray-300 rounded', title: '\${imp} icon' });\\n\`;
@@ -133,3 +139,4 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               throw new Error('GeneratedApp is not a valid React component');
             }`;
 };
+
