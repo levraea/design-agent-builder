@@ -1,6 +1,4 @@
 
-
-
 export const generateCodeProcessor = (cleanCode: string): string => {
   return `
             // Ensure React is properly available
@@ -10,6 +8,11 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             
             // Process the code
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
+            
+            // Remove any local enhancedFetch function definitions that might shadow the global one
+            processedCode = processedCode.replace(/async\\s+function\\s+enhancedFetch[^}]*}[^}]*}/g, '');
+            processedCode = processedCode.replace(/const\\s+enhancedFetch\\s*=\\s*async[^;]*;/g, '');
+            processedCode = processedCode.replace(/function\\s+enhancedFetch[^}]*}[^}]*}/g, '');
             
             // Add data validation helpers at the top
             processedCode = 'const ensureArray = (data) => Array.isArray(data) ? data : [];\\n' + 
@@ -114,7 +117,8 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               MaterialCard: typeof window.MaterialCard,
               MaterialButton: typeof window.MaterialButton,
               ArcElement: typeof window.ArcElement,
-              Lucide: typeof window.Lucide
+              Lucide: typeof window.Lucide,
+              enhancedFetch: typeof window.enhancedFetch
             });
             
             // Transpile JSX to JavaScript
