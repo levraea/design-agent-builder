@@ -1,6 +1,11 @@
 
 export const generateMockUIComponents = (): string => {
   return `
+            // Ensure React is available before creating components
+            if (!window.React) {
+              throw new Error('React must be loaded before creating mock components');
+            }
+            
             // Mock UI components for common libraries
             
             // Shadcn/UI components (already available)
@@ -87,6 +92,12 @@ export const generateMockUIComponents = (): string => {
             window.MaterialCardBody = ({ children, className = '', ...props }) => 
               React.createElement('div', { 
                 className: \`\${className}\`,
+                ...props 
+              }, children);
+            
+            window.MaterialCardFooter = ({ children, className = '', ...props }) => 
+              React.createElement('div', { 
+                className: \`mt-4 pt-4 border-t border-gray-200 \${className}\`,
                 ...props 
               }, children);
             
@@ -179,6 +190,7 @@ export const generateMockUIComponents = (): string => {
               Card: window.MaterialCard,
               CardHeader: window.MaterialCardHeader,
               CardBody: window.MaterialCardBody,
+              CardFooter: window.MaterialCardFooter,
               Button: window.MaterialButton,
               Typography: window.MaterialTypography,
               Select: window.MaterialSelect,

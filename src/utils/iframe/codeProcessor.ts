@@ -1,6 +1,11 @@
 
 export const generateCodeProcessor = (cleanCode: string): string => {
   return `
+            // Ensure React is properly available
+            if (!window.React) {
+              throw new Error('React is not available in the global scope');
+            }
+            
             // Process the code
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
             
@@ -14,11 +19,23 @@ export const generateCodeProcessor = (cleanCode: string): string => {
                 if (imp === 'Card') replacements += 'const Card = window.MaterialCard;\\n';
                 else if (imp === 'CardHeader') replacements += 'const CardHeader = window.MaterialCardHeader;\\n';
                 else if (imp === 'CardBody') replacements += 'const CardBody = window.MaterialCardBody;\\n';
+                else if (imp === 'CardFooter') replacements += 'const CardFooter = window.MaterialCardFooter || window.MaterialCardBody;\\n';
                 else if (imp === 'Button') replacements += 'const Button = window.MaterialButton;\\n';
                 else if (imp === 'Typography') replacements += 'const Typography = window.MaterialTypography;\\n';
                 else if (imp === 'Select') replacements += 'const Select = window.MaterialSelect || window.Select;\\n';
                 else if (imp === 'Option') replacements += 'const Option = window.MaterialOption || window.Option;\\n';
                 else if (imp === 'Spinner') replacements += 'const Spinner = window.MaterialSpinner || (() => React.createElement("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" }));\\n';
+              });
+              return replacements;
+            });
+            
+            // Handle React imports - ensure they use window.React
+            processedCode = processedCode.replace(/import\\s+React[^;]*;?\\s*/g, 'const React = window.React;\\n');
+            processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]react['"];?\\s*/g, (match, imports) => {
+              const importList = imports.split(',').map(imp => imp.trim());
+              let replacements = 'const React = window.React;\\n';
+              importList.forEach(imp => {
+                replacements += \`const \${imp} = React.\${imp};\\n\`;
               });
               return replacements;
             });
@@ -107,6 +124,8 @@ export const generateCodeProcessor = (cleanCode: string): string => {
 
             console.log('Processing code...');
             console.log('Available components:', {
+              React: typeof window.React,
+              ReactDOM: typeof window.ReactDOM,
               Card: typeof window.Card,
               Button: typeof window.Button,
               MaterialCard: typeof window.MaterialCard,
