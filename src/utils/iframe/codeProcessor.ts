@@ -48,6 +48,48 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               return replacements;
             });
             
+            // Handle Lucide React imports - replace unsupported icons with supported ones
+            processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]lucide-react['"];?\\s*/g, (match, imports) => {
+              const importList = imports.split(',').map(imp => imp.trim());
+              let replacements = '';
+              importList.forEach(imp => {
+                // Map unsupported Lucide icons to supported ones
+                const supportedIconMap = {
+                  'HeartHandshake': 'Heart', // Use Heart instead of HeartHandshake
+                  'ActivitySquare': 'Activity',
+                  'BarChart3': 'BarChart',
+                  'LineChart': 'TrendingUp',
+                  'PieChart': 'Circle',
+                  'Users2': 'Users',
+                  'MapPin': 'Map',
+                  'Database': 'HardDrive',
+                  'Globe2': 'Globe',
+                  'Download': 'ArrowDown',
+                  'Upload': 'ArrowUp',
+                  'Loader2': 'Loader',
+                  'AlertTriangle': 'AlertCircle'
+                };
+                
+                const finalIcon = supportedIconMap[imp] || imp;
+                // Only include commonly supported icons
+                const commonIcons = [
+                  'Heart', 'Handshake', 'Activity', 'BarChart', 'TrendingUp', 'Circle', 'Users', 'Map', 
+                  'HardDrive', 'Globe', 'ArrowDown', 'ArrowUp', 'Loader', 'AlertCircle', 'Search', 
+                  'Plus', 'X', 'Check', 'Home', 'Settings', 'Bell', 'MessageCircle', 'ArrowLeft', 
+                  'ArrowRight', 'ChevronDown', 'ChevronUp', 'Filter', 'RefreshCw', 'Download', 'Upload',
+                  'Eye', 'EyeOff', 'Edit', 'Trash', 'Save', 'Cancel', 'Play', 'Pause', 'Stop'
+                ];
+                
+                if (commonIcons.includes(finalIcon)) {
+                  replacements += \`const \${imp} = window.Lucide.\${finalIcon} || (() => React.createElement('div', { className: 'w-4 h-4 bg-gray-300 rounded' }));\\n\`;
+                } else {
+                  // Fallback to a simple div for unsupported icons
+                  replacements += \`const \${imp} = () => React.createElement('div', { className: 'w-4 h-4 bg-gray-300 rounded', title: '\${imp} icon' });\\n\`;
+                }
+              });
+              return replacements;
+            });
+            
             // Remove other import/export statements
             processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '');
             processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '');
@@ -64,7 +106,8 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               Button: typeof window.Button,
               MaterialCard: typeof window.MaterialCard,
               MaterialButton: typeof window.MaterialButton,
-              ArcElement: typeof window.ArcElement
+              ArcElement: typeof window.ArcElement,
+              Lucide: typeof window.Lucide
             });
             
             // Transpile JSX to JavaScript
