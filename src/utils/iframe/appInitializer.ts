@@ -24,6 +24,7 @@ export const generateAppInitializer = (cleanCode: string): string => {
               window.RadarChart = recharts.RadarChart;
               window.XAxis = recharts.XAxis;
               window.YAxis = recharts.YAxis;
+              window.ZAxis = recharts.ZAxis;
               window.CartesianGrid = recharts.CartesianGrid;
               window.Tooltip = recharts.Tooltip;
               window.Legend = recharts.Legend;

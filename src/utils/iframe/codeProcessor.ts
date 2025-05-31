@@ -1,5 +1,6 @@
 
 
+
 export const generateCodeProcessor = (cleanCode: string): string => {
   return `
             // Ensure React is properly available
@@ -139,4 +140,3 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               throw new Error('GeneratedApp is not a valid React component');
             }`;
 };
-

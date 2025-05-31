@@ -1,4 +1,5 @@
 
+
 export const generateRechartsLoader = (): string => {
   return `
         async function loadRecharts() {
@@ -85,6 +86,7 @@ export const generateRechartsLoader = (): string => {
                   // Axis components
                   if (recharts.XAxis) window.XAxis = recharts.XAxis;
                   if (recharts.YAxis) window.YAxis = recharts.YAxis;
+                  if (recharts.ZAxis) window.ZAxis = recharts.ZAxis;
                   
                   // Grid and helper components
                   if (recharts.CartesianGrid) window.CartesianGrid = recharts.CartesianGrid;
@@ -175,6 +177,7 @@ export const generateRechartsFallbacks = (): string => {
             // Axis components (invisible fallbacks)
             window.XAxis = () => null;
             window.YAxis = () => null;
+            window.ZAxis = () => null;
             
             // Grid and helper components
             window.CartesianGrid = () => null;
