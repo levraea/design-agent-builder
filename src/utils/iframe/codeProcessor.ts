@@ -10,9 +10,10 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
             
             // Remove any local enhancedFetch function definitions that might shadow the global one
-            processedCode = processedCode.replace(/async\\s+function\\s+enhancedFetch[^}]*}[^}]*}/g, '');
-            processedCode = processedCode.replace(/const\\s+enhancedFetch\\s*=\\s*async[^;]*;/g, '');
-            processedCode = processedCode.replace(/function\\s+enhancedFetch[^}]*}[^}]*}/g, '');
+            // More precise regex patterns to avoid breaking code structure
+            processedCode = processedCode.replace(/const\\s+enhancedFetch\\s*=\\s*async\\s*\\([^)]*\\)\\s*=>\\s*\\{[^}]*\\}[^}]*\\}/g, '// enhancedFetch removed');
+            processedCode = processedCode.replace(/async\\s+function\\s+enhancedFetch\\s*\\([^)]*\\)\\s*\\{[^}]*\\}[^}]*\\}/g, '// enhancedFetch removed');
+            processedCode = processedCode.replace(/function\\s+enhancedFetch\\s*\\([^)]*\\)\\s*\\{[^}]*\\}[^}]*\\}/g, '// enhancedFetch removed');
             
             // Add data validation helpers at the top
             processedCode = 'const ensureArray = (data) => Array.isArray(data) ? data : [];\\n' + 
