@@ -1,4 +1,3 @@
-
 import { Persona } from '@/types/persona';
 
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
@@ -151,8 +150,8 @@ CODE:
 - Create visually impressive applications with rich interactions and beautiful designs
 - Use JSX syntax for all React elements
 
-API CALLS - STANDARD FETCH WITH DEBUGGING:
-Use the standard fetch function for API calls with comprehensive error handling and debugging:
+API CALLS - STANDARD FETCH WITH DEBUGGING AND DATA CONTAINER CHECKING:
+Use the standard fetch function for API calls with comprehensive error handling, debugging, and proper data extraction:
 
 \`\`\`javascript
 const fetchData = async () => {
@@ -170,8 +169,27 @@ const fetchData = async () => {
       throw new Error(\`Agriculture API failed: \${agricultureResponse.status}\`);
     }
     
-    const agricultureData = await agricultureResponse.json();
-    console.log('Agriculture data received:', agricultureData);
+    const agricultureRawData = await agricultureResponse.json();
+    console.log('Agriculture raw response:', agricultureRawData);
+    console.log('Agriculture response type:', typeof agricultureRawData);
+    
+    // Check for common data container patterns
+    let agricultureData = agricultureRawData;
+    if (agricultureRawData.data) {
+      console.log('Found data container in agriculture response');
+      agricultureData = agricultureRawData.data;
+    } else if (agricultureRawData.results) {
+      console.log('Found results container in agriculture response');
+      agricultureData = agricultureRawData.results;
+    } else if (agricultureRawData.items) {
+      console.log('Found items container in agriculture response');
+      agricultureData = agricultureRawData.items;
+    } else if (agricultureRawData.response && agricultureRawData.response.data) {
+      console.log('Found nested response.data container in agriculture response');
+      agricultureData = agricultureRawData.response.data;
+    }
+    
+    console.log('Agriculture final data:', agricultureData);
     console.log('Agriculture data type:', typeof agricultureData);
     console.log('Agriculture data length:', Array.isArray(agricultureData) ? agricultureData.length : 'Not an array');
     setAgricultureData(agricultureData);
@@ -185,8 +203,27 @@ const fetchData = async () => {
       throw new Error(\`Health API failed: \${healthResponse.status}\`);
     }
     
-    const healthData = await healthResponse.json();
-    console.log('Health data received:', healthData);
+    const healthRawData = await healthResponse.json();
+    console.log('Health raw response:', healthRawData);
+    console.log('Health response type:', typeof healthRawData);
+    
+    // Check for common data container patterns
+    let healthData = healthRawData;
+    if (healthRawData.data) {
+      console.log('Found data container in health response');
+      healthData = healthRawData.data;
+    } else if (healthRawData.results) {
+      console.log('Found results container in health response');
+      healthData = healthRawData.results;
+    } else if (healthRawData.items) {
+      console.log('Found items container in health response');
+      healthData = healthRawData.items;
+    } else if (healthRawData.response && healthRawData.response.data) {
+      console.log('Found nested response.data container in health response');
+      healthData = healthRawData.response.data;
+    }
+    
+    console.log('Health final data:', healthData);
     console.log('Health data type:', typeof healthData);
     console.log('Health data length:', Array.isArray(healthData) ? healthData.length : 'Not an array');
     setHealthData(healthData);
@@ -200,8 +237,27 @@ const fetchData = async () => {
       throw new Error(\`Nutrition API failed: \${nutritionResponse.status}\`);
     }
     
-    const nutritionData = await nutritionResponse.json();
-    console.log('Nutrition data received:', nutritionData);
+    const nutritionRawData = await nutritionResponse.json();
+    console.log('Nutrition raw response:', nutritionRawData);
+    console.log('Nutrition response type:', typeof nutritionRawData);
+    
+    // Check for common data container patterns
+    let nutritionData = nutritionRawData;
+    if (nutritionRawData.data) {
+      console.log('Found data container in nutrition response');
+      nutritionData = nutritionRawData.data;
+    } else if (nutritionRawData.results) {
+      console.log('Found results container in nutrition response');
+      nutritionData = nutritionRawData.results;
+    } else if (nutritionRawData.items) {
+      console.log('Found items container in nutrition response');
+      nutritionData = nutritionRawData.items;
+    } else if (nutritionRawData.response && nutritionRawData.response.data) {
+      console.log('Found nested response.data container in nutrition response');
+      nutritionData = nutritionRawData.response.data;
+    }
+    
+    console.log('Nutrition final data:', nutritionData);
     console.log('Nutrition data type:', typeof nutritionData);
     console.log('Nutrition data length:', Array.isArray(nutritionData) ? nutritionData.length : 'Not an array');
     setNutritionData(nutritionData);
@@ -217,15 +273,16 @@ const fetchData = async () => {
 };
 \`\`\`
 
-IMPORTANT: Add extensive console logging to track:
-- API response status codes
-- Data structure and types received
-- Whether data is arrays or objects
-- Any errors during fetch or parsing
+IMPORTANT: 
+- ALWAYS check for common data container patterns: data, results, items, response.data
+- Add extensive console logging to track the data extraction process
+- Log both raw and processed data structures
+- Handle different API response formats gracefully
+- Check if the actual data is nested within container objects
 
-Also handle different data structures flexibly - the APIs might return objects instead of arrays.
+This is a CRITICAL and STANDARD practice for API integration - most production APIs wrap their data in containers for metadata, pagination, and error handling consistency.
 
-ALWAYS use standard fetch for external API calls and include comprehensive debugging.
+ALWAYS use standard fetch for external API calls and include comprehensive debugging with data container checking.
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 DESCRIPTION: I created a beautiful weather dashboard that fetches real-time weather data using the OpenWeather API. The app features a gradient background, animated weather icons, and displays current conditions with a 5-day forecast. I added smooth hover effects and loading animations for a great user experience.
