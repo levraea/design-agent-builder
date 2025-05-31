@@ -130,13 +130,60 @@ export const generateMockUIComponents = (): string => {
               }, children);
             };
             
+            // Material Tailwind Select and Option components
+            window.MaterialSelect = ({ children, label, value, onChange, className = '', ...props }) => {
+              return React.createElement('div', { className: \`relative \${className}\` }, [
+                label && React.createElement('label', { 
+                  key: 'label',
+                  className: 'block text-sm font-medium text-gray-700 mb-1' 
+                }, label),
+                React.createElement('select', {
+                  key: 'select',
+                  value,
+                  onChange: (e) => onChange && onChange(e.target.value),
+                  className: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+                  ...props
+                }, children)
+              ]);
+            };
+            
+            window.MaterialOption = ({ children, value, ...props }) => 
+              React.createElement('option', { value, ...props }, children);
+            
+            // Material Tailwind Spinner component
+            window.MaterialSpinner = ({ className = '', color = 'blue', size = 'md', ...props }) => {
+              const sizeClasses = {
+                sm: 'h-4 w-4',
+                md: 'h-8 w-8',
+                lg: 'h-12 w-12'
+              };
+              const colorClasses = {
+                blue: 'border-blue-500',
+                red: 'border-red-500',
+                green: 'border-green-500'
+              };
+              
+              return React.createElement('div', {
+                className: \`animate-spin rounded-full border-2 border-t-transparent \${sizeClasses[size]} \${colorClasses[color]} \${className}\`,
+                ...props
+              });
+            };
+            
+            // Make components available under both names for compatibility
+            window.Select = window.MaterialSelect;
+            window.Option = window.MaterialOption;
+            window.Spinner = window.MaterialSpinner;
+            
             // Make Material Tailwind components available under the library namespace
             window.MaterialTailwind = {
               Card: window.MaterialCard,
               CardHeader: window.MaterialCardHeader,
               CardBody: window.MaterialCardBody,
               Button: window.MaterialButton,
-              Typography: window.MaterialTypography
+              Typography: window.MaterialTypography,
+              Select: window.MaterialSelect,
+              Option: window.MaterialOption,
+              Spinner: window.MaterialSpinner
             };
             
             console.log('UI components loaded and available globally');`;
