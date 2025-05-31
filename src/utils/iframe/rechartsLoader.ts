@@ -41,7 +41,5 @@ export const generateRechartsLoader = (): string => {
         }`;
 };
 
-// For backward compatibility, export the fallbacks function separately
-export const generateRechartsFallbacks = (): string => {
-  return generateRechartsFallbacks();
-};
+// Re-export the fallbacks function for backward compatibility
+export { generateRechartsFallbacks };
