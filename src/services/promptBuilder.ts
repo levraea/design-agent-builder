@@ -1,4 +1,3 @@
-
 import { Persona } from '@/types/persona';
 
 export const buildPrompt = (
@@ -73,8 +72,8 @@ DESIGN FOR THIS PERSONA:
   let apiCodeExample = '';
   if (selectedAPIDetails.length > 0) {
     apiCodeExample = `
-API CALLS - STANDARD FETCH WITH DEBUGGING AND DATA CONTAINER CHECKING:
-Use the standard fetch function for API calls with comprehensive error handling, debugging, and proper data extraction for the following selected APIs:
+API CALLS - STANDARD FETCH WITH DEBUGGING AND ARRAY CHECKING:
+Use the standard fetch function for API calls with comprehensive error handling, debugging, and proper array extraction for the following selected APIs:
 
 ${selectedAPIDetails.map(api => `- ${api.name} (${api.link}): ${api.description}`).join('\n')}
 
@@ -100,20 +99,22 @@ ${selectedAPIDetails.map((api, index) => {
     console.log('${api.name} raw response:', ${variableName}RawData);
     console.log('${api.name} response type:', typeof ${variableName}RawData);
     
-    // Check for common data container patterns
-    let ${variableName}Data = ${variableName}RawData;
-    if (${variableName}RawData.data) {
-      console.log('Found data container in ${variableName} response');
+    // Check for common array patterns
+    let ${variableName}Data;
+    
+    // If it's already an array (like from restcountries.com), use it directly
+    if (Array.isArray(${variableName}RawData)) {
+      ${variableName}Data = ${variableName}RawData;
+    } else if (Array.isArray(${variableName}RawData.data)) {
       ${variableName}Data = ${variableName}RawData.data;
-    } else if (${variableName}RawData.results) {
-      console.log('Found results container in ${variableName} response');
+    } else if (Array.isArray(${variableName}RawData.results)) {
       ${variableName}Data = ${variableName}RawData.results;
-    } else if (${variableName}RawData.items) {
-      console.log('Found items container in ${variableName} response');
+    } else if (Array.isArray(${variableName}RawData.items)) {
       ${variableName}Data = ${variableName}RawData.items;
-    } else if (${variableName}RawData.response && ${variableName}RawData.response.data) {
-      console.log('Found nested response.data container in ${variableName} response');
+    } else if (${variableName}RawData.response && Array.isArray(${variableName}RawData.response.data)) {
       ${variableName}Data = ${variableName}RawData.response.data;
+    } else {
+      throw new Error('Unexpected API response format: no usable array found.');
     }
     
     console.log('${api.name} final data:', ${variableName}Data);
@@ -134,11 +135,11 @@ ${selectedAPIDetails.map((api, index) => {
 \`\`\`
 
 IMPORTANT: 
-- ALWAYS check for common data container patterns: data, results, items, response.data
+- ALWAYS check for common array patterns: direct array, data, results, items, response.data
 - Add extensive console logging to track the data extraction process
 - Log both raw and processed data structures
 - Handle different API response formats gracefully
-- Check if the actual data is nested within container objects
+- Throw error if no usable array is found
 
 This is a CRITICAL and STANDARD practice for API integration - most production APIs wrap their data in containers for metadata, pagination, and error handling consistency.`;
   } else {
@@ -163,17 +164,22 @@ const fetchData = async () => {
     const rawData = await response.json();
     console.log('Raw response:', rawData);
     
-    // Check for common data container patterns
-    let data = rawData;
-    if (rawData.data) {
-      console.log('Found data container');
+    // Check for common array patterns
+    let data;
+    
+    // If it's already an array, use it directly
+    if (Array.isArray(rawData)) {
+      data = rawData;
+    } else if (Array.isArray(rawData.data)) {
       data = rawData.data;
-    } else if (rawData.results) {
-      console.log('Found results container');
+    } else if (Array.isArray(rawData.results)) {
       data = rawData.results;
-    } else if (rawData.items) {
-      console.log('Found items container');
+    } else if (Array.isArray(rawData.items)) {
       data = rawData.items;
+    } else if (rawData.response && Array.isArray(rawData.response.data)) {
+      data = rawData.response.data;
+    } else {
+      throw new Error('Unexpected API response format: no usable array found.');
     }
     
     console.log('Final data:', data);
