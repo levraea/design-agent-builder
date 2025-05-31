@@ -40,6 +40,7 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '// import removed\\n');
 
             console.log('Processing code with minimal transformations...');
+            console.log('Global enhancedFetch available:', typeof window.enhancedFetch);
             
             // Transpile JSX to JavaScript
             const transformedCode = Babel.transform(processedCode, {
