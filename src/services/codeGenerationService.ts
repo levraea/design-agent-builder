@@ -1,4 +1,3 @@
-
 import { Persona } from '@/types/persona';
 
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
@@ -19,8 +18,8 @@ export const generateSampleCode = (prompt: string, apis: string[], components: s
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Use enhancedFetch for direct API calls (no CORS proxy)
-      const response = await enhancedFetch('https://api.example.com/sample-endpoint');
+      // Use standard fetch for API calls
+      const response = await fetch('https://api.example.com/sample-endpoint');
       const result = await response.json();
       setData(result);
     } catch (error) {
@@ -151,22 +150,21 @@ CODE:
 - Create visually impressive applications with rich interactions and beautiful designs
 - Use JSX syntax for all React elements
 
-API CALLS - DIRECT FETCH ONLY:
-IMPORTANT: Use the enhancedFetch function for direct API calls only:
+API CALLS - STANDARD FETCH:
+Use the standard fetch function for API calls:
 
 \`\`\`javascript
-// Use enhancedFetch for direct API calls - it makes direct requests to APIs
-const response = await enhancedFetch('https://api.example.com/endpoint');
+// Use standard fetch for API calls
+const response = await fetch('https://api.example.com/endpoint');
 const data = await response.json();
 \`\`\`
 
-This enhancedFetch function:
-- Makes direct API calls to the target URL
-- Only works with APIs that support CORS or are publicly accessible
-- Provides error handling for failed requests
-- No proxy services are used
+This approach:
+- Uses the browser's built-in fetch API
+- Works with APIs that support CORS or are publicly accessible
+- Provides standard error handling for failed requests
 
-ALWAYS use enhancedFetch for external API calls instead of regular fetch.
+ALWAYS use standard fetch for external API calls.
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 DESCRIPTION: I created a beautiful weather dashboard that fetches real-time weather data using the OpenWeather API. The app features a gradient background, animated weather icons, and displays current conditions with a 5-day forecast. I added smooth hover effects and loading animations for a great user experience.
@@ -199,5 +197,5 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use standard fetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
