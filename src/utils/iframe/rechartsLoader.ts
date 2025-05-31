@@ -98,6 +98,7 @@ export const generateRechartsLoader = (): string => {
                   if (recharts.Line) window.Line = recharts.Line;
                   if (recharts.Area) window.Area = recharts.Area;
                   if (recharts.Bar) window.Bar = recharts.Bar;
+                  if (recharts.Scatter) window.Scatter = recharts.Scatter;
                   if (recharts.Cell) window.Cell = recharts.Cell;
                   
                   // Reference components
@@ -188,6 +189,7 @@ export const generateRechartsFallbacks = (): string => {
             window.Line = () => null;
             window.Area = () => null;
             window.Bar = () => null;
+            window.Scatter = () => null;
             window.Cell = () => null;
             
             // Reference components

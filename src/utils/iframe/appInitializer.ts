@@ -32,6 +32,7 @@ export const generateAppInitializer = (cleanCode: string): string => {
               window.Line = recharts.Line;
               window.Area = recharts.Area;
               window.Bar = recharts.Bar;
+              window.Scatter = recharts.Scatter;
               window.Cell = recharts.Cell;
               window.ReferenceLine = recharts.ReferenceLine;
               window.ReferenceArea = recharts.ReferenceArea;
