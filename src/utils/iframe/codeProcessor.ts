@@ -35,12 +35,18 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             processedCode = processedCode.replace(/export\\s+function\\s+GeneratedApp/g, 'function GeneratedApp');
             processedCode = processedCode.replace(/export\\s+default\\s+GeneratedApp/g, '// GeneratedApp exported');
             
+            // Remove local enhancedFetch function definitions that shadow the global one
+            processedCode = processedCode.replace(/async\\s+function\\s+enhancedFetch\\s*\\([^)]*\\)\\s*\\{[^}]*\\}/g, '// Local enhancedFetch removed - using global window.enhancedFetch');
+            processedCode = processedCode.replace(/function\\s+enhancedFetch\\s*\\([^)]*\\)\\s*\\{[^}]*\\}/g, '// Local enhancedFetch removed - using global window.enhancedFetch');
+            processedCode = processedCode.replace(/const\\s+enhancedFetch\\s*=\\s*async\\s*\\([^)]*\\)\\s*=>\\s*\\{[^}]*\\}/g, '// Local enhancedFetch removed - using global window.enhancedFetch');
+            
             // Remove other imports (let them fail naturally if needed)
             processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '// import removed\\n');
             processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '// import removed\\n');
 
             console.log('Processing code with minimal transformations...');
             console.log('Global enhancedFetch available:', typeof window.enhancedFetch);
+            console.log('Processed code preview:', processedCode.substring(0, 500));
             
             // Transpile JSX to JavaScript
             const transformedCode = Babel.transform(processedCode, {
