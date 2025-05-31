@@ -68,7 +68,7 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               return replacements;
             });
             
-            // Handle Lucide React imports - replace unsupported icons with supported ones
+            // Handle Lucide React imports - CRITICAL FIX for HeartHandshake
             processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]lucide-react['"];?\\s*/g, (match, imports) => {
               const importList = imports.split(',').map(imp => imp.trim());
               let replacements = '';
@@ -111,6 +111,9 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               });
               return replacements;
             });
+            
+            // ADDITIONAL FIX: Replace any remaining HeartHandshake references in the code itself
+            processedCode = processedCode.replace(/HeartHandshake/g, 'Heart');
             
             // Remove other import/export statements
             processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '');
