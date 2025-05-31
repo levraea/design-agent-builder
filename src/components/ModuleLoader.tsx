@@ -37,8 +37,8 @@ export const ModuleLoader = ({ modules, onLoaded, onError }: ModuleLoaderProps) 
         } catch (error) {
           console.error(`Failed to load module ${moduleName}:`, error);
           status[moduleName] = 'error';
-          // Don't call onError for chart modules as they're optional
-          if (!moduleName.includes('chart')) {
+          // Don't call onError for optional UI libraries
+          if (!moduleName.includes('chart') && !moduleName.includes('heroicons') && !moduleName.includes('material-tailwind')) {
             onError(`Failed to load module: ${moduleName}`);
           }
         }
@@ -69,6 +69,10 @@ const getModuleUrl = (moduleName: string): string | null => {
     'chart.js': 'https://esm.sh/chart.js',
     'react-chartjs-2': 'https://esm.sh/react-chartjs-2',
     'recharts': 'https://esm.sh/recharts',
+    '@heroicons/react/24/outline': 'https://esm.sh/@heroicons/react@2.0.18/24/outline',
+    '@heroicons/react/24/solid': 'https://esm.sh/@heroicons/react@2.0.18/24/solid',
+    '@heroicons/react/20/solid': 'https://esm.sh/@heroicons/react@2.0.18/20/solid',
+    '@material-tailwind/react': 'https://esm.sh/@material-tailwind/react',
   };
 
   return moduleMap[moduleName] || null;

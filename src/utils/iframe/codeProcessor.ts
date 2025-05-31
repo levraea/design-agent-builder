@@ -20,6 +20,34 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               return replacements;
             });
             
+            // Handle Heroicons imports
+            processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]@heroicons\\/react\\/24\\/outline['"];?\\s*/g, (match, imports) => {
+              // Map Heroicons imports to Lucide React icons (which are available)
+              const importList = imports.split(',').map(imp => imp.trim());
+              let replacements = '';
+              importList.forEach(imp => {
+                // Map common Heroicons to Lucide equivalents
+                const iconMap = {
+                  'UserIcon': 'User',
+                  'HomeIcon': 'Home',
+                  'CogIcon': 'Settings',
+                  'BellIcon': 'Bell',
+                  'ChatIcon': 'MessageCircle',
+                  'SearchIcon': 'Search',
+                  'PlusIcon': 'Plus',
+                  'XIcon': 'X',
+                  'CheckIcon': 'Check',
+                  'ArrowLeftIcon': 'ArrowLeft',
+                  'ArrowRightIcon': 'ArrowRight',
+                  'ChevronDownIcon': 'ChevronDown',
+                  'ChevronUpIcon': 'ChevronUp'
+                };
+                const lucideIcon = iconMap[imp] || imp.replace('Icon', '');
+                replacements += \`// Using Lucide \${lucideIcon} instead of Heroicons \${imp}\\n\`;
+              });
+              return replacements;
+            });
+            
             // Remove other import/export statements
             processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '');
             processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '');
