@@ -69,8 +69,8 @@ export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): stri
   // Nutrition-related keywords (new for UNICEF)
   const nutritionKeywords = ['nutrition', 'malnutrition', 'unicef', 'child nutrition', 'stunting', 'wasting', 'underweight', 'children'];
   if (nutritionKeywords.some(keyword => lowerPrompt.includes(keyword))) {
-    const unicefAPI = availableAPIs.find(api => api.id === 'unicef-nutrition');
-    if (unicefAPI) relevantAPIs.push(unicefAPI.id);
+    const gnrAPI = availableAPIs.find(api => api.id === 'gnr-nutrition');
+    if (gnrAPI) relevantAPIs.push(gnrAPI.id);
   }
 
   // Biological/Genomic research keywords (EBI Search API, LAPIS, Ensembl, UCSC)
