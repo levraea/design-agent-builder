@@ -66,8 +66,8 @@ export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): stri
     if (whoAPI) relevantAPIs.push(whoAPI.id);
   }
 
-  // Nutrition-related keywords (new for UNICEF)
-  const nutritionKeywords = ['nutrition', 'malnutrition', 'unicef', 'child nutrition', 'stunting', 'wasting', 'underweight', 'children'];
+  // Nutrition-related keywords
+  const nutritionKeywords = ['nutrition', 'malnutrition', 'child nutrition', 'stunting', 'wasting', 'underweight', 'children'];
   if (nutritionKeywords.some(keyword => lowerPrompt.includes(keyword))) {
     const gnrAPI = availableAPIs.find(api => api.id === 'gnr-nutrition');
     if (gnrAPI) relevantAPIs.push(gnrAPI.id);
