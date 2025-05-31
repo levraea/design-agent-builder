@@ -1,3 +1,4 @@
+
 import { Persona } from '@/types/persona';
 
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
@@ -150,21 +151,81 @@ CODE:
 - Create visually impressive applications with rich interactions and beautiful designs
 - Use JSX syntax for all React elements
 
-API CALLS - STANDARD FETCH:
-Use the standard fetch function for API calls:
+API CALLS - STANDARD FETCH WITH DEBUGGING:
+Use the standard fetch function for API calls with comprehensive error handling and debugging:
 
 \`\`\`javascript
-// Use standard fetch for API calls
-const response = await fetch('https://api.example.com/endpoint');
-const data = await response.json();
+const fetchData = async () => {
+  setLoading(true);
+  setError(null);
+  console.log('Starting API calls...');
+  
+  try {
+    // Agriculture API
+    console.log('Fetching agriculture data...');
+    const agricultureResponse = await fetch('https://ft9rfwu9wi.execute-api.us-east-2.amazonaws.com/agriculture');
+    console.log('Agriculture response status:', agricultureResponse.status);
+    
+    if (!agricultureResponse.ok) {
+      throw new Error(\`Agriculture API failed: \${agricultureResponse.status}\`);
+    }
+    
+    const agricultureData = await agricultureResponse.json();
+    console.log('Agriculture data received:', agricultureData);
+    console.log('Agriculture data type:', typeof agricultureData);
+    console.log('Agriculture data length:', Array.isArray(agricultureData) ? agricultureData.length : 'Not an array');
+    setAgricultureData(agricultureData);
+
+    // Health API
+    console.log('Fetching health data...');
+    const healthResponse = await fetch('https://yem7yxwgge.execute-api.us-east-2.amazonaws.com/health');
+    console.log('Health response status:', healthResponse.status);
+    
+    if (!healthResponse.ok) {
+      throw new Error(\`Health API failed: \${healthResponse.status}\`);
+    }
+    
+    const healthData = await healthResponse.json();
+    console.log('Health data received:', healthData);
+    console.log('Health data type:', typeof healthData);
+    console.log('Health data length:', Array.isArray(healthData) ? healthData.length : 'Not an array');
+    setHealthData(healthData);
+
+    // Nutrition API
+    console.log('Fetching nutrition data...');
+    const nutritionResponse = await fetch('https://0ih68gj8ei.execute-api.us-east-2.amazonaws.com/nutrition');
+    console.log('Nutrition response status:', nutritionResponse.status);
+    
+    if (!nutritionResponse.ok) {
+      throw new Error(\`Nutrition API failed: \${nutritionResponse.status}\`);
+    }
+    
+    const nutritionData = await nutritionResponse.json();
+    console.log('Nutrition data received:', nutritionData);
+    console.log('Nutrition data type:', typeof nutritionData);
+    console.log('Nutrition data length:', Array.isArray(nutritionData) ? nutritionData.length : 'Not an array');
+    setNutritionData(nutritionData);
+
+    console.log('All API calls completed successfully');
+    setLoading(false);
+  } catch (err) {
+    console.error('API fetch error:', err);
+    console.error('Error details:', err.message);
+    setError(err);
+    setLoading(false);
+  }
+};
 \`\`\`
 
-This approach:
-- Uses the browser's built-in fetch API
-- Works with APIs that support CORS or are publicly accessible
-- Provides standard error handling for failed requests
+IMPORTANT: Add extensive console logging to track:
+- API response status codes
+- Data structure and types received
+- Whether data is arrays or objects
+- Any errors during fetch or parsing
 
-ALWAYS use standard fetch for external API calls.
+Also handle different data structures flexibly - the APIs might return objects instead of arrays.
+
+ALWAYS use standard fetch for external API calls and include comprehensive debugging.
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 DESCRIPTION: I created a beautiful weather dashboard that fetches real-time weather data using the OpenWeather API. The app features a gradient background, animated weather icons, and displays current conditions with a 5-day forecast. I added smooth hover effects and loading animations for a great user experience.
@@ -197,5 +258,5 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use standard fetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use standard fetch for external API calls with comprehensive debugging.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
