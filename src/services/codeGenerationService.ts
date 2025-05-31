@@ -1,3 +1,4 @@
+
 import { Persona } from '@/types/persona';
 
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
@@ -132,26 +133,14 @@ DESIGN FOR THIS PERSONA:
 `;
   }
 
-  return `You are a React component generator. Generate a complete React functional component using JSX syntax.
-
-${personaContext}${conversationContext}${currentCodeContext}
-
-CRITICAL REQUIREMENTS:
-- Use React hooks (useState, useEffect) as needed
-- Use JSX syntax (NOT React.createElement calls)
-- Return your response in this EXACT format:
-
-DESCRIPTION: [Write a brief, conversational description of what you built, what features it includes, and any APIs you integrated. This should sound natural as if you're explaining to the user what you just created.]
-
-CODE:
-[Insert the complete GeneratedApp function here using JSX]
-
-- The component MUST be named "GeneratedApp"
-- Create visually impressive applications with rich interactions and beautiful designs
-- Use JSX syntax for all React elements
-
+  // Build dynamic API fetch code based on selected APIs
+  let apiCodeExample = '';
+  if (selectedAPIDetails.length > 0) {
+    apiCodeExample = `
 API CALLS - STANDARD FETCH WITH DEBUGGING AND DATA CONTAINER CHECKING:
-Use the standard fetch function for API calls with comprehensive error handling, debugging, and proper data extraction:
+Use the standard fetch function for API calls with comprehensive error handling, debugging, and proper data extraction for the following selected APIs:
+
+${selectedAPIDetails.map(api => `- ${api.name} (${api.link}): ${api.description}`).join('\n')}
 
 \`\`\`javascript
 const fetchData = async () => {
@@ -160,107 +149,42 @@ const fetchData = async () => {
   console.log('Starting API calls...');
   
   try {
-    // Agriculture API
-    console.log('Fetching agriculture data...');
-    const agricultureResponse = await fetch('https://ft9rfwu9wi.execute-api.us-east-2.amazonaws.com/agriculture');
-    console.log('Agriculture response status:', agricultureResponse.status);
+${selectedAPIDetails.map((api, index) => {
+  const variableName = api.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return `    // ${api.name}
+    console.log('Fetching ${variableName} data...');
+    const ${variableName}Response = await fetch('${api.link}');
+    console.log('${api.name} response status:', ${variableName}Response.status);
     
-    if (!agricultureResponse.ok) {
-      throw new Error(\`Agriculture API failed: \${agricultureResponse.status}\`);
+    if (!${variableName}Response.ok) {
+      throw new Error(\`${api.name} API failed: \${${variableName}Response.status}\`);
     }
     
-    const agricultureRawData = await agricultureResponse.json();
-    console.log('Agriculture raw response:', agricultureRawData);
-    console.log('Agriculture response type:', typeof agricultureRawData);
+    const ${variableName}RawData = await ${variableName}Response.json();
+    console.log('${api.name} raw response:', ${variableName}RawData);
+    console.log('${api.name} response type:', typeof ${variableName}RawData);
     
     // Check for common data container patterns
-    let agricultureData = agricultureRawData;
-    if (agricultureRawData.data) {
-      console.log('Found data container in agriculture response');
-      agricultureData = agricultureRawData.data;
-    } else if (agricultureRawData.results) {
-      console.log('Found results container in agriculture response');
-      agricultureData = agricultureRawData.results;
-    } else if (agricultureRawData.items) {
-      console.log('Found items container in agriculture response');
-      agricultureData = agricultureRawData.items;
-    } else if (agricultureRawData.response && agricultureRawData.response.data) {
-      console.log('Found nested response.data container in agriculture response');
-      agricultureData = agricultureRawData.response.data;
+    let ${variableName}Data = ${variableName}RawData;
+    if (${variableName}RawData.data) {
+      console.log('Found data container in ${variableName} response');
+      ${variableName}Data = ${variableName}RawData.data;
+    } else if (${variableName}RawData.results) {
+      console.log('Found results container in ${variableName} response');
+      ${variableName}Data = ${variableName}RawData.results;
+    } else if (${variableName}RawData.items) {
+      console.log('Found items container in ${variableName} response');
+      ${variableName}Data = ${variableName}RawData.items;
+    } else if (${variableName}RawData.response && ${variableName}RawData.response.data) {
+      console.log('Found nested response.data container in ${variableName} response');
+      ${variableName}Data = ${variableName}RawData.response.data;
     }
     
-    console.log('Agriculture final data:', agricultureData);
-    console.log('Agriculture data type:', typeof agricultureData);
-    console.log('Agriculture data length:', Array.isArray(agricultureData) ? agricultureData.length : 'Not an array');
-    setAgricultureData(agricultureData);
-
-    // Health API
-    console.log('Fetching health data...');
-    const healthResponse = await fetch('https://yem7yxwgge.execute-api.us-east-2.amazonaws.com/health');
-    console.log('Health response status:', healthResponse.status);
-    
-    if (!healthResponse.ok) {
-      throw new Error(\`Health API failed: \${healthResponse.status}\`);
-    }
-    
-    const healthRawData = await healthResponse.json();
-    console.log('Health raw response:', healthRawData);
-    console.log('Health response type:', typeof healthRawData);
-    
-    // Check for common data container patterns
-    let healthData = healthRawData;
-    if (healthRawData.data) {
-      console.log('Found data container in health response');
-      healthData = healthRawData.data;
-    } else if (healthRawData.results) {
-      console.log('Found results container in health response');
-      healthData = healthRawData.results;
-    } else if (healthRawData.items) {
-      console.log('Found items container in health response');
-      healthData = healthRawData.items;
-    } else if (healthRawData.response && healthRawData.response.data) {
-      console.log('Found nested response.data container in health response');
-      healthData = healthRawData.response.data;
-    }
-    
-    console.log('Health final data:', healthData);
-    console.log('Health data type:', typeof healthData);
-    console.log('Health data length:', Array.isArray(healthData) ? healthData.length : 'Not an array');
-    setHealthData(healthData);
-
-    // Nutrition API
-    console.log('Fetching nutrition data...');
-    const nutritionResponse = await fetch('https://0ih68gj8ei.execute-api.us-east-2.amazonaws.com/nutrition');
-    console.log('Nutrition response status:', nutritionResponse.status);
-    
-    if (!nutritionResponse.ok) {
-      throw new Error(\`Nutrition API failed: \${nutritionResponse.status}\`);
-    }
-    
-    const nutritionRawData = await nutritionResponse.json();
-    console.log('Nutrition raw response:', nutritionRawData);
-    console.log('Nutrition response type:', typeof nutritionRawData);
-    
-    // Check for common data container patterns
-    let nutritionData = nutritionRawData;
-    if (nutritionRawData.data) {
-      console.log('Found data container in nutrition response');
-      nutritionData = nutritionRawData.data;
-    } else if (nutritionRawData.results) {
-      console.log('Found results container in nutrition response');
-      nutritionData = nutritionRawData.results;
-    } else if (nutritionRawData.items) {
-      console.log('Found items container in nutrition response');
-      nutritionData = nutritionRawData.items;
-    } else if (nutritionRawData.response && nutritionRawData.response.data) {
-      console.log('Found nested response.data container in nutrition response');
-      nutritionData = nutritionRawData.response.data;
-    }
-    
-    console.log('Nutrition final data:', nutritionData);
-    console.log('Nutrition data type:', typeof nutritionData);
-    console.log('Nutrition data length:', Array.isArray(nutritionData) ? nutritionData.length : 'Not an array');
-    setNutritionData(nutritionData);
+    console.log('${api.name} final data:', ${variableName}Data);
+    console.log('${api.name} data type:', typeof ${variableName}Data);
+    console.log('${api.name} data length:', Array.isArray(${variableName}Data) ? ${variableName}Data.length : 'Not an array');
+    set${variableName.charAt(0).toUpperCase() + variableName.slice(1)}Data(${variableName}Data);`;
+}).join('\n\n')}
 
     console.log('All API calls completed successfully');
     setLoading(false);
@@ -280,7 +204,73 @@ IMPORTANT:
 - Handle different API response formats gracefully
 - Check if the actual data is nested within container objects
 
-This is a CRITICAL and STANDARD practice for API integration - most production APIs wrap their data in containers for metadata, pagination, and error handling consistency.
+This is a CRITICAL and STANDARD practice for API integration - most production APIs wrap their data in containers for metadata, pagination, and error handling consistency.`;
+  } else {
+    apiCodeExample = `
+API CALLS - STANDARD FETCH WITH DEBUGGING:
+If you need to make API calls, use the standard fetch function with comprehensive error handling and debugging:
+
+\`\`\`javascript
+const fetchData = async () => {
+  setLoading(true);
+  setError(null);
+  console.log('Starting API call...');
+  
+  try {
+    const response = await fetch('YOUR_API_ENDPOINT_HERE');
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(\`API failed: \${response.status}\`);
+    }
+    
+    const rawData = await response.json();
+    console.log('Raw response:', rawData);
+    
+    // Check for common data container patterns
+    let data = rawData;
+    if (rawData.data) {
+      console.log('Found data container');
+      data = rawData.data;
+    } else if (rawData.results) {
+      console.log('Found results container');
+      data = rawData.results;
+    } else if (rawData.items) {
+      console.log('Found items container');
+      data = rawData.items;
+    }
+    
+    console.log('Final data:', data);
+    setData(data);
+    setLoading(false);
+  } catch (err) {
+    console.error('API fetch error:', err);
+    setError(err);
+    setLoading(false);
+  }
+};
+\`\`\``;
+  }
+
+  return `You are a React component generator. Generate a complete React functional component using JSX syntax.
+
+${personaContext}${conversationContext}${currentCodeContext}
+
+CRITICAL REQUIREMENTS:
+- Use React hooks (useState, useEffect) as needed
+- Use JSX syntax (NOT React.createElement calls)
+- Return your response in this EXACT format:
+
+DESCRIPTION: [Write a brief, conversational description of what you built, what features it includes, and any APIs you integrated. This should sound natural as if you're explaining to the user what you just created.]
+
+CODE:
+[Insert the complete GeneratedApp function here using JSX]
+
+- The component MUST be named "GeneratedApp"
+- Create visually impressive applications with rich interactions and beautiful designs
+- Use JSX syntax for all React elements
+
+${apiCodeExample}
 
 ALWAYS use standard fetch for external API calls and include comprehensive debugging with data container checking.
 
