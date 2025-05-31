@@ -237,9 +237,9 @@ export const mockAPIs: API[] = [
     cors: 'yes'
   },
   {
-    id: 'unicef-nutrition',
-    name: 'UNICEF Nutrition',
-    description: 'UNICEF nutrition data and child malnutrition statistics worldwide',
+    id: 'gnr-nutrition',
+    name: 'Global Nutrition Report',
+    description: 'Global nutrition data and statistics worldwide',
     category: 'CH Data Assets, Analytics, and AI Platform',
     version: 'v1',
     status: 'active',
