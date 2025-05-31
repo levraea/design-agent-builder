@@ -1,15 +1,16 @@
 
 export const generateCodeProcessor = (cleanCode: string): string => {
   return `
-            // Ensure React is properly available
+            // Ensure React is available
             if (!window.React) {
               throw new Error('React is not available in the global scope');
             }
             
-            // Process the code with minimal transformations
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
             
-            // Only handle essential React imports - replace with window.React
+            // Only do minimal essential transforms:
+            
+            // 1. Replace React imports with global reference
             processedCode = processedCode.replace(/import\\s+React[^;]*;?\\s*/g, 'const React = window.React;\\n');
             processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]react['"];?\\s*/g, (match, imports) => {
               const importList = imports.split(',').map(imp => imp.trim());
@@ -20,46 +21,26 @@ export const generateCodeProcessor = (cleanCode: string): string => {
               return replacements;
             });
             
-            // Handle Lucide React imports - simple fallback
-            processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]lucide-react['"];?\\s*/g, (match, imports) => {
-              const importList = imports.split(',').map(imp => imp.trim());
-              let replacements = '';
-              importList.forEach(imp => {
-                replacements += \`const \${imp} = window.Lucide && window.Lucide.\${imp} ? window.Lucide.\${imp} : (() => React.createElement('div', { className: 'w-4 h-4 bg-gray-300 rounded' }, '□'));\\n\`;
-              });
-              return replacements;
-            });
-            
-            // Remove export statements
+            // 2. Remove export statements
             processedCode = processedCode.replace(/export\\s+default\\s+function\\s+GeneratedApp/g, 'function GeneratedApp');
             processedCode = processedCode.replace(/export\\s+function\\s+GeneratedApp/g, 'function GeneratedApp');
-            processedCode = processedCode.replace(/export\\s+default\\s+GeneratedApp/g, '// GeneratedApp exported');
+            processedCode = processedCode.replace(/export\\s+default\\s+GeneratedApp/g, '');
             
-            // Remove other imports (let them fail naturally if needed)
-            processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '// import removed\\n');
-            processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '// import removed\\n');
+            // 3. Remove other imports (they'll be handled by globals or fail gracefully)
+            processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '');
+            processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '');
 
-            console.log('Processing code with minimal transformations...');
-            console.log('Processed code preview:', processedCode.substring(0, 500));
-            
-            // Transpile JSX to JavaScript
+            // Transpile JSX and execute
             const transformedCode = Babel.transform(processedCode, {
               presets: ['react']
             }).code;
 
-            console.log('Code transpiled successfully');
-
-            // Execute the code
             eval(transformedCode);
 
-            // Render the component
+            // Render
             if (typeof GeneratedApp === 'function') {
-              console.log('Rendering GeneratedApp...');
               const root = ReactDOM.createRoot(document.getElementById('root'));
               root.render(React.createElement(GeneratedApp));
-              
-              console.log('App rendered successfully');
-              // Signal success to parent
               window.parent.postMessage({ type: 'success' }, '*');
             } else {
               throw new Error('GeneratedApp is not a valid React component');
