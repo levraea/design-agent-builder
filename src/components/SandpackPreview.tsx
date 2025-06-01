@@ -38,9 +38,36 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
     );
   }
 
-  // Prepare the code for Sandpack with minimal processing
+  // Add enhancedFetch function for API calls
+  const enhancedFetchCode = `
+// Enhanced fetch function for API calls
+const enhancedFetch = async (url, options = {}) => {
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('HTTP error! status: ' + response.status);
+    }
+    
+    return response;
+  } catch (error) {
+    console.error('API call failed:', error);
+    throw error;
+  }
+};
+`;
+
+  // Prepare the code for Sandpack with enhancedFetch function
   const finalCode = `
 import React, { useState, useEffect } from 'react';
+
+${enhancedFetchCode}
 
 ${code}
 
