@@ -39,11 +39,12 @@ export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
   const files = generateSandpackFiles(code);
 
   return (
-    <div className="h-full w-full bg-white">
+    <div className="h-full w-full">
       <Sandpack
         template="react"
         files={files}
         options={{
+          layout: 'preview',
           showNavigator: false,
           showTabs: false,
           showLineNumbers: false,
@@ -51,9 +52,8 @@ export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
           showConsole: false,
           showConsoleButton: false,
           autorun: true,
-          wrapContent: true,
-          resizablePanels: false,
-          layout: 'preview'
+          editorHeight: 0,
+          editorWidthPercentage: 0
         }}
         theme="light"
         customSetup={{
