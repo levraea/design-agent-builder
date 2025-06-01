@@ -1,4 +1,5 @@
 
+
 import { Persona } from '@/types/persona';
 
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
@@ -168,6 +169,35 @@ This enhancedFetch function:
 
 ALWAYS use enhancedFetch for external API calls instead of regular fetch.
 
+ROBUST API RESPONSE HANDLING:
+When processing API responses, use this robust handling logic to accommodate different response structures:
+
+\`\`\`javascript
+// After fetching data from API
+const response = await enhancedFetch('api-url');
+const apiRawData = await response.json();
+
+// Robust handling for different API response formats
+let apiData;
+if (Array.isArray(apiRawData)) {
+  apiData = apiRawData;
+} else if (Array.isArray(apiRawData.data)) {
+  apiData = apiRawData.data;
+} else if (Array.isArray(apiRawData.results)) {
+  apiData = apiRawData.results;
+} else if (Array.isArray(apiRawData.items)) {
+  apiData = apiRawData.items;
+} else if (apiRawData.response && Array.isArray(apiRawData.response.data)) {
+  apiData = apiRawData.response.data;
+} else {
+  throw new Error('Unexpected API response format: no usable array found.');
+}
+
+// Now use apiData which is guaranteed to be an array
+\`\`\`
+
+This ensures your code works with various API response formats without breaking.
+
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 DESCRIPTION: I created a beautiful weather dashboard that fetches real-time weather data using the OpenWeather API. The app features a gradient background, animated weather icons, and displays current conditions with a 5-day forecast. I added smooth hover effects and loading animations for a great user experience.
 
@@ -201,3 +231,4 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
 
 REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
+
