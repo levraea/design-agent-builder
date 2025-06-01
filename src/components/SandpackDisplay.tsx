@@ -53,8 +53,7 @@ export const SandpackDisplay = ({ code, isGenerating }: SandpackDisplayProps) =>
           showInlineErrors: true,
           wrapContent: true,
           autorun: true,
-          editorWidthPercentage: 50,
-          layout: 'default'
+          editorWidthPercentage: 50
         }}
         theme="light"
         customSetup={{
