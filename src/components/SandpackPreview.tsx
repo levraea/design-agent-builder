@@ -38,8 +38,10 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
     );
   }
 
-  // Add enhancedFetch function for API calls
-  const enhancedFetchCode = `
+  // Prepare the code for Sandpack with proper function definition
+  const finalCode = `
+import React, { useState, useEffect } from 'react';
+
 // Enhanced fetch function for API calls
 const enhancedFetch = async (url, options = {}) => {
   try {
@@ -61,13 +63,6 @@ const enhancedFetch = async (url, options = {}) => {
     throw error;
   }
 };
-`;
-
-  // Prepare the code for Sandpack with enhancedFetch function
-  const finalCode = `
-import React, { useState, useEffect } from 'react';
-
-${enhancedFetchCode}
 
 ${code}
 
