@@ -38,7 +38,9 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
     );
   }
 
-  console.log('Raw AI-generated code:', code);
+  console.log('=== RAW AI-GENERATED CODE (before wrapping) ===');
+  console.log(code);
+  console.log('=== END RAW CODE ===');
 
   // Prepare the code for Sandpack with imports and utilities
   const finalCode = `
@@ -94,7 +96,9 @@ ${code}
 export default GeneratedApp;
 `;
 
-  console.log('Final code being sent to Sandpack:', finalCode);
+  console.log('=== FINAL CODE BEING SENT TO SANDPACK ===');
+  console.log(finalCode);
+  console.log('=== END FINAL CODE ===');
 
   return (
     <div className="h-full">
