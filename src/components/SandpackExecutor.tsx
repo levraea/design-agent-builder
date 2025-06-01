@@ -32,12 +32,17 @@ export const SandpackExecutor = ({ code, previewOnly = false }: SandpackExecutor
         options={{
           showNavigator: false,
           showTabs: false,
-          showLineNumbers: !previewOnly,
-          showInlineErrors: !previewOnly,
+          showLineNumbers: false,
+          showInlineErrors: false,
           wrapContent: true,
           editorHeight: previewOnly ? 0 : 400,
           autorun: true,
           editorWidthPercentage: previewOnly ? 0 : 50,
+          showConsole: false,
+          showConsoleButton: false,
+          ...(previewOnly && {
+            layout: 'preview',
+          }),
         }}
         theme="light"
         customSetup={{
