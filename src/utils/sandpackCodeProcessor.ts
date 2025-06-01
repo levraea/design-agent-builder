@@ -9,6 +9,10 @@ export const processCodeForSandpack = (code: string): string => {
   // Remove ``` at the end
   cleanedCode = cleanedCode.replace(/\n?```\s*$/i, '');
   
+  // Remove React imports since React is already imported in App.js
+  cleanedCode = cleanedCode.replace(/import\s+React[^;]*;?\s*\n?/gi, '');
+  cleanedCode = cleanedCode.replace(/import\s*\{[^}]*\}\s*from\s*['"]react['"];?\s*\n?/gi, '');
+  
   // Check if we have a valid GeneratedApp function
   const hasGeneratedApp = cleanedCode.includes('function GeneratedApp');
   
