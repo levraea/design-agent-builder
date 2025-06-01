@@ -1,4 +1,3 @@
-
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -33,6 +32,13 @@ export const SandpackExecutor = ({ code }: SandpackExecutorProps) => {
     </div>
   );
 }`;
+
+  // Process the code to fix template literal issues
+  const processedCode = cleanedCode
+    .replace(/`([^`]*\$\{[^}]*\}[^`]*)`/g, (match, content) => {
+      // Convert template literals to regular string concatenation for safer execution
+      return content.replace(/\$\{([^}]+)\}/g, '" + ($1) + "');
+    });
 
   // Create the App.js content for Sandpack
   const appContent = `import React, { useState, useEffect } from 'react';
@@ -122,7 +128,7 @@ const Title = ({ children, className = '', ...props }) => (
 );
 
 // Generated component
-${cleanedCode}
+${processedCode}
 
 export default function App() {
   return <GeneratedApp />;
