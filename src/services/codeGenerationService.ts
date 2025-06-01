@@ -141,6 +141,7 @@ ${personaContext}${conversationContext}${currentCodeContext}
 CRITICAL REQUIREMENTS:
 - Use React hooks (useState, useEffect) as needed
 - Use JSX syntax (NOT React.createElement calls)
+- Use modern ES6 imports for Recharts: import { BarChart, LineChart, XAxis, YAxis, etc. } from 'recharts'
 - Return your response in this EXACT format:
 
 DESCRIPTION: [Write a brief, conversational description of what you built, what features it includes, and any APIs you integrated. This should sound natural as if you're explaining to the user what you just created.]
@@ -151,6 +152,27 @@ CODE:
 - The component MUST be named "GeneratedApp"
 - Create visually impressive applications with rich interactions and beautiful designs
 - Use JSX syntax for all React elements
+- Use modern ES6 imports instead of global variables
+
+RECHARTS USAGE:
+Use proper ES6 imports for Recharts components:
+
+\`\`\`javascript
+// Recharts components are available via imports
+import { BarChart, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Bar, Line } from 'recharts';
+
+// Use them directly in JSX
+<ResponsiveContainer width="100%" height={300}>
+  <BarChart data={data}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="name" />
+    <YAxis />
+    <Tooltip />
+    <Legend />
+    <Bar dataKey="value" fill="#8884d8" />
+  </BarChart>
+</ResponsiveContainer>
+\`\`\`
 
 API CALLS - DIRECT FETCH ONLY:
 IMPORTANT: Use the enhancedFetch function for direct API calls only:
@@ -231,4 +253,3 @@ ${conversationContext ? 'Based on the conversation history above, ' : ''}User pr
 
 REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
-
