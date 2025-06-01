@@ -1,5 +1,6 @@
 
 import { Persona } from '@/types/persona';
+import { getAPIResponseInstructions } from '@/utils/promptAnalyzer';
 
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
   return `function GeneratedApp() {
@@ -133,6 +134,9 @@ DESIGN FOR THIS PERSONA:
 `;
   }
 
+  // Get API-specific response handling instructions
+  const apiResponseInstructions = getAPIResponseInstructions(selectedAPIs);
+
   return `You are a React component generator. Generate a complete React functional component using JSX syntax.
 
 ${personaContext}${conversationContext}${currentCodeContext}
@@ -167,6 +171,8 @@ This enhancedFetch function:
 - No proxy services are used
 
 ALWAYS use enhancedFetch for external API calls instead of regular fetch.
+
+${apiResponseInstructions}
 
 EXAMPLE FORMAT (FOLLOW THIS EXACT STRUCTURE):
 DESCRIPTION: I created a beautiful weather dashboard that fetches real-time weather data using the OpenWeather API. The app features a gradient background, animated weather icons, and displays current conditions with a 5-day forecast. I added smooth hover effects and loading animations for a great user experience.

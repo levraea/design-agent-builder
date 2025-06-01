@@ -109,3 +109,30 @@ export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): stri
 
   return relevantAPIs;
 };
+
+// Helper function to get API-specific response handling instructions
+export const getAPIResponseInstructions = (apiIds: string[]): string => {
+  let instructions = '';
+  
+  if (apiIds.includes('faostat-agriculture')) {
+    instructions += `
+
+IMPORTANT - FAOSTAT API Response Structure:
+The FAOSTAT Agriculture API returns data wrapped in a "data" container. Your code must handle this correctly:
+```javascript
+const response = await enhancedFetch('https://ft9rfwu9wi.execute-api.us-east-2.amazonaws.com/agriculture');
+const result = await response.json();
+const actualData = result.data; // The array is in result.data, not result directly
+```
+Always access the array using result.data, not result directly.`;
+  }
+
+  if (apiIds.includes('who-health') || apiIds.includes('gnr-nutrition')) {
+    instructions += `
+
+IMPORTANT - Health API Response Structure:
+WHO and GNR APIs also return data in a nested structure. Always check the response format and access the data array correctly.`;
+  }
+
+  return instructions;
+};
