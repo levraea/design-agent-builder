@@ -13,6 +13,9 @@ export const processCodeForSandpack = (code: string): string => {
   cleanedCode = cleanedCode.replace(/import\s+React[^;]*;?\s*\n?/gi, '');
   cleanedCode = cleanedCode.replace(/import\s*\{[^}]*\}\s*from\s*['"]react['"];?\s*\n?/gi, '');
   
+  // Remove default exports since we handle the export in sandpackFileGenerator
+  cleanedCode = cleanedCode.replace(/export\s+default\s+[^;]+;?\s*\n?/gi, '');
+  
   // Check if we have a valid GeneratedApp function
   const hasGeneratedApp = cleanedCode.includes('function GeneratedApp');
   
