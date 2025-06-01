@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { Loader2 } from 'lucide-react';
@@ -63,7 +62,6 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
           showTabs: false,
           showLineNumbers: false,
           showInlineErrors: true,
-          showErrorScreen: true,
           autorun: true,
           autoReload: true,
           recompileMode: 'delayed',
