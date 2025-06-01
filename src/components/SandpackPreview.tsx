@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { Loader2 } from 'lucide-react';
@@ -39,15 +38,12 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
     );
   }
 
-  // Convert the generated code to work with Sandpack
-  const sandpackCode = convertCodeForSandpack(code);
-
   return (
     <div className="h-full">
       <Sandpack
         template="react-ts"
         files={{
-          '/App.tsx': sandpackCode,
+          '/App.tsx': code,
         }}
         customSetup={{
           dependencies: {
@@ -67,132 +63,10 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
           autorun: true,
           autoReload: false,
           recompileMode: 'immediate',
-          bundlerURL: undefined // Let Sandpack use default bundler
+          bundlerURL: undefined
         }}
         theme="light"
       />
     </div>
   );
-};
-
-// Robust code conversion that properly handles all syntax
-const convertCodeForSandpack = (code: string): string => {
-  // Add necessary imports and mock components at the top
-  const imports = `import React, { useState, useEffect } from 'react';
-import { BarChart, LineChart, AreaChart, PieChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Bar, Line, Area, Pie, Cell } from 'recharts';
-
-// Mock UI components for Sandpack
-const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={\`bg-white rounded-lg border shadow-sm \${className}\`}>{children}</div>
-);
-
-const CardHeader = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={\`flex flex-col space-y-1.5 p-6 \${className}\`}>{children}</div>
-);
-
-const CardTitle = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <h3 className={\`text-2xl font-semibold leading-none tracking-tight \${className}\`}>{children}</h3>
-);
-
-const CardContent = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={\`p-6 pt-0 \${className}\`}>{children}</div>
-);
-
-const Button = ({ children, onClick, disabled = false, className = '' }: { 
-  children: React.ReactNode; 
-  onClick?: () => void; 
-  disabled?: boolean; 
-  className?: string; 
-}) => (
-  <button
-    onClick={onClick}
-    disabled={disabled}
-    className={\`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4 \${className}\`}
-  >
-    {children}
-  </button>
-);
-
-const Input = ({ placeholder, className = '', ...props }: { 
-  placeholder?: string; 
-  className?: string; 
-  [key: string]: any; 
-}) => (
-  <input
-    placeholder={placeholder}
-    className={\`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 \${className}\`}
-    {...props}
-  />
-);
-
-// Enhanced fetch function for API calls
-const enhancedFetch = async (url: string, options: any = {}) => {
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        ...options.headers
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(\`HTTP error! status: \${response.status}\`);
-    }
-    
-    return response;
-  } catch (error) {
-    console.error('Enhanced fetch error:', error);
-    throw error;
-  }
-};
-
-`;
-
-  try {
-    // Simply return the code as-is with imports, but wrapped properly
-    // Don't try to parse or modify the function body to avoid syntax issues
-    let cleanCode = code.trim();
-    
-    // If it starts with "function GeneratedApp", use it directly
-    if (cleanCode.startsWith('function GeneratedApp')) {
-      return `${imports}
-
-${cleanCode}
-
-export default GeneratedApp;`;
-    }
-    
-    // If it doesn't start with function, wrap it
-    return `${imports}
-
-function GeneratedApp() {
-${cleanCode}
-}
-
-export default GeneratedApp;`;
-    
-  } catch (error) {
-    console.error('Error converting code for Sandpack:', error);
-    // Fallback to a simple working component
-    return `${imports}
-
-function GeneratedApp() {
-  return (
-    <div className="p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      <Card className="max-w-2xl mx-auto shadow-xl">
-        <CardHeader>
-          <CardTitle>Code Processing Error</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>There was an issue processing the generated code. Please try regenerating.</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-export default GeneratedApp;`;
-  }
 };
