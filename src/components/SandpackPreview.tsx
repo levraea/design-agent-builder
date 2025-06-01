@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { Loader2 } from 'lucide-react';
@@ -74,7 +75,7 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
   );
 };
 
-// Improved code conversion that handles template literals properly
+// Robust code conversion that properly handles all syntax
 const convertCodeForSandpack = (code: string): string => {
   // Add necessary imports and mock components at the top
   const imports = `import React, { useState, useEffect } from 'react';
@@ -149,29 +150,49 @@ const enhancedFetch = async (url: string, options: any = {}) => {
 
 `;
 
-  // Clean up the function body more carefully
-  let functionBody = code.trim();
-  
-  // Remove the function declaration line
-  functionBody = functionBody.replace(/^function\s+GeneratedApp\s*\(\s*\)\s*\{/, '');
-  
-  // Remove the final closing brace - find the last occurrence
-  const lastBraceIndex = functionBody.lastIndexOf('}');
-  if (lastBraceIndex !== -1) {
-    functionBody = functionBody.substring(0, lastBraceIndex);
-  }
-  
-  // Clean up any remaining whitespace
-  functionBody = functionBody.trim();
+  try {
+    // Simply return the code as-is with imports, but wrapped properly
+    // Don't try to parse or modify the function body to avoid syntax issues
+    let cleanCode = code.trim();
+    
+    // If it starts with "function GeneratedApp", use it directly
+    if (cleanCode.startsWith('function GeneratedApp')) {
+      return `${imports}
 
-  // Create the complete component with proper indentation
-  const fullCode = `${imports}
+${cleanCode}
+
+export default GeneratedApp;`;
+    }
+    
+    // If it doesn't start with function, wrap it
+    return `${imports}
 
 function GeneratedApp() {
-${functionBody}
+${cleanCode}
 }
 
 export default GeneratedApp;`;
+    
+  } catch (error) {
+    console.error('Error converting code for Sandpack:', error);
+    // Fallback to a simple working component
+    return `${imports}
 
-  return fullCode;
+function GeneratedApp() {
+  return (
+    <div className="p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+      <Card className="max-w-2xl mx-auto shadow-xl">
+        <CardHeader>
+          <CardTitle>Code Processing Error</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>There was an issue processing the generated code. Please try regenerating.</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export default GeneratedApp;`;
+  }
 };
