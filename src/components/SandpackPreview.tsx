@@ -38,26 +38,9 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
     );
   }
 
-  // Clean the AI-generated code
   console.log('Raw AI-generated code:', code);
-  
-  // Remove code block markers and extract just the component code
-  let cleanCode = code;
-  
-  // Remove ```javascript and ``` markers if present
-  cleanCode = cleanCode.replace(/```javascript\s*/g, '');
-  cleanCode = cleanCode.replace(/```\s*/g, '');
-  
-  // Remove any import statements since we'll handle them ourselves
-  cleanCode = cleanCode.replace(/import.*from.*['"].*['"];?\s*/g, '');
-  
-  // Extract just the GeneratedApp function
-  const functionMatch = cleanCode.match(/function GeneratedApp\(\)\s*{[\s\S]*}/);
-  if (functionMatch) {
-    cleanCode = functionMatch[0];
-  }
 
-  // Prepare the code for Sandpack
+  // Prepare the code for Sandpack with imports and utilities
   const finalCode = `
 import React, { useState, useEffect } from 'react';
 import { 
@@ -106,16 +89,7 @@ window.enhancedFetch = async function(url, options) {
 // Make enhancedFetch available globally
 const enhancedFetch = window.enhancedFetch;
 
-try {
-  console.log('About to execute AI-generated code');
-  
-${cleanCode}
-
-  console.log('AI-generated code executed successfully');
-} catch (error) {
-  console.error('Error in AI-generated code:', error);
-  throw error;
-}
+${code}
 
 export default GeneratedApp;
 `;
