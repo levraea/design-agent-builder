@@ -80,6 +80,8 @@ CRITICAL SANDPACK COMPATIBILITY REQUIREMENTS:
 - Use React hooks (useState, useEffect) as needed
 - Use JSX syntax (NOT React.createElement calls)
 - Use modern ES6 imports for Recharts: import { BarChart, LineChart, XAxis, YAxis, etc. } from 'recharts'
+- CRITICAL: Avoid template literals (backticks) - use string concatenation with + operator instead
+- Example: Use 'https://api.example.com/data?param=' + value instead of \`https://api.example.com/data?param=\${value}\`
 
 AVAILABLE COMPONENTS (use these instead of external UI libraries):
 - Standard HTML elements: div, button, input, select, option, form, etc.
@@ -125,7 +127,9 @@ IMPORTANT: Use the enhancedFetch function for direct API calls only:
 
 \`\`\`javascript
 // Use enhancedFetch for direct API calls - it makes direct requests to APIs
-const response = await enhancedFetch('https://api.example.com/endpoint');
+// AVOID template literals - use string concatenation instead
+const apiUrl = 'https://api.example.com/endpoint?param=' + encodeURIComponent(value);
+const response = await enhancedFetch(apiUrl);
 const data = await response.json();
 \`\`\`
 
@@ -136,6 +140,7 @@ This enhancedFetch function:
 - No proxy services are used
 
 ALWAYS use enhancedFetch for external API calls instead of regular fetch.
+CRITICAL: Use string concatenation with + operator instead of template literals for URLs.
 
 ROBUST API RESPONSE HANDLING:
 When processing API responses, use this robust handling logic to accommodate different response structures:
@@ -197,5 +202,5 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls. NO EXTERNAL UI LIBRARIES - use only HTML elements with Tailwind CSS.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls. NO EXTERNAL UI LIBRARIES - use only HTML elements with Tailwind CSS. CRITICAL: Use string concatenation instead of template literals for better Sandpack compatibility.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
