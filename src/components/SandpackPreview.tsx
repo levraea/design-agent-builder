@@ -74,9 +74,9 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
   );
 };
 
-// Convert the generated code to work with Sandpack's ES module environment
+// Simplified conversion - Sandpack handles most of the heavy lifting
 const convertCodeForSandpack = (code: string): string => {
-  // Add necessary imports at the top
+  // Add necessary imports and mock components at the top
   const imports = `import React, { useState, useEffect } from 'react';
 import { BarChart, LineChart, AreaChart, PieChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Bar, Line, Area, Pie, Cell } from 'recharts';
 
@@ -140,17 +140,8 @@ const enhancedFetch = async (url, options = {}) => {
 
 `;
 
-  // Clean and fix the code to prevent syntax errors
+  // Simple extraction of the component body - Sandpack handles JSX parsing
   let cleanCode = code.replace(/^function GeneratedApp\(\)\s*\{/, '').replace(/\}$/, '');
-  
-  // Fix template literal issues by properly escaping backticks and ensuring they're closed
-  cleanCode = cleanCode.replace(/`([^`]*?)$/gm, (match, content) => {
-    // If we find an unclosed template literal, close it properly
-    return '`' + content + '`';
-  });
-  
-  // Remove any problematic global references
-  cleanCode = cleanCode.replace(/window\.\w+/g, '');
   
   // Add the component export
   const fullCode = `${imports}
