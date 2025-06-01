@@ -44,7 +44,6 @@ export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
         template="react"
         files={files}
         options={{
-          layout: 'preview',
           showNavigator: false,
           showTabs: false,
           showLineNumbers: false,
@@ -52,8 +51,9 @@ export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
           showConsole: false,
           showConsoleButton: false,
           autorun: true,
-          editorHeight: 0,
-          editorWidthPercentage: 0,
+          wrapContent: true,
+          resizablePanels: false,
+          layout: 'preview'
         }}
         theme="light"
         customSetup={{
