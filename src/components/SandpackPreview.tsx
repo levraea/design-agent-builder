@@ -61,9 +61,10 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
           showLineNumbers: false,
           showInlineErrors: true,
           autorun: true,
-          autoReload: false,
-          recompileMode: 'immediate',
-          bundlerURL: undefined
+          autoReload: true,
+          recompileMode: 'delayed',
+          recompileDelay: 500,
+          bundlerURL: 'https://sandpack-bundler.codesandbox.io'
         }}
         theme="light"
       />
