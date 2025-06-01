@@ -27,6 +27,13 @@ export const generateMockUIComponents = (): string => {
                 ...props 
               }, children);
             
+            // Add standalone Title component (alias for CardTitle)
+            window.Title = ({ children, className = '', ...props }) => 
+              React.createElement('h3', { 
+                className: \`text-2xl font-semibold leading-none tracking-tight \${className}\`,
+                ...props 
+              }, children);
+            
             window.CardContent = ({ children, className = '', ...props }) => 
               React.createElement('div', { 
                 className: \`p-6 pt-0 \${className}\`,
@@ -72,6 +79,36 @@ export const generateMockUIComponents = (): string => {
               
               return React.createElement('div', {
                 className: \`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 \${variants[variant]} \${className}\`,
+                ...props
+              }, children);
+            };
+
+            // Add other common title/heading components
+            window.Heading = ({ children, level = 1, className = '', ...props }) => {
+              const levels = {
+                1: 'text-4xl font-bold',
+                2: 'text-3xl font-bold', 
+                3: 'text-2xl font-bold',
+                4: 'text-xl font-bold',
+                5: 'text-lg font-bold',
+                6: 'text-base font-bold'
+              };
+              const tag = \`h\${level}\`;
+              return React.createElement(tag, {
+                className: \`\${levels[level]} \${className}\`,
+                ...props
+              }, children);
+            };
+
+            window.Text = ({ children, className = '', variant = 'default', ...props }) => {
+              const variants = {
+                default: 'text-base',
+                large: 'text-lg',
+                small: 'text-sm',
+                muted: 'text-sm text-muted-foreground'
+              };
+              return React.createElement('p', {
+                className: \`\${variants[variant]} \${className}\`,
                 ...props
               }, children);
             };
