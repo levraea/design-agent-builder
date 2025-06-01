@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { Loader2 } from 'lucide-react';
@@ -73,7 +74,7 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
   );
 };
 
-// Minimal conversion - let Sandpack handle the heavy lifting
+// Improved code conversion that handles template literals properly
 const convertCodeForSandpack = (code: string): string => {
   // Add necessary imports and mock components at the top
   const imports = `import React, { useState, useEffect } from 'react';
@@ -148,17 +149,22 @@ const enhancedFetch = async (url: string, options: any = {}) => {
 
 `;
 
-  // Just extract the function body and wrap it properly
-  // Remove the function declaration and closing brace, keeping the body intact
-  let functionBody = code;
+  // Clean up the function body more carefully
+  let functionBody = code.trim();
   
-  // Remove function declaration
+  // Remove the function declaration line
   functionBody = functionBody.replace(/^function\s+GeneratedApp\s*\(\s*\)\s*\{/, '');
   
-  // Remove the last closing brace
-  functionBody = functionBody.replace(/\}$/, '');
+  // Remove the final closing brace - find the last occurrence
+  const lastBraceIndex = functionBody.lastIndexOf('}');
+  if (lastBraceIndex !== -1) {
+    functionBody = functionBody.substring(0, lastBraceIndex);
+  }
+  
+  // Clean up any remaining whitespace
+  functionBody = functionBody.trim();
 
-  // Create the complete component
+  // Create the complete component with proper indentation
   const fullCode = `${imports}
 
 function GeneratedApp() {
