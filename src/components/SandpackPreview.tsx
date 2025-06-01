@@ -60,6 +60,22 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
   // Prepare the code for Sandpack
   const finalCode = `
 import React, { useState, useEffect } from 'react';
+import { 
+  ResponsiveContainer, 
+  LineChart, 
+  BarChart, 
+  PieChart, 
+  AreaChart,
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  Line, 
+  Bar, 
+  Area,
+  Cell 
+} from 'recharts';
 
 // Enhanced fetch function for API calls with better error handling
 window.enhancedFetch = async function(url, options) {
