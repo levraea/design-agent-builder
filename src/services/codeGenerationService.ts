@@ -1,5 +1,3 @@
-
-
 import { Persona } from '@/types/persona';
 
 export const generateSampleCode = (prompt: string, apis: string[], components: string[], errorMessage?: string) => {
@@ -134,16 +132,26 @@ DESIGN FOR THIS PERSONA:
 `;
   }
 
-  return `You are a React component generator. Generate a complete React functional component using JSX syntax.
+  return `You are a React component generator. Generate a complete React functional component using JSX syntax that works directly with Sandpack (CodeSandbox) environment.
 
 ${personaContext}${conversationContext}${currentCodeContext}
 
-CRITICAL REQUIREMENTS:
+CRITICAL SANDPACK COMPATIBILITY REQUIREMENTS:
+- Use ONLY standard React and available libraries (recharts, lucide-react)
+- DO NOT use any UI libraries like @material-tailwind/react, @radix-ui, shadcn/ui, or Material-UI
+- Use ONLY basic HTML elements (div, button, input, select, etc.) with Tailwind CSS classes
 - Use React hooks (useState, useEffect) as needed
 - Use JSX syntax (NOT React.createElement calls)
 - Use modern ES6 imports for Recharts: import { BarChart, LineChart, XAxis, YAxis, etc. } from 'recharts'
-- Return your response in this EXACT format:
 
+AVAILABLE COMPONENTS (use these instead of external UI libraries):
+- Standard HTML elements: div, button, input, select, option, form, etc.
+- Style with Tailwind CSS classes
+- For cards: use <div className="bg-white rounded-lg shadow-lg p-6">
+- For buttons: use <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+- For inputs: use <input className="w-full p-2 border rounded">
+
+RETURN FORMAT:
 DESCRIPTION: [Write a brief, conversational description of what you built, what features it includes, and any APIs you integrated. This should sound natural as if you're explaining to the user what you just created.]
 
 CODE:
@@ -153,6 +161,7 @@ CODE:
 - Create visually impressive applications with rich interactions and beautiful designs
 - Use JSX syntax for all React elements
 - Use modern ES6 imports instead of global variables
+- NO external UI component libraries - use only HTML elements with Tailwind
 
 RECHARTS USAGE:
 Use proper ES6 imports for Recharts components:
@@ -229,27 +238,27 @@ function GeneratedApp() {
   
   return (
     <div className="p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      <Card className="max-w-2xl mx-auto shadow-xl">
-        <CardHeader className="text-center bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-t-lg">
-          <CardTitle className="text-2xl font-bold">My Beautiful App</CardTitle>
-        </CardHeader>
-        <CardContent className="p-8 space-y-6">
+      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white p-6 text-center">
+          <h1 className="text-2xl font-bold">My Beautiful App</h1>
+        </div>
+        <div className="p-8 space-y-6">
           <div className="text-center">
             <p className="text-xl font-semibold text-gray-700 mb-4">Count: {count}</p>
-            <Button 
+            <button 
               onClick={() => setCount(count + 1)}
               className="bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white px-8 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
             >
               Increment
-            </Button>
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls. NO EXTERNAL UI LIBRARIES - use only HTML elements with Tailwind CSS.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
