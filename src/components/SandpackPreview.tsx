@@ -100,12 +100,16 @@ export default GeneratedApp;
   console.log(finalCode);
   console.log('=== END FINAL CODE ===');
 
+  // Generate a unique key based on code to force remount when code changes
+  const sandpackKey = `sandpack-${Date.now()}-${code.slice(0, 50).replace(/\s+/g, '')}`;
+
   return (
     <div className="h-full">
       <Sandpack
-        template="react"
+        key={sandpackKey}
+        template="react-ts"
         files={{
-          '/App.js': finalCode,
+          '/App.tsx': finalCode,
         }}
         customSetup={{
           dependencies: {
@@ -119,8 +123,8 @@ export default GeneratedApp;
           showInlineErrors: true,
           autorun: true,
           autoReload: true,
-          recompileMode: 'delayed',
-          recompileDelay: 500,
+          recompileMode: 'immediate',
+          recompileDelay: 100,
           bundlerURL: 'https://sandpack-bundler.codesandbox.io'
         }}
         theme="light"
