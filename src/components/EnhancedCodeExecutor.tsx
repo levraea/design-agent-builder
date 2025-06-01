@@ -40,7 +40,7 @@ export const EnhancedCodeExecutor = ({
   if (showPreviewOnly) {
     return (
       <div className="w-full h-full">
-        <SandpackExecutor code={currentCode} />
+        <SandpackExecutor code={currentCode} previewOnly={true} />
       </div>
     );
   }
@@ -60,7 +60,7 @@ export const EnhancedCodeExecutor = ({
 
       {/* Sandpack Code Execution */}
       <div className="flex-1 overflow-hidden">
-        <SandpackExecutor code={currentCode} />
+        <SandpackExecutor code={currentCode} previewOnly={false} />
       </div>
     </div>
   );

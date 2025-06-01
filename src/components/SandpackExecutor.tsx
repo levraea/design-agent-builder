@@ -6,9 +6,10 @@ import { generateSandpackFiles } from '@/utils/sandpackFileGenerator';
 
 interface SandpackExecutorProps {
   code: string;
+  previewOnly?: boolean;
 }
 
-export const SandpackExecutor = ({ code }: SandpackExecutorProps) => {
+export const SandpackExecutor = ({ code, previewOnly = false }: SandpackExecutorProps) => {
   if (!code.trim()) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
@@ -31,11 +32,12 @@ export const SandpackExecutor = ({ code }: SandpackExecutorProps) => {
         options={{
           showNavigator: false,
           showTabs: false,
-          showLineNumbers: true,
-          showInlineErrors: true,
+          showLineNumbers: !previewOnly,
+          showInlineErrors: !previewOnly,
           wrapContent: true,
-          editorHeight: 400,
+          editorHeight: previewOnly ? 0 : 400,
           autorun: true,
+          editorWidthPercentage: previewOnly ? 0 : 50,
         }}
         theme="light"
         customSetup={{
