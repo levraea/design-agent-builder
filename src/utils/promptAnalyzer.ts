@@ -1,4 +1,3 @@
-
 import { API } from '@/types/api';
 
 export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): string[] => {
@@ -119,11 +118,11 @@ export const getAPIResponseInstructions = (apiIds: string[]): string => {
 
 IMPORTANT - FAOSTAT API Response Structure:
 The FAOSTAT Agriculture API returns data wrapped in a "data" container. Your code must handle this correctly:
-```javascript
+\`\`\`javascript
 const response = await enhancedFetch('https://ft9rfwu9wi.execute-api.us-east-2.amazonaws.com/agriculture');
 const result = await response.json();
 const actualData = result.data; // The array is in result.data, not result directly
-```
+\`\`\`
 Always access the array using result.data, not result directly.`;
   }
 
