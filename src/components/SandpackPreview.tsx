@@ -32,7 +32,7 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
           </div>
           <h3 className="text-lg font-medium mb-2">Sandpack Live Preview</h3>
           <p>Your generated application will appear here</p>
-          <p className="text-sm mt-2">Now with reliable dependency loading</p>
+          <p className="text-sm mt-2">Now with improved stability</p>
         </div>
       </div>
     );
@@ -64,9 +64,9 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
           showLineNumbers: false,
           showInlineErrors: true,
           autorun: true,
-          autoReload: true,
-          recompileMode: 'delayed',
-          recompileDelay: 500
+          autoReload: false,
+          recompileMode: 'immediate',
+          bundlerURL: undefined // Let Sandpack use default bundler
         }}
         theme="light"
       />
