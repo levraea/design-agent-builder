@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Code } from 'lucide-react';
 import { useCodeGeneration } from '@/hooks/useCodeGeneration';
 import { DesignControlPanel } from '@/components/DesignControlPanel';
-import { SandpackDisplay } from '@/components/SandpackDisplay';
+import { PreviewPanel } from '@/components/PreviewPanel';
 import { Persona } from '@/types/persona';
 
 interface DesignToCodeProps {
@@ -50,14 +50,12 @@ const DesignToCode = ({ onModuleComplete }: DesignToCodeProps) => {
             />
           </div>
 
-          {/* Right Panel - Sandpack Code & Preview (2/3 width) */}
+          {/* Right Panel - Live Preview and Generated Code (2/3 width) */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-lg h-full overflow-hidden">
-              <SandpackDisplay
-                code={generatedCode}
-                isGenerating={isGenerating}
-              />
-            </div>
+            <PreviewPanel
+              generatedCode={generatedCode}
+              isGenerating={isGenerating}
+            />
           </div>
         </div>
       </div>

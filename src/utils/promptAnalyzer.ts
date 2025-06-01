@@ -40,37 +40,26 @@ export const analyzePromptForAPIs = (prompt: string, availableAPIs: API[]): stri
     if (cryptoAPI) relevantAPIs.push(cryptoAPI.id);
   }
 
-  // Agriculture-related keywords (now includes FAOSTAT)
-  const agricultureKeywords = ['agriculture', 'farming', 'crop', 'harvest', 'food', 'agricultural', 'farm', 'faostat', 'production', 'trade'];
+  // Agriculture-related keywords
+  const agricultureKeywords = ['agriculture', 'farming', 'crop', 'harvest', 'food', 'agricultural', 'farm'];
   if (agricultureKeywords.some(keyword => lowerPrompt.includes(keyword))) {
     const worldBankAgriAPI = availableAPIs.find(api => api.id === 'world-bank-agriculture');
     const faoAPI = availableAPIs.find(api => api.id === 'fao-agricultural-data');
     const dataGovAgriAPI = availableAPIs.find(api => api.id === 'data-gov-agriculture');
-    const faostatAPI = availableAPIs.find(api => api.id === 'faostat-agriculture');
     
     if (worldBankAgriAPI) relevantAPIs.push(worldBankAgriAPI.id);
     if (faoAPI) relevantAPIs.push(faoAPI.id);
     if (dataGovAgriAPI) relevantAPIs.push(dataGovAgriAPI.id);
-    if (faostatAPI) relevantAPIs.push(faostatAPI.id);
   }
 
-  // Health/Food Safety-related keywords (now includes WHO)
-  const healthKeywords = ['health', 'safety', 'recall', 'cdc', 'public health', 'disease', 'outbreak', 'who', 'world health', 'mortality', 'morbidity'];
+  // Health/Food Safety-related keywords
+  const healthKeywords = ['health', 'safety', 'recall', 'cdc', 'public health', 'disease', 'outbreak'];
   if (healthKeywords.some(keyword => lowerPrompt.includes(keyword))) {
     const cdcAPI = availableAPIs.find(api => api.id === 'cdc-health-data');
     const fdaFoodAPI = availableAPIs.find(api => api.id === 'fda-food');
-    const whoAPI = availableAPIs.find(api => api.id === 'who-health');
     
     if (cdcAPI) relevantAPIs.push(cdcAPI.id);
     if (fdaFoodAPI) relevantAPIs.push(fdaFoodAPI.id);
-    if (whoAPI) relevantAPIs.push(whoAPI.id);
-  }
-
-  // Nutrition-related keywords
-  const nutritionKeywords = ['nutrition', 'malnutrition', 'child nutrition', 'stunting', 'wasting', 'underweight', 'children'];
-  if (nutritionKeywords.some(keyword => lowerPrompt.includes(keyword))) {
-    const gnrAPI = availableAPIs.find(api => api.id === 'gnr-nutrition');
-    if (gnrAPI) relevantAPIs.push(gnrAPI.id);
   }
 
   // Biological/Genomic research keywords (EBI Search API, LAPIS, Ensembl, UCSC)

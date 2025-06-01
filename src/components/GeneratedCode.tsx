@@ -31,9 +31,8 @@ export const GeneratedCode = ({ code }: GeneratedCodeProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <h3 className="text-lg font-semibold text-gray-900">Generated Code</h3>
+    <div className="h-full flex flex-col">
+      <div className="flex items-center justify-end p-4 border-b">
         <div className="flex space-x-2">
           <Button
             variant="outline"
@@ -66,7 +65,7 @@ export const GeneratedCode = ({ code }: GeneratedCodeProps) => {
             </div>
           </ScrollArea>
         ) : (
-          <div className="h-full flex items-center justify-center text-gray-500">
+          <div className="h-full flex items-center justify-center text-gray-500 bg-gray-50">
             <div className="text-center">
               <Code className="w-12 h-12 mx-auto mb-3 text-gray-400" />
               <p>Generated code will appear here</p>
