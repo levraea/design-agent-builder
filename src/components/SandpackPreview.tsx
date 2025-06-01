@@ -106,7 +106,8 @@ export default GeneratedApp;
         customSetup={{
           dependencies: {
             'recharts': '^2.12.7',
-            'lucide-react': '^0.462.0'
+            'lucide-react': '^0.462.0',
+            'lodash': '^4.17.21'
           }
         }}
         options={{
