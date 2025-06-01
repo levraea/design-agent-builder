@@ -20,11 +20,12 @@ AVAILABLE COMPONENTS (use these instead of external UI libraries):
 
 export const RECHARTS_USAGE = `
 RECHARTS USAGE:
-Use proper ES6 imports for Recharts components:
+Recharts components are already imported and available for use:
 
 \`\`\`javascript
-// Recharts components are available via imports
-import { BarChart, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Bar, Line } from 'recharts';
+// These are already imported for you:
+// ResponsiveContainer, LineChart, BarChart, PieChart, AreaChart
+// XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, Bar, Area, Cell
 
 // Use them directly in JSX
 <ResponsiveContainer width="100%" height={300}>
@@ -76,15 +77,18 @@ function GeneratedApp() {
 `;
 
 export const RETURN_FORMAT_INSTRUCTIONS = `
-RETURN FORMAT:
-DESCRIPTION: [Write a brief, conversational description of what you built, what features it includes, and any APIs you integrated. This should sound natural as if you're explaining to the user what you just created.]
+CRITICAL RETURN FORMAT - FOLLOW EXACTLY:
+DESCRIPTION: [Write a brief, conversational description of what you built]
 
 CODE:
-[Insert the complete GeneratedApp function here using JSX]
+[Insert ONLY the GeneratedApp function here - NO IMPORTS, NO MARKDOWN BLOCKS, NO EXPORT STATEMENTS]
 
+REQUIREMENTS:
 - The component MUST be named "GeneratedApp"
-- Create visually impressive applications with rich interactions and beautiful designs
-- Use JSX syntax for all React elements
-- Use modern ES6 imports instead of global variables
-- NO external UI component libraries - use only HTML elements with Tailwind
+- DO NOT include any import statements (they are already provided)
+- DO NOT include markdown code blocks (\`\`\`javascript or \`\`\`)
+- DO NOT include export statements
+- Return ONLY the function definition starting with "function GeneratedApp()"
+- React, useState, useEffect, and all Recharts components are already imported
+- enhancedFetch is already available as a global function
 `;
