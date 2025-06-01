@@ -80,8 +80,24 @@ CRITICAL SANDPACK COMPATIBILITY REQUIREMENTS:
 - Use React hooks (useState, useEffect) as needed
 - Use JSX syntax (NOT React.createElement calls)
 - Use modern ES6 imports for Recharts: import { BarChart, LineChart, XAxis, YAxis, etc. } from 'recharts'
-- CRITICAL: Avoid template literals (backticks) - use string concatenation with + operator instead
-- Example: Use 'https://api.example.com/data?param=' + value instead of \`https://api.example.com/data?param=\${value}\`
+
+CRITICAL SYNTAX RULES - FOLLOW THESE EXACTLY:
+1. NEVER use template literals (backticks \`). ALWAYS use string concatenation with + operator
+2. NEVER use arrow functions in object methods - use regular function syntax
+3. ALWAYS use double quotes for strings, not single quotes when possible
+4. ALWAYS end statements with semicolons
+5. NEVER use optional chaining (?.) - use explicit checks instead
+6. AVOID destructuring in function parameters - use explicit property access
+
+EXAMPLES OF CORRECT SYNTAX:
+✅ const url = "https://api.example.com/data?param=" + encodeURIComponent(value);
+❌ const url = \`https://api.example.com/data?param=\${value}\`;
+
+✅ const handleClick = function() { console.log("clicked"); };
+❌ const handleClick = () => { console.log("clicked"); };
+
+✅ if (data && data.results) { ... }
+❌ if (data?.results) { ... }
 
 AVAILABLE COMPONENTS (use these instead of external UI libraries):
 - Standard HTML elements: div, button, input, select, option, form, etc.
@@ -127,8 +143,8 @@ IMPORTANT: Use the enhancedFetch function for direct API calls only:
 
 \`\`\`javascript
 // Use enhancedFetch for direct API calls - it makes direct requests to APIs
-// AVOID template literals - use string concatenation instead
-const apiUrl = 'https://api.example.com/endpoint?param=' + encodeURIComponent(value);
+// CRITICAL: Use string concatenation with + operator, NOT template literals
+const apiUrl = "https://api.example.com/endpoint?param=" + encodeURIComponent(value);
 const response = await enhancedFetch(apiUrl);
 const data = await response.json();
 \`\`\`
@@ -147,7 +163,7 @@ When processing API responses, use this robust handling logic to accommodate dif
 
 \`\`\`javascript
 // After fetching data from API
-const response = await enhancedFetch('api-url');
+const response = await enhancedFetch("api-url");
 const apiRawData = await response.json();
 
 // Robust handling for different API response formats
@@ -163,7 +179,7 @@ if (Array.isArray(apiRawData)) {
 } else if (apiRawData.response && Array.isArray(apiRawData.response.data)) {
   apiData = apiRawData.response.data;
 } else {
-  throw new Error('Unexpected API response format: no usable array found.');
+  throw new Error("Unexpected API response format: no usable array found.");
 }
 
 // Now use apiData which is guaranteed to be an array
@@ -178,6 +194,10 @@ CODE:
 function GeneratedApp() {
   const [count, setCount] = useState(0);
   
+  const handleIncrement = function() {
+    setCount(count + 1);
+  };
+  
   return (
     <div className="p-8 min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
@@ -188,7 +208,7 @@ function GeneratedApp() {
           <div className="text-center">
             <p className="text-xl font-semibold text-gray-700 mb-4">Count: {count}</p>
             <button 
-              onClick={() => setCount(count + 1)}
+              onClick={handleIncrement}
               className="bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white px-8 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-200"
             >
               Increment
@@ -202,5 +222,5 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls. NO EXTERNAL UI LIBRARIES - use only HTML elements with Tailwind CSS. CRITICAL: Use string concatenation instead of template literals for better Sandpack compatibility.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls. NO EXTERNAL UI LIBRARIES - use only HTML elements with Tailwind CSS. CRITICAL: Use string concatenation instead of template literals for better Sandpack compatibility. Follow all CRITICAL SYNTAX RULES above.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
