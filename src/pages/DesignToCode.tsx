@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Code } from 'lucide-react';
 import { useCodeGeneration } from '@/hooks/useCodeGeneration';
 import { DesignControlPanel } from '@/components/DesignControlPanel';
-import { PreviewPanel } from '@/components/PreviewPanel';
 import { Persona } from '@/types/persona';
 
 interface DesignToCodeProps {
@@ -50,12 +49,11 @@ const DesignToCode = ({ onModuleComplete }: DesignToCodeProps) => {
             />
           </div>
 
-          {/* Right Panel - Live Preview and Generated Code (2/3 width) */}
+          {/* Right Panel - Blank (2/3 width) */}
           <div className="lg:col-span-2">
-            <PreviewPanel
-              generatedCode={generatedCode}
-              isGenerating={isGenerating}
-            />
+            <div className="bg-white rounded-lg shadow-lg h-full">
+              {/* Completely blank */}
+            </div>
           </div>
         </div>
       </div>
