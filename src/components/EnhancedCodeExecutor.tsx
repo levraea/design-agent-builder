@@ -3,16 +3,17 @@ import React, { useState, useEffect } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 import { SandpackExecutor } from './SandpackExecutor';
-import { LiveUpdateManager } from './LiveUpdateManager';
 
 interface EnhancedCodeExecutorProps {
   code: string;
   enableLiveUpdates?: boolean;
+  showPreviewOnly?: boolean;
 }
 
 export const EnhancedCodeExecutor = ({ 
   code, 
-  enableLiveUpdates = true 
+  enableLiveUpdates = true,
+  showPreviewOnly = false
 }: EnhancedCodeExecutorProps) => {
   const [currentCode, setCurrentCode] = useState(code);
   const [error, setError] = useState<string | null>(null);
@@ -22,11 +23,6 @@ export const EnhancedCodeExecutor = ({
     setCurrentCode(code);
     setError(null); // Clear any previous errors
   }, [code]);
-
-  const handleCodeChange = (newCode: string) => {
-    setCurrentCode(newCode);
-    setError(null);
-  };
 
   if (!currentCode.trim()) {
     return (
@@ -40,6 +36,16 @@ export const EnhancedCodeExecutor = ({
     );
   }
 
+  // If showPreviewOnly is true, only show the Sandpack preview
+  if (showPreviewOnly) {
+    return (
+      <div className="w-full h-full">
+        <SandpackExecutor code={currentCode} />
+      </div>
+    );
+  }
+
+  // Original behavior for cases where we want the full interface
   return (
     <div className="w-full h-full flex flex-col">
       {/* Error Display */}
@@ -50,14 +56,6 @@ export const EnhancedCodeExecutor = ({
             <strong>Execution Error:</strong> {error}
           </AlertDescription>
         </Alert>
-      )}
-
-      {/* Live Update Manager */}
-      {enableLiveUpdates && (
-        <LiveUpdateManager
-          code={currentCode}
-          onCodeChange={handleCodeChange}
-        />
       )}
 
       {/* Sandpack Code Execution */}

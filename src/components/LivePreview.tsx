@@ -23,7 +23,7 @@ export const LivePreview = ({ code, isGenerating }: LivePreviewProps) => {
           </div>
         ) : code ? (
           <div className="h-full">
-            <EnhancedCodeExecutor code={code} enableLiveUpdates={true} />
+            <EnhancedCodeExecutor code={code} showPreviewOnly={true} />
           </div>
         ) : (
           <div className="h-full flex items-center justify-center text-gray-500">
