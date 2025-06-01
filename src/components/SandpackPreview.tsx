@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { Loader2 } from 'lucide-react';
@@ -139,10 +140,16 @@ const enhancedFetch = async (url, options = {}) => {
 
 `;
 
-  // Remove the function declaration wrapper and extract just the component body
+  // Clean and fix the code to prevent syntax errors
   let cleanCode = code.replace(/^function GeneratedApp\(\)\s*\{/, '').replace(/\}$/, '');
   
-  // Replace any global component references that might not work in Sandpack
+  // Fix template literal issues by properly escaping backticks and ensuring they're closed
+  cleanCode = cleanCode.replace(/`([^`]*?)$/gm, (match, content) => {
+    // If we find an unclosed template literal, close it properly
+    return '`' + content + '`';
+  });
+  
+  // Remove any problematic global references
   cleanCode = cleanCode.replace(/window\.\w+/g, '');
   
   // Add the component export
