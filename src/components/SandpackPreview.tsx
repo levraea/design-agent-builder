@@ -38,12 +38,19 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
     );
   }
 
-  // Prepare the code for Sandpack with proper function definition
+  // Enhanced error handling and debugging
+  console.log('Raw AI-generated code:', code);
+
+  // Prepare the code for Sandpack with better error handling
   const finalCode = `
 import React, { useState, useEffect } from 'react';
 
-// Enhanced fetch function for API calls
-const enhancedFetch = async (url, options = {}) => {
+// Enhanced fetch function for API calls with better error handling
+window.enhancedFetch = async function(url, options) {
+  console.log('enhancedFetch called with:', url);
+  if (!options) {
+    options = {};
+  }
   try {
     const response = await fetch(url, {
       ...options,
@@ -64,10 +71,24 @@ const enhancedFetch = async (url, options = {}) => {
   }
 };
 
+// Make enhancedFetch available globally
+const enhancedFetch = window.enhancedFetch;
+
+try {
+  console.log('About to execute AI-generated code');
+  
 ${code}
+
+  console.log('AI-generated code executed successfully');
+} catch (error) {
+  console.error('Error in AI-generated code:', error);
+  throw error;
+}
 
 export default GeneratedApp;
 `;
+
+  console.log('Final code being sent to Sandpack:', finalCode);
 
   return (
     <div className="h-full">
