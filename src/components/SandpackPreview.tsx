@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Sandpack } from '@codesandbox/sandpack-react';
 import { Loader2 } from 'lucide-react';
@@ -74,30 +73,35 @@ export const SandpackPreview = ({ code, isGenerating }: SandpackPreviewProps) =>
   );
 };
 
-// Simplified conversion - Sandpack handles most of the heavy lifting
+// Minimal conversion - let Sandpack handle the heavy lifting
 const convertCodeForSandpack = (code: string): string => {
   // Add necessary imports and mock components at the top
   const imports = `import React, { useState, useEffect } from 'react';
 import { BarChart, LineChart, AreaChart, PieChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Bar, Line, Area, Pie, Cell } from 'recharts';
 
 // Mock UI components for Sandpack
-const Card = ({ children, className = '' }) => (
+const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
   <div className={\`bg-white rounded-lg border shadow-sm \${className}\`}>{children}</div>
 );
 
-const CardHeader = ({ children, className = '' }) => (
+const CardHeader = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
   <div className={\`flex flex-col space-y-1.5 p-6 \${className}\`}>{children}</div>
 );
 
-const CardTitle = ({ children, className = '' }) => (
+const CardTitle = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
   <h3 className={\`text-2xl font-semibold leading-none tracking-tight \${className}\`}>{children}</h3>
 );
 
-const CardContent = ({ children, className = '' }) => (
+const CardContent = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
   <div className={\`p-6 pt-0 \${className}\`}>{children}</div>
 );
 
-const Button = ({ children, onClick, disabled = false, className = '' }) => (
+const Button = ({ children, onClick, disabled = false, className = '' }: { 
+  children: React.ReactNode; 
+  onClick?: () => void; 
+  disabled?: boolean; 
+  className?: string; 
+}) => (
   <button
     onClick={onClick}
     disabled={disabled}
@@ -107,7 +111,11 @@ const Button = ({ children, onClick, disabled = false, className = '' }) => (
   </button>
 );
 
-const Input = ({ placeholder, className = '', ...props }) => (
+const Input = ({ placeholder, className = '', ...props }: { 
+  placeholder?: string; 
+  className?: string; 
+  [key: string]: any; 
+}) => (
   <input
     placeholder={placeholder}
     className={\`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 \${className}\`}
@@ -116,7 +124,7 @@ const Input = ({ placeholder, className = '', ...props }) => (
 );
 
 // Enhanced fetch function for API calls
-const enhancedFetch = async (url, options = {}) => {
+const enhancedFetch = async (url: string, options: any = {}) => {
   try {
     const response = await fetch(url, {
       ...options,
@@ -140,14 +148,21 @@ const enhancedFetch = async (url, options = {}) => {
 
 `;
 
-  // Simple extraction of the component body - Sandpack handles JSX parsing
-  let cleanCode = code.replace(/^function GeneratedApp\(\)\s*\{/, '').replace(/\}$/, '');
+  // Just extract the function body and wrap it properly
+  // Remove the function declaration and closing brace, keeping the body intact
+  let functionBody = code;
   
-  // Add the component export
+  // Remove function declaration
+  functionBody = functionBody.replace(/^function\s+GeneratedApp\s*\(\s*\)\s*\{/, '');
+  
+  // Remove the last closing brace
+  functionBody = functionBody.replace(/\}$/, '');
+
+  // Create the complete component
   const fullCode = `${imports}
 
 function GeneratedApp() {
-${cleanCode}
+${functionBody}
 }
 
 export default GeneratedApp;`;
