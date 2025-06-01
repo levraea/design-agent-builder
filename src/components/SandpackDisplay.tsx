@@ -59,7 +59,8 @@ export const SandpackDisplay = ({ code, isGenerating }: SandpackDisplayProps) =>
         customSetup={{
           dependencies: {
             "react": "^18.0.0",
-            "react-dom": "^18.0.0"
+            "react-dom": "^18.0.0",
+            "recharts": "^2.12.7"
           }
         }}
       />
