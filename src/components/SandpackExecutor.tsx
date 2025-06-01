@@ -6,10 +6,10 @@ import { generateSandpackFiles } from '@/utils/sandpackFileGenerator';
 
 interface SandpackExecutorProps {
   code: string;
-  previewOnly?: boolean;
+  mode: 'preview' | 'editor';
 }
 
-export const SandpackExecutor = ({ code, previewOnly = false }: SandpackExecutorProps) => {
+export const SandpackExecutor = ({ code, mode }: SandpackExecutorProps) => {
   if (!code.trim()) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
@@ -24,25 +24,50 @@ export const SandpackExecutor = ({ code, previewOnly = false }: SandpackExecutor
 
   const files = generateSandpackFiles(code);
 
+  if (mode === 'preview') {
+    return (
+      <div className="h-full w-full">
+        <Sandpack
+          template="react"
+          files={files}
+          options={{
+            layout: 'preview',
+            showNavigator: false,
+            showTabs: false,
+            showLineNumbers: false,
+            showInlineErrors: false,
+            showConsole: false,
+            showConsoleButton: false,
+            autorun: true,
+          }}
+          theme="light"
+          customSetup={{
+            dependencies: {
+              "react": "^18.0.0",
+              "react-dom": "^18.0.0"
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full">
+    <div className="h-full w-full">
       <Sandpack
         template="react"
         files={files}
         options={{
           showNavigator: false,
-          showTabs: false,
-          showLineNumbers: false,
-          showInlineErrors: false,
+          showTabs: true,
+          showLineNumbers: true,
+          showInlineErrors: true,
           wrapContent: true,
-          editorHeight: previewOnly ? 0 : 400,
+          editorHeight: 400,
           autorun: true,
-          editorWidthPercentage: previewOnly ? 0 : 50,
+          editorWidthPercentage: 60,
           showConsole: false,
           showConsoleButton: false,
-          ...(previewOnly && {
-            layout: 'preview',
-          }),
         }}
         theme="light"
         customSetup={{
