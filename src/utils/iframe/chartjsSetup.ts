@@ -4,26 +4,39 @@ export const generateChartJSSetup = (): string => {
             // Make Chart.js available globally and register necessary components
             if (typeof Chart !== 'undefined') {
               // Register Chart.js components including ArcElement for pie charts
+              const {
+                CategoryScale,
+                LinearScale,
+                PointElement,
+                LineElement,
+                BarElement,
+                ArcElement,
+                Title,
+                Tooltip,
+                Legend,
+                Filler
+              } = Chart;
+              
               Chart.register(
-                Chart.CategoryScale,
-                Chart.LinearScale,
-                Chart.PointElement,
-                Chart.LineElement,
-                Chart.BarElement,
-                Chart.ArcElement,
-                Chart.Title,
-                Chart.Tooltip,
-                Chart.Legend,
-                Chart.Filler
+                CategoryScale,
+                LinearScale,
+                PointElement,
+                LineElement,
+                BarElement,
+                ArcElement,
+                Title,
+                Tooltip,
+                Legend,
+                Filler
               );
               
               window.ChartJS = Chart;
-              window.CategoryScale = Chart.CategoryScale;
-              window.LinearScale = Chart.LinearScale;
-              window.PointElement = Chart.PointElement;
-              window.LineElement = Chart.LineElement;
-              window.BarElement = Chart.BarElement;
-              window.ArcElement = Chart.ArcElement;
+              window.CategoryScale = CategoryScale;
+              window.LinearScale = LinearScale;
+              window.PointElement = PointElement;
+              window.LineElement = LineElement;
+              window.BarElement = BarElement;
+              window.ArcElement = ArcElement;
               
               console.log('Chart.js loaded and components registered including ArcElement');
             } else {
