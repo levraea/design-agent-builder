@@ -5,6 +5,32 @@ export const generateRechartsLoader = (): string => {
           console.log('🔄 Loading Recharts for React charts...');
           
           try {
+            // Ensure React and PropTypes are available first
+            if (typeof React === 'undefined') {
+              throw new Error('React is not available globally');
+            }
+            
+            // Add PropTypes to window if not available (Recharts needs it)
+            if (typeof window.PropTypes === 'undefined') {
+              console.log('📦 Loading PropTypes for Recharts compatibility...');
+              const propTypesResponse = await fetch('https://unpkg.com/prop-types@15.8.1/prop-types.min.js');
+              if (!propTypesResponse.ok) {
+                throw new Error('Failed to load PropTypes');
+              }
+              const propTypesScript = await propTypesResponse.text();
+              const script = document.createElement('script');
+              script.textContent = propTypesScript;
+              document.head.appendChild(script);
+              
+              // Wait for PropTypes to be available
+              await new Promise(resolve => setTimeout(resolve, 100));
+              
+              if (typeof PropTypes !== 'undefined') {
+                window.PropTypes = PropTypes;
+                console.log('✅ PropTypes loaded successfully');
+              }
+            }
+            
             console.log('📦 Attempting to load Recharts UMD...');
             
             // Load Recharts from UMD build
@@ -23,7 +49,7 @@ export const generateRechartsLoader = (): string => {
             document.head.appendChild(script);
             
             // Wait longer for script execution and check multiple possible locations
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             console.log('🔍 Checking Recharts availability...');
             console.log('window.Recharts:', typeof window.Recharts);
@@ -105,6 +131,7 @@ export const generateRechartsLoader = (): string => {
           } catch (error) {
             console.error('❌ Recharts loading failed:', error.message);
             console.error('Full error:', error);
+            console.error('Error stack:', error.stack);
             return false;
           }
         }`;
