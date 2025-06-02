@@ -1,4 +1,5 @@
 
+
 export const generateRechartsLoader = (): string => {
   return `
         async function loadRecharts() {
@@ -89,6 +90,7 @@ export const generateRechartsLoader = (): string => {
               window.Line = recharts.Line;
               window.Area = recharts.Area;
               window.Bar = recharts.Bar;
+              window.Pie = recharts.Pie;
               window.Scatter = recharts.Scatter;
               window.Radar = recharts.Radar;
               window.Cell = recharts.Cell;
@@ -118,7 +120,7 @@ export const generateRechartsLoader = (): string => {
               console.log('✅ All Recharts components are now available globally');
               
               // Verify components are actually functions
-              const testComponents = ['LineChart', 'BarChart', 'ResponsiveContainer'];
+              const testComponents = ['LineChart', 'BarChart', 'PieChart', 'Pie', 'ResponsiveContainer'];
               for (const comp of testComponents) {
                 console.log(\`\${comp} type:\`, typeof window[comp]);
               }
@@ -157,6 +159,7 @@ export const generateRechartsFallbacks = (): string => {
             window.Line = () => null;
             window.Area = () => null;
             window.Bar = () => null;
+            window.Pie = () => null;
             window.XAxis = () => null;
             window.YAxis = () => null;
             window.CartesianGrid = () => null;
@@ -170,3 +173,4 @@ export const generateRechartsFallbacks = (): string => {
                 style: { width: width || '100%', height: height || '100%' }
               }, children);`;
 };
+
