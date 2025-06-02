@@ -22,19 +22,35 @@ export const generateRechartsLoader = (): string => {
             script.textContent = scriptText;
             document.head.appendChild(script);
             
-            // Wait for script execution
-            await new Promise(resolve => setTimeout(resolve, 300));
+            // Wait longer for script execution and check multiple possible locations
+            await new Promise(resolve => setTimeout(resolve, 500));
             
             console.log('🔍 Checking Recharts availability...');
             console.log('window.Recharts:', typeof window.Recharts);
+            console.log('window.recharts:', typeof window.recharts);
+            console.log('Available window properties:', Object.keys(window).filter(key => key.toLowerCase().includes('recharts')));
+            
+            // Try different possible locations for Recharts
+            let recharts = null;
             
             if (window.Recharts && typeof window.Recharts === 'object') {
-              console.log('✅ Recharts loaded successfully');
+              recharts = window.Recharts;
+              console.log('✅ Found Recharts at window.Recharts');
+            } else if (window.recharts && typeof window.recharts === 'object') {
+              recharts = window.recharts;
+              console.log('✅ Found Recharts at window.recharts');
+            } else {
+              // Check if components are directly available on window
+              if (window.LineChart || window.BarChart) {
+                console.log('✅ Found Recharts components directly on window');
+                return true; // Components already available
+              }
+            }
+            
+            if (recharts) {
+              console.log('📊 Available Recharts components:', Object.keys(recharts));
               
               // Make all Recharts components available globally
-              const recharts = window.Recharts;
-              
-              // Chart components
               window.LineChart = recharts.LineChart;
               window.AreaChart = recharts.AreaChart;
               window.BarChart = recharts.BarChart;
@@ -74,6 +90,13 @@ export const generateRechartsLoader = (): string => {
               window.ReferenceDot = recharts.ReferenceDot;
               
               console.log('✅ All Recharts components are now available globally');
+              
+              // Verify components are actually functions
+              const testComponents = ['LineChart', 'BarChart', 'ResponsiveContainer'];
+              for (const comp of testComponents) {
+                console.log(\`\${comp} type:\`, typeof window[comp]);
+              }
+              
               return true;
             }
             
@@ -81,6 +104,7 @@ export const generateRechartsLoader = (): string => {
             
           } catch (error) {
             console.error('❌ Recharts loading failed:', error.message);
+            console.error('Full error:', error);
             return false;
           }
         }`;
