@@ -4,6 +4,12 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             // Process the code
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
             
+            // Remove Chart.js registerables references that cause errors
+            processedCode = processedCode.replace(/Chart\\.register\\([^)]*registerables[^)]*\\);?/g, '');
+            processedCode = processedCode.replace(/registerables/g, '');
+            processedCode = processedCode.replace(/from\\s+['"]chart\\.js\\/auto['"];?/g, '');
+            processedCode = processedCode.replace(/import\\s+.*?registerables.*?from\\s+['"]chart\\.js.*?['"];?\\s*/g, '');
+            
             // Remove import/export statements and replace with global references
             processedCode = processedCode.replace(/import\\s+.*?from\\s+['"]@material-tailwind\\/react['"];?\\s*/g, '');
             processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]@material-tailwind\\/react['"];?\\s*/g, (match, imports) => {
