@@ -152,6 +152,31 @@ CODE:
 - Create visually impressive applications with rich interactions and beautiful designs
 - Use JSX syntax for all React elements
 
+CHARTING - USE RECHARTS ONLY:
+For any charts or data visualizations, use ONLY Recharts components. Do NOT use Chart.js or any other charting library.
+
+Available Recharts components:
+- LineChart, AreaChart, BarChart, PieChart, ScatterChart, RadarChart
+- Line, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend
+- ResponsiveContainer (always wrap charts in this)
+- Cell (for PieChart segments with different colors)
+
+Example Recharts usage:
+\`\`\`jsx
+<ResponsiveContainer width="100%" height={400}>
+  <LineChart data={chartData}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="name" />
+    <YAxis />
+    <Tooltip />
+    <Legend />
+    <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} />
+  </LineChart>
+</ResponsiveContainer>
+\`\`\`
+
+IMPORTANT: Never use Chart.js, registerables, or any non-Recharts charting code.
+
 API CALLS - DIRECT FETCH ONLY:
 IMPORTANT: Use the enhancedFetch function for direct API calls only:
 
@@ -229,6 +254,5 @@ function GeneratedApp() {
 
 ${conversationContext ? 'Based on the conversation history above, ' : ''}User prompt: ${augmentedPrompt}
 
-REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
+REMEMBER: Return ONLY in the DESCRIPTION/CODE format shown above. The description should be conversational and explain what you built. USE JSX SYNTAX, NOT React.createElement(). ALWAYS use enhancedFetch for external API calls. For charts, use ONLY Recharts components - no Chart.js.${persona ? ` Make sure the design is tailored for ${persona.name}'s needs and preferences.` : ''}`;
 };
-

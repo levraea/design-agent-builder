@@ -14,13 +14,16 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             processedCode = processedCode.replace(/export\\s+default\\s+GeneratedApp/g, '// GeneratedApp exported');
             processedCode = processedCode.replace(/export\\s+\\{[^}]*\\}/g, '// exports removed');
 
-            console.log('Processing code with minimal transformations...');
-            console.log('Available components:', {
+            console.log('Processing code - Recharts only approach...');
+            console.log('Available chart components:', {
+              LineChart: typeof window.LineChart,
+              BarChart: typeof window.BarChart,
+              PieChart: typeof window.PieChart,
+              ResponsiveContainer: typeof window.ResponsiveContainer
+            });
+            console.log('Available UI components:', {
               Card: typeof window.Card,
-              Button: typeof window.Button,
-              MaterialCard: typeof window.MaterialCard,
-              MaterialButton: typeof window.MaterialButton,
-              ArcElement: typeof window.ArcElement
+              Button: typeof window.Button
             });
             
             // Transpile JSX to JavaScript
