@@ -1,32 +1,10 @@
 
 export const generateCodeProcessor = (cleanCode: string): string => {
   return `
-            // Process the code
+            // Process the code with minimal transformations
             let processedCode = \`${cleanCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`;
             
-            // Remove Chart.js registerables references that cause errors
-            processedCode = processedCode.replace(/Chart\\.register\\([^)]*registerables[^)]*\\);?/g, '');
-            processedCode = processedCode.replace(/registerables/g, '');
-            processedCode = processedCode.replace(/from\\s+['"]chart\\.js\\/auto['"];?/g, '');
-            processedCode = processedCode.replace(/import\\s+.*?registerables.*?from\\s+['"]chart\\.js.*?['"];?\\s*/g, '');
-            
-            // Remove import/export statements and replace with global references
-            processedCode = processedCode.replace(/import\\s+.*?from\\s+['"]@material-tailwind\\/react['"];?\\s*/g, '');
-            processedCode = processedCode.replace(/import\\s+\\{([^}]*)\\}\\s+from\\s+['"]@material-tailwind\\/react['"];?\\s*/g, (match, imports) => {
-              // Map Material Tailwind imports to global references
-              const importList = imports.split(',').map(imp => imp.trim());
-              let replacements = '';
-              importList.forEach(imp => {
-                if (imp === 'Card') replacements += 'const Card = window.MaterialCard;\\n';
-                else if (imp === 'CardHeader') replacements += 'const CardHeader = window.MaterialCardHeader;\\n';
-                else if (imp === 'CardBody') replacements += 'const CardBody = window.MaterialCardBody;\\n';
-                else if (imp === 'Button') replacements += 'const Button = window.MaterialButton;\\n';
-                else if (imp === 'Typography') replacements += 'const Typography = window.MaterialTypography;\\n';
-              });
-              return replacements;
-            });
-            
-            // Remove other import/export statements
+            // Only remove import/export statements - leave all other code intact
             processedCode = processedCode.replace(/import\\s+.*?from\\s+['"][^'"]+['"];?\\s*/g, '');
             processedCode = processedCode.replace(/import\\s+['"][^'"]+['"];?\\s*/g, '');
             processedCode = processedCode.replace(/import\\s*\\{[^}]*\\}\\s*from\\s+['"][^'"]+['"];?\\s*/g, '');
@@ -36,7 +14,7 @@ export const generateCodeProcessor = (cleanCode: string): string => {
             processedCode = processedCode.replace(/export\\s+default\\s+GeneratedApp/g, '// GeneratedApp exported');
             processedCode = processedCode.replace(/export\\s+\\{[^}]*\\}/g, '// exports removed');
 
-            console.log('Processing code...');
+            console.log('Processing code with minimal transformations...');
             console.log('Available components:', {
               Card: typeof window.Card,
               Button: typeof window.Button,
